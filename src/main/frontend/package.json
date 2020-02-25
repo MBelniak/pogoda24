@@ -1,0 +1,35 @@
+{
+  "name": "pogoda24-react",
+  "version": "0.1.0",
+  "description": "React app for pogoda24/7 website",
+  "dependencies": {
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2",
+    "rest": "^1.3.1",
+    "react-scripts": "2.1.8",
+    "babel-loader": "8.0.5",
+    "webpack": "4.28.3"
+  },
+  "scripts": {
+    "watch": "webpack --watch -d",
+    "build.windows": "react-scripts build && rd /s /q \"../resources/build\" && move \"build\" \"../resources/\"",
+    "build.linux": "react-scripts build && rm -rf \"../resources/build\" && mv \"build\" \"../resources/\"",
+    "build.mac": "react-scripts build && rm -rf \"../resources/build\" && mv \"build\" \"../resources/\""
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-react": "^7.0.0",
+    "webpack": "^4.19.1",
+    "webpack-cli": "^3.1.0"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
