@@ -12,9 +12,9 @@
   },
   "scripts": {
     "watch": "webpack --watch -d",
-    "build.windows": "react-scripts build && rd /s /q \"../resources/build\" && move \"build\" \"../resources/\"",
-    "build.linux": "react-scripts build && rm -rf \"../resources/build\" && mv \"build\" \"../resources/\"",
-    "build.mac": "react-scripts build && rm -rf \"../resources/build\" && mv \"build\" \"../resources/\""
+    "build.windows": "react-scripts build && rd /s /q \"../webapp/resources/build\" && move \"build\" \"../webapp/resources/\"",
+    "build.linux": "react-scripts build && rm -rf \"../webapp/resources/build\" && mv \"build\" \"../webapp/resources/\"",
+    "build.mac": "react-scripts build && rm -rf \"../webapp/resources/build\" && mv \"build\" \"../webapp/resources/\""
   },
   "eslintConfig": {
     "extends": "react-app"
