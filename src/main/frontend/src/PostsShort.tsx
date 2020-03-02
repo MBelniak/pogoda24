@@ -1,11 +1,10 @@
 import React from "react";
 import LoadingIndicator from "./LoadingIndicator";
-import {lightblue} from "color-name";
-import ForecastImage from "./ForecastImage";
+import ForecastMapList from "./ForecastMapList";
 
 interface State {
-    loading?: boolean;
-    posts?: ShortPost[];
+    loading: boolean;
+    posts: ShortPost[] | null;
 }
 
 export default class PostsShort extends React.Component<{}, State> {
@@ -20,7 +19,7 @@ export default class PostsShort extends React.Component<{}, State> {
 
     async componentDidMount() {
         try {
-            let response = await fetch("api/posts");
+            let response = await fetch("api/posts?page=0&count=10");
             let data = await response.json();
             this.setState({ loading: false, posts: data });
         } catch (error) {
@@ -29,23 +28,30 @@ export default class PostsShort extends React.Component<{}, State> {
     }
 
     renderPosts() {
-        const posts: ShortPost[] = this.state.posts;
-        return posts.map(post => (
-            <div className="post">
-                <div className="postdate ">
-                    {post.postDate}
-                </div>
-                <div className="bold">
-                    <div className="center">
-                        {post.shortDesc}
-                        <!--TODO implement Router-->
-                        <a href={'/api/posts/' + post.id} style={{color: lightblue}}>+ Czytaj dalej</a>
-                        <br />
-                        {post.imagesIds.map(imageId => (<ForecastImage id={imageId} />))}
+        const posts = this.state.posts;
+        if (posts != null) {
+            return posts.map(post => (
+                <div className="post">
+                    <div className="postdate ">
+                        {post.postDate}
+                    </div>
+                    <div className="bold">
+                        <div className="center">
+                            {post.shortDesc}
+                            {/*--TODO implement Router */}
+                            <a href={'/api/posts/' + post.id} style={{color: "#66AAFF"}}>+ Czytaj dalej</a>
+                            <br/>
+                            <ForecastMapList id={post.id}/>))}
+                        </div>
                     </div>
                 </div>
-            </div>
-        ))
+            ))
+        }
+        else
+            return(
+                <div className="post">
+                </div>
+            )
     }
 
     render() {
@@ -73,14 +79,12 @@ class ShortPost {
     id: number;
     postDate: Date;
     shortDesc: string;
-    imagesIds: number[];
     longDescId: number;
 
     constructor(id, postDate, shortDesc, imagesIds, longDescId) {
             this.id = id;
             this.postDate = postDate;
             this.shortDesc = shortDesc;
-            this.imagesIds = imagesIds;
             this.longDescId = longDescId;
     }
 }

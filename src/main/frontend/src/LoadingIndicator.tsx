@@ -8,8 +8,8 @@ export default class LoadingIndicator extends React.Component {
     render() {
         return (
             <div className="loadingIndicator">
-                <!-- TODO -->
-            </div>
+                {/* TODO */}
+                </div>
         )
     }
 }

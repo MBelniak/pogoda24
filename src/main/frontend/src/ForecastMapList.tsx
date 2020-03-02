@@ -2,26 +2,26 @@ import React from "react";
 
 interface State {
     loading: boolean;
-    imageURL: URL;
+    imageURL?: string;
 }
 
-export default class ForecastImage extends React.Component<{}, State> {
+export default class ForecastMapList extends React.Component<{id: number}, State> {
 
     constructor(props) {
         super(props);
     }
     state: State = {
       loading: true,
-      imageURL: null
+      imageURL: undefined
     };
 
     async componentDidMount() {
-        let url = 'api/images/' + this.imageId;
+        let url = 'api/images?postId=' + this.props.id;
         try {
             let response = await fetch(url);
-            this.setState({loading: false, imageURL: window.createObjectURL(response)})
+            this.setState({loading: false, imageURL: window.URL.createObjectURL(response)})
         } catch (error) {
-            this.setState({loading: false, imageURL: null});
+            this.setState({loading: false, imageURL: undefined});
             console.log("Cannot load image");
         }
     }
