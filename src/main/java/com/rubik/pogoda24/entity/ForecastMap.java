@@ -9,7 +9,7 @@ public class ForecastMap {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String imageURL;
+    private String imageUrl;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Post post;
@@ -22,12 +22,12 @@ public class ForecastMap {
         this.id = id;
     }
 
-    public String getImageURL() {
-        return imageURL;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImageURL(String imageURL) {
-        this.imageURL = imageURL;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Post getPost() {

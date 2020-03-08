@@ -7,10 +7,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.util.List;
@@ -25,7 +25,7 @@ public class ForecastMapsController {
         this.forecastMapsService = forecastMapsService;
     }
 
-    @GetMapping(value = "/images/urls", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/images/urls")
     public @ResponseBody
     List<String> getImagesURLsByPost(@RequestParam(value = "postId", required = false) Long postId) {
         if (postId != null) {
@@ -35,7 +35,7 @@ public class ForecastMapsController {
     }
 
     @GetMapping("/images/{url}")
-    public ResponseEntity<?> getRawImage(@PathParam("url") String url) {
+    public ResponseEntity<?> getRawImage(@PathVariable("url") String url) {
         try {
             Resource resource = forecastMapsService.getRawImage(url);
             return ResponseEntity.ok()

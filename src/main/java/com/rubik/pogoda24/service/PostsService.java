@@ -20,7 +20,7 @@ public class PostsService {
     }
 
     public Page<Post> getOrderedByDate(int page, int count) {
-        Pageable pageable = PageRequest.of(page, count, Sort.by("timestamp").descending());
+        Pageable pageable = PageRequest.of(page, count, Sort.by("postDate").descending());
         return postsRepository.findAll(pageable);
     }
 }

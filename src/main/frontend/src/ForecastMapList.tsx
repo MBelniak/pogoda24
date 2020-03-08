@@ -2,7 +2,7 @@ import React from "react";
 
 interface State {
     loading: boolean;
-    imageURL?: string;
+    imagesURLs: string[];
 }
 
 export default class ForecastMapList extends React.Component<{id: number}, State> {
@@ -12,19 +12,30 @@ export default class ForecastMapList extends React.Component<{id: number}, State
     }
     state: State = {
       loading: true,
-      imageURL: undefined
+      imagesURLs: []
     };
 
     async componentDidMount() {
-        let url = 'api/images?postId=' + this.props.id;
+        let url = 'api/images/urls?postId=' + this.props.id;
         try {
             let response = await fetch(url);
-            this.setState({loading: false, imageURL: window.URL.createObjectURL(response)})
+            let data = await response.json();
+            this.setState({loading: false, imagesURLs: data})
         } catch (error) {
-            this.setState({loading: false, imageURL: undefined});
+            this.setState({loading: false, imagesURLs: []});
             console.log("Cannot load image");
         }
     }
+
+    renderMaps() {
+        return this.state.imagesURLs.map(imageURL => (
+            <a href={imageURL}>
+                <img className="pimg" src={'api/images/' + imageURL} width='49%'/>
+            </a>
+        ))
+    }
+
+
 
     render() {
         if (this.state.loading === true) {
@@ -34,17 +45,17 @@ export default class ForecastMapList extends React.Component<{id: number}, State
                 </div>
             )
         }
-        if (this.state.imageURL == null) {
+        if (this.state.imagesURLs == null) {
             return (
                 <div>
-                    Cannot load image.
+                    Cannot load images.
                 </div>
             )
         }
         return (
-            <a href={this.state.imageURL}>
-                <img className="pimg" src={this.state.imageURL} width='49%'/>
-            </a>
+            <div>
+                {this.renderMaps()}
+            </div>
         )
     }
 }

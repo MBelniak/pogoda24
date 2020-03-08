@@ -1,10 +1,10 @@
 package com.rubik.pogoda24.service;
 
+import com.rubik.pogoda24.config.ApiConfig;
 import com.rubik.pogoda24.entity.ForecastMap;
 import com.rubik.pogoda24.entity.ImageURLSOnly;
 import com.rubik.pogoda24.repository.ForecastMapsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -17,27 +17,28 @@ public class ForecastMapsService {
 
     private final ForecastMapsRepository forecastMapsRepository;
     private final ResourceLoader resourceLoader;
-
-    @Value("${images.rootDir}")
-    private static String IMAGES_ROOT_DIR;
+    private ApiConfig apiConfig;
 
     @Autowired
-    public ForecastMapsService(ForecastMapsRepository forecastMapsRepository, ResourceLoader resourceLoader) {
+    public ForecastMapsService(ForecastMapsRepository forecastMapsRepository, ResourceLoader resourceLoader,
+        ApiConfig apiConfig) {
         this.forecastMapsRepository = forecastMapsRepository;
         this.resourceLoader = resourceLoader;
+        this.apiConfig = apiConfig;
     }
 
     public Resource getRawImage(String url) {
-        return resourceLoader.getResource("file:"+IMAGES_ROOT_DIR+"/"+url);
+
+        return resourceLoader.getResource("file:"+apiConfig.getImagesDir()+"/"+url);
     }
 
     public List<String> getImagesURLs() {
         List<ForecastMap> forecastMapsURLs = forecastMapsRepository.findAll();
-        return forecastMapsURLs.stream().map(ForecastMap::getImageURL).collect(Collectors.toList());
+        return forecastMapsURLs.stream().map(ForecastMap::getImageUrl).collect(Collectors.toList());
     }
 
     public List<String> getImagesURLs(Long postId) {
         List<ImageURLSOnly> forecastMapsURLs = forecastMapsRepository.findAllByPostId(postId, ImageURLSOnly.class);
-        return forecastMapsURLs.stream().map(ImageURLSOnly::getImageURL).collect(Collectors.toList());
+        return forecastMapsURLs.stream().map(ImageURLSOnly::getImageUrl).collect(Collectors.toList());
     }
 }
