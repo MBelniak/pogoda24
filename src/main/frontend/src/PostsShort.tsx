@@ -4,7 +4,7 @@ import ForecastMapList from "./ForecastMapList";
 
 interface State {
     loading: boolean;
-    posts: ShortPost[] | null;
+    posts: ShortPost[];
 }
 
 export default class PostsShort extends React.Component<{}, State> {
@@ -14,7 +14,7 @@ export default class PostsShort extends React.Component<{}, State> {
 
     state: State = {
         loading: true,
-        posts: null
+        posts: []
     };
 
     async componentDidMount() {
@@ -23,53 +23,56 @@ export default class PostsShort extends React.Component<{}, State> {
             let data = await response.json();
             this.setState({ loading: false, posts: data });
         } catch (error) {
-            this.setState({ loading: false, posts: null })
+            this.setState({ loading: false, posts: [] })
         }
     }
 
-    renderPosts() {
-        const posts = this.state.posts;
-        if (posts != null) {
-            return posts.map(post => (
-                <div className="post">
-                    <div className="postdate ">
-                        {post.postDate}
-                    </div>
-                    <div className="bold">
-                        <div className="center">
-                            {post.shortDesc}
-                            {/*--TODO implement Router */}
-                            <a href={'/api/posts/' + post.id} style={{color: "#66AAFF"}}>+ Czytaj dalej</a>
-                            <br/>
-                            <ForecastMapList id={post.id}/>))}
-                        </div>
-                    </div>
-                </div>
-            ))
+    private processDescription(description: string) {
+        let result = description;
+        if (description.length > 170) {
+            let length = 170;
+            while (description.substr(length, 1) != ' ') {
+                --length;
+            }
+            result = description.substr(0, length) + '...';
         }
-        else
-            return(
-                <div className="post">
+
+        result.replace("\r\n", "<br/>");
+        return result;
+    }
+
+
+    renderPosts() {
+        return this.state.posts.map(post => (
+            <div className="post">
+                <div className="postdate ">
+                    {post.postDate}
                 </div>
-            )
+                <div className="bold center">
+                    {this.processDescription(post.description)}
+                    {/*--TODO implement Router */}
+                    <a href={'/api/posts/' + post.id} style={{color: "#66AAFF"}}>+ Czytaj dalej</a>
+                    <br/>
+                    <ForecastMapList id={post.id}/>
+                </div>
+            </div>
+        ))
     }
 
     render() {
         if (this.state.loading) {
             return <LoadingIndicator />
         }
-
-        if (this.state.posts == null) {
+        if (this.state.posts === null) {
             return (
                 <div className="postsShort">
                     No posts available
                 </div>
             )
         }
-
         return (
             <div className="postsShort">
-                {this.renderPosts}
+                {this.renderPosts()}
             </div>
         )
     }
@@ -78,13 +81,11 @@ export default class PostsShort extends React.Component<{}, State> {
 class ShortPost {
     id: number;
     postDate: Date;
-    shortDesc: string;
-    longDescId: number;
+    description: string;
 
-    constructor(id, postDate, shortDesc, imagesIds, longDescId) {
+    constructor(id, postDate, description) {
             this.id = id;
             this.postDate = postDate;
-            this.shortDesc = shortDesc;
-            this.longDescId = longDescId;
+            this.description = description;
     }
 }

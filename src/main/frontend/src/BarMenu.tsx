@@ -8,11 +8,7 @@ class BarMenu extends React.Component {
     render() {
         return (
             <div className="barMenu">
-                <ul className="barMenuUl">
-                    <li><a href="about.html">O Nas</a></li>
-                    <li><a href="ciekawostki.html">Ciekawostki</a></li>
-                    <li><a href="prognozy.html">Ostrzeżenia i Prognozy</a></li>
-                </ul>
+
             </div>
         )
     }
