@@ -1,6 +1,6 @@
 import React from "react";
 
-class Copyright extends React.Component {
+export class Copyright extends React.Component {
     constructor(props) {
         super(props)
     }
@@ -13,5 +13,3 @@ class Copyright extends React.Component {
         )
     }
 }
-
-export default Copyright

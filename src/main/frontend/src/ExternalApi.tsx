@@ -1,6 +1,6 @@
 import React from "react"
 
-class ExternalApi extends React.Component {
+export class ExternalApi extends React.Component {
     constructor(props) {
         super(props)
     }
@@ -20,5 +20,3 @@ class ExternalApi extends React.Component {
         )
     }
 }
-
-export default ExternalApi

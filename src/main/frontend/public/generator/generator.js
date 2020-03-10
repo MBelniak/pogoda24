@@ -53,6 +53,7 @@ window.nightIconNames = [
     "Księżyc",
     "Księżyc_Chmury",
     "Księżyc_Chmury_Deszcz",
+    "Księżyc_Dużo_Chmur",
     "Księżyc_Mało chmur",
     "Księżyc_Mało śnieg i deszcz",
     "Księżyc_Przelotny deszcz",

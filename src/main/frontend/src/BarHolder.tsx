@@ -1,6 +1,6 @@
 import React from "react";
 
-class BarHolder extends React.Component {
+export class BarHolder extends React.Component {
     constructor(props) {
         super(props)
     }
@@ -13,5 +13,3 @@ class BarHolder extends React.Component {
         )
     }
 }
-
-export default BarHolder

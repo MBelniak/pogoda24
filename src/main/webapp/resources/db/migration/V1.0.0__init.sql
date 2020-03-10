@@ -6,7 +6,7 @@ CREATE TABLE forecast_map (
 
 CREATE TABLE post (
   id          BIGINT PRIMARY KEY AUTO_INCREMENT,
-  post_date   DATE DEFAULT CURRENT_TIMESTAMP not null,
+  post_date   TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
   description nvarchar
 );
 

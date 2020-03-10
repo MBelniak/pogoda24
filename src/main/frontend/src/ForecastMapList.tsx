@@ -5,7 +5,7 @@ interface State {
     imagesURLs: string[];
 }
 
-export default class ForecastMapList extends React.Component<{id: number}, State> {
+export class ForecastMapList extends React.Component<{id: number}, State> {
 
     constructor(props) {
         super(props);
