@@ -1,6 +1,6 @@
 import React from "react";
 
-class BarTitle extends React.Component {
+export class BarTitle extends React.Component {
     constructor(props) {
         super(props)
     }
@@ -13,5 +13,3 @@ class BarTitle extends React.Component {
         )
     }
 }
-
-export default BarTitle

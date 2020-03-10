@@ -1,7 +1,7 @@
 package com.rubik.pogoda24.entity;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.sql.Timestamp;
 
 @Entity
 public class Post {
@@ -10,7 +10,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Date postDate;
+    private Timestamp postDate;
 
     private String description;
 
@@ -22,11 +22,11 @@ public class Post {
         this.id = id;
     }
 
-    public Date getPostDate() {
+    public Timestamp getPostDate() {
         return postDate;
     }
 
-    public void setPostDate(Date postDate) {
+    public void setPostDate(Timestamp postDate) {
         this.postDate = postDate;
     }
 

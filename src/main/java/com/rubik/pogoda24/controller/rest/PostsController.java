@@ -20,6 +20,7 @@ public class PostsController {
         this.postsService = postsService;
     }
 
+
     @GetMapping("/posts")
     public List<Post> getPosts(@RequestParam int page, @RequestParam int count) {
         Page<Post> posts = postsService.getOrderedByDate(page, count);

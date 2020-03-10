@@ -1,6 +1,6 @@
 import React from "react";
 
-class BarMenu extends React.Component {
+export class BarMenu extends React.Component {
     constructor(props) {
         super(props)
     }
@@ -13,5 +13,3 @@ class BarMenu extends React.Component {
         )
     }
 }
-
-export default BarMenu

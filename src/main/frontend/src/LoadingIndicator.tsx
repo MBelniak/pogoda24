@@ -1,6 +1,6 @@
 import React from "react"
 
-export default class LoadingIndicator extends React.Component {
+export class LoadingIndicator extends React.Component {
     constructor(props) {
         super(props)
     }
