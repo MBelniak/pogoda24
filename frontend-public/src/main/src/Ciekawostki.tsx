@@ -2,6 +2,7 @@ import React from "react";
 import { Copyright } from "./Copyright";
 import { TopBar } from "./TopBar";
 import { BarHolder } from "./BarHolder";
+import {Links} from "./Links";
 
 export class Ciekawostki extends React.Component{
 
@@ -13,7 +14,7 @@ export class Ciekawostki extends React.Component{
         return (
             <div className="mainFrame">
                 <BarHolder/>
-                <TopBar/>
+                <TopBar render={() => <Links/>}/>
                 <div className="mainContent">
                     <img src="img/bg.jpg" className="bgimg"/>
                     <Copyright/>

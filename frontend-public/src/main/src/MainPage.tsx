@@ -9,9 +9,10 @@ import {
     Route,
     Link
 } from "react-router-dom";
+import {Links} from "./Links";
 
 
-export class MainPage extends React.Component{
+export class MainPage extends React.Component {
 
     constructor(props) {
         super(props);
@@ -21,7 +22,7 @@ export class MainPage extends React.Component{
         return (
             <div className="mainFrame">
                 <BarHolder/>
-                <TopBar/>
+                <TopBar render={() => <Links/>}/>
                 <div className="mainContent">
                     <img src="img/bg.jpg" className="bgimg"/>
                     <ExternalApi/>

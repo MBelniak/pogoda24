@@ -1,14 +1,13 @@
 {
-  "short_name": "Pogoda24 App",
-  "name": "Pogoda24 App",
+  "short_name": "Pogoda24",
+  "name": "Pogoda24 App - Admin",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "img/favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     }
   ],
-  "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"

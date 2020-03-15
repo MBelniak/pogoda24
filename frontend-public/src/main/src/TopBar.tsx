@@ -1,7 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export class TopBar extends React.Component {
+interface TopBarProps {
+    render(): JSX.Element;
+}
+
+export class TopBar extends React.Component<TopBarProps, {}> {
     constructor(props) {
         super (props)
     }
@@ -15,11 +19,7 @@ export class TopBar extends React.Component {
                         E-Pogoda24
                     </Link>
 
-                    <ul>
-                        <li><Link to="/about">O Nas</Link></li>
-                        <li><Link to="/ciekawostki">Ciekawostki</Link></li>
-                        <li><Link to="/prognozy">Ostrzeżenia i Prognozy</Link></li>
-                    </ul>
+                    {this.props.render()}
                 </div>
             </div>
         )

@@ -4,6 +4,7 @@ import { BarHolder } from "./BarHolder";
 import { TopBar } from "./TopBar";
 import { PostsShort } from "./PostsShort";
 import { Copyright } from "./Copyright";
+import {Links} from "./Links";
 
 export class Prognozy extends React.Component {
 
@@ -18,7 +19,7 @@ export class Prognozy extends React.Component {
         return (
             <div className="mainFrame">
                 <BarHolder/>
-                <TopBar/>
+                <TopBar render={() => <Links/>}/>
                 <div className="mainContent">
                     <img src="img/bg.jpg" className="bgimg"/>
                     <PostsShort forecastCount={1}/>

@@ -1,0 +1,30 @@
+.ftext1
+{
+border: none;
+border-bottom: 1px solid gray;
+margin-bottom: 1px;
+background: lightgray;
+}
+.fbtn1
+{
+border: 1px solid gray;
+background: lightgray;
+font-weight: bold;
+color: black;
+}
+.fbtn1:hover
+{
+background: gray;
+}
+.panelIcon:hover
+{
+opacity: 0.8;
+}
+.ftext2
+{
+width: 100%;
+border: 1px solid gray;
+background: lightgray;
+color: black;
+resize: vertical;
+}
