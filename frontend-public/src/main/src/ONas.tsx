@@ -2,6 +2,7 @@ import React from "react";
 import { TopBar } from "./TopBar";
 import { BarHolder } from "./BarHolder";
 import { Copyright } from "./Copyright";
+import {Links} from "./Links";
 
 export class ONas extends React.Component {
     constructor(props) {
@@ -12,7 +13,7 @@ export class ONas extends React.Component {
         return (
             <div className="mainFrame">
                 <BarHolder/>
-                <TopBar/>
+                <TopBar render={() => <Links/>}/>
                 <div className="mainContent">
                     <img src="img/bg.jpg" className="bgimg"/>
                     <div className="post">

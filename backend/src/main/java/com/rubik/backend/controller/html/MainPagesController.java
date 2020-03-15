@@ -10,4 +10,9 @@ public class MainPagesController {
     public String getIndexPage() {
         return "index";
     }
+
+    @RequestMapping(value = "/write")
+    public String getWritePage() {
+        return "admin/index";
+    }
 }

@@ -4,7 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @Configuration
@@ -13,10 +14,10 @@ public class WebMvcConfigurerImpl implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("resources/admin/static/**").addResourceLocations("/resources/admin/static/");
-        registry.addResourceHandler("resources/admin/**").addResourceLocations("/resources/admin/");
-        registry.addResourceHandler("resources/static/**").addResourceLocations("/resources/static/");
-        registry.addResourceHandler("resources/**").addResourceLocations("/resources/public/");
+        registry.addResourceHandler("/static/admin/**").addResourceLocations("classpath:admin/static");
+        registry.addResourceHandler("/admin/**").addResourceLocations("classpath:admin/");
+        registry.addResourceHandler("/static/**").addResourceLocations("classpath:public/static/");
+        registry.addResourceHandler("/**").addResourceLocations("classpath:public/");
     }
 
     @Bean

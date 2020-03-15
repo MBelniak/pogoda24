@@ -18,8 +18,7 @@
   "scripts": {
     "start": "react-scripts start",
     "watch": "webpack --watch -d",
-    "build.windows": "react-scripts build && (if exist \"build-public\" rd /s /q \"build-public\") && move \"build\" \"build-public\"",
-    "build.linux-mac": "react-scripts build && rm -rf \"build-public\" && mv \"build\" \"build-public\""
+    "build": "react-scripts build"
   },
   "proxy": "http://localhost:8080",
   "eslintConfig": {

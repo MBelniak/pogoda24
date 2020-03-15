@@ -35,8 +35,6 @@ export class ForecastMapList extends React.Component<{id: number}, State> {
         ))
     }
 
-
-
     render() {
         if (this.state.loading === true) {
             return (
