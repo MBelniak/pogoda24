@@ -12,7 +12,7 @@
     <fileSets>
         <fileSet>
             <outputDirectory>/</outputDirectory>
-            <directory>src/main/build</directory>
+            <directory>src/main/dist</directory>
         </fileSet>
     </fileSets>
 </assembly>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import img from '../public/img/logoimg.jpg';
 
 interface TopBarProps {
     render(): JSX.Element;
@@ -15,7 +16,7 @@ export class TopBar extends React.Component<TopBarProps, {}> {
             <div className="topBar topBarLink">
                 <div>
                     <Link to="/">
-                        <img width="32" height="32" style={{marginBottom: '-8px'}} src="img/logoimg.jpg"></img>
+                        <img width="32" height="32" style={{marginBottom: '-8px'}} src={img}/>
                         E-Pogoda24
                     </Link>
 
