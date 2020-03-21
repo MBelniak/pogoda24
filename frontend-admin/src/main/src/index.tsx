@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { App } from './App';
+import {MainPage} from "./MainPage";
 
+import '../public/css/newstyle.css';
+import '../public/img/favicon.png';
 
 ReactDOM.render(
-    <App />
+    <MainPage/>
     , document.getElementById('root'));
 

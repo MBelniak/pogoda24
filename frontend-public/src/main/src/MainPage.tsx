@@ -4,12 +4,8 @@ import { PostsShort } from "./PostsShort";
 import { ExternalApi } from "./ExternalApi";
 import { TopBar } from "./TopBar";
 import { BarHolder } from "./BarHolder";
-import {
-    Switch,
-    Route,
-    Link
-} from "react-router-dom";
-import {Links} from "./Links";
+import { Links } from "./Links";
+import img from '../public/img/bg.jpg';
 
 
 export class MainPage extends React.Component {
@@ -24,7 +20,7 @@ export class MainPage extends React.Component {
                 <BarHolder/>
                 <TopBar render={() => <Links/>}/>
                 <div className="mainContent">
-                    <img src="img/bg.jpg" className="bgimg"/>
+                    <img src={img} className="bgimg"/>
                     <ExternalApi/>
                     <PostsShort forecastCount={5}/>
                     <Copyright/>
