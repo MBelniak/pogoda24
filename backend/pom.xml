@@ -88,11 +88,34 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete>
+                                    <fileset dir="${project.basedir}/src/main/resources/public"/>
+                                </delete>
+                                <delete>
+                                    <fileset dir="${project.basedir}/src/main/resources/admin"/>
+                                </delete>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
                 <execution>
                     <id>unzip-webapp-admin</id>
-                    <phase>process-resources</phase>
+                    <phase>compile</phase>
                     <goals>
                         <goal>unpack</goal>
                     </goals>

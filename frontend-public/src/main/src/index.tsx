@@ -5,10 +5,12 @@ import {
     BrowserRouter as Router,
     Switch,
     Route,
-} from "react-router-dom";
+} from 'react-router-dom';
 import {Ciekawostki} from "./Ciekawostki";
 import {ONas} from "./ONas";
 import {Prognozy} from "./Prognozy";
+import '../public/css/newstyle.css';
+import '../public/img/favicon.png';
 
 ReactDOM.render(
     <Router>
