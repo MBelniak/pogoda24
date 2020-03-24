@@ -1,8 +1,8 @@
-import React from "react";
-import { Copyright } from "./Copyright";
-import { TopBar } from "./TopBar";
-import { BarHolder } from "./BarHolder";
-import {Links} from "./Links";
+import React from 'react';
+const Copyright = require('shared24').Copyright;
+const TopBar = require('shared24').TopBar;
+const BarHolder = require('shared24').BarHolder;
+import { Links } from './Links';
 
 export class Ciekawostki extends React.Component{
 

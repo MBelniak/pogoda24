@@ -24,12 +24,10 @@ module.exports = {
                 query: {
                     presets: ['@babel/preset-env', '@babel/preset-react']
                 },
-                exclude: /node_modules/
             },
             {
                 test: /\.ts(x)?$/,
                 loader: 'ts-loader',
-                exclude: /node_modules/
             },
             {
                 test: /\.js(x)?$/,
