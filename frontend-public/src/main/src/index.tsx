@@ -1,15 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {MainPage} from "./MainPage";
+import {MainPage} from './MainPage';
 import {
     BrowserRouter as Router,
     Switch,
     Route,
 } from 'react-router-dom';
-import {Ciekawostki} from "./Ciekawostki";
-import {ONas} from "./ONas";
-import {Prognozy} from "./Prognozy";
+import {Ciekawostki} from './Ciekawostki';
+import {ONas} from './ONas';
+import {Prognozy} from './Prognozy';
 import '../public/css/newstyle.css';
+import 'shared24/src/css/main.css';
 import '../public/img/favicon.png';
 
 ReactDOM.render(

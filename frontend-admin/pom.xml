@@ -15,6 +15,14 @@
     <name>frontend-admin</name>
     <description>Pogoda 24/7 Admin Frontend Module</description>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.rubik</groupId>
+            <artifactId>shared</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -23,19 +31,9 @@
                 <version>1.6</version>
                 <configuration>
                     <workingDirectory>src/main</workingDirectory>
-                    <installDirectory>target</installDirectory>
+                    <installDirectory>../node</installDirectory>
                 </configuration>
                 <executions>
-                    <execution>
-                        <id>install node and npm</id>
-                        <goals>
-                            <goal>install-node-and-npm</goal>
-                        </goals>
-                        <configuration>
-                            <nodeVersion>v10.11.0</nodeVersion>
-                            <npmVersion>6.4.1</npmVersion>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>npm install</id>
                         <goals>
@@ -43,6 +41,15 @@
                         </goals>
                         <configuration>
                             <arguments>install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm link shared24</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>link shared24</arguments>
                         </configuration>
                     </execution>
                     <execution>

@@ -14,7 +14,8 @@ module.exports = {
             'src',
             'node_modules'
         ],
-        extensions: ['.ts', '.tsx', '.js', '.jsx']
+        symlinks: true,
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.css']
     },
     module: {
         rules: [
@@ -24,20 +25,10 @@ module.exports = {
                 query: {
                     presets: ['@babel/preset-env', '@babel/preset-react']
                 },
-                exclude: /node_modules/
             },
             {
                 test: /\.ts(x)?$/,
                 loader: 'ts-loader',
-                exclude: /node_modules/
-            },
-            {
-                test: /\.js(x)?$/,
-                loader: 'babel',
-                query: {
-                    presets: ['es2015', 'react']
-                },
-                exclude: /node_modules/
             },
             {
                 test: /\.css$/,
@@ -48,7 +39,14 @@ module.exports = {
                             path: resolve('dist')
                         }
                     },
-                    'css-loader'
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: {
+                                localIdentName: '[local]'
+                            }
+                        }
+                    }
                 ],
             },
             {

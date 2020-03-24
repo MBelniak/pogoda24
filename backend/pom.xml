@@ -93,11 +93,12 @@
                 <version>1.7</version>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <phase>process-resources</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
+                            <failOnError>false</failOnError>
                             <tasks>
                                 <delete>
                                     <fileset dir="${project.basedir}/src/main/resources/public"/>
@@ -115,7 +116,7 @@
             <executions>
                 <execution>
                     <id>unzip-webapp-admin</id>
-                    <phase>compile</phase>
+                    <phase>process-resources</phase>
                     <goals>
                         <goal>unpack</goal>
                     </goals>
@@ -133,7 +134,7 @@
                 </execution>
                 <execution>
                     <id>unzip-webapp-public</id>
-                    <phase>compile</phase>
+                    <phase>process-resources</phase>
                     <goals>
                         <goal>unpack</goal>
                     </goals>
