@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import img from '../public/img/logoimg.jpg';
+import img from './img/logoimg.jpg';
 
 
 export class Links extends React.Component {

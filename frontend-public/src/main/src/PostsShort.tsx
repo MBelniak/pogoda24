@@ -1,6 +1,7 @@
 import React from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { ForecastMapList } from './ForecastMapList';
+
 interface State {
     loading: boolean;
     posts: ShortPost[];
