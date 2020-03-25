@@ -9,6 +9,7 @@
     "@types/react-router": "5.1.2",
     "@types/react-router-dom": "5.1.2",
     "babel-loader": "8.0.6",
+    "history": "^4.10.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router": "5.1.2",
@@ -18,7 +19,8 @@
     "webpack": "4.41.5"
   },
   "scripts": {
-    "start": "react-app-rewired start",
+    "start": "npm link shared24 && webpack-dev-server --entry ./src/index.tsx --output-filename ./dist/bundle.js",
+    "eject": "react-scripts eject",
     "watch": "webpack --watch -d",
     "build": "webpack"
   },

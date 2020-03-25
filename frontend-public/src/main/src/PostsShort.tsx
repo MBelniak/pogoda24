@@ -70,7 +70,7 @@ export class PostsShort extends React.Component<{forecastCount}, State> {
                             {/*--TODO implement Router */}
                             <a href={'/api/posts/' + post.id} style={{color: "#66AAFF"}}>+ Czytaj dalej</a>
                             <br/>
-                            <ForecastMapList id={post.id}/>
+                            <ForecastMapList id={post.id} />
                         </div>
                     </div>
                 ))}
