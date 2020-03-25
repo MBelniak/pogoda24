@@ -2,23 +2,30 @@ const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const resolve = require('path').resolve;
 
-module.exports = {
-    entry: "./src/index.tsx",
-    output: {
-        path: resolve('dist'),
-        filename: 'bundle.js',
-        publicPath: "/admin"
-    },
-    mode: "production",
-    resolve: {
+
+module.exports = function override(config, env) {
+   config.plugins = [
+       new HtmlWebPackPlugin({
+           template: "./public/index.html",
+           filename: "./index.html",
+           stats: { children: false }
+       }),
+       new MiniCssExtractPlugin(
+           {
+               filename: "[name].css"
+           })
+   ];
+
+    config.resolve = {
         modules: [
             'src',
             'node_modules'
         ],
         symlinks: true,
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.css']
-    },
-    module: {
+    };
+
+    config.module = {
         rules: [
             {
                 test: /\.ts(x)?$/,
@@ -55,16 +62,7 @@ module.exports = {
                 loader: "file-loader?name=/img/[name].[ext]"
             }
         ]
-    },
-    plugins: [
-        new HtmlWebPackPlugin({
-            template: "./public/index.html",
-            filename: "./index.html",
-            stats: { children: false }
-        }),
-        new MiniCssExtractPlugin(
-            {
-                filename: "[name].css"
-            })
-    ]
-}
+    };
+
+    return config;
+};

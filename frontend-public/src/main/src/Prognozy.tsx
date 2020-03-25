@@ -1,10 +1,10 @@
 import React from 'react';
 import { PagingBar } from './PagingBar';
+import { PostsShort } from './PostsShort';
+import { Links } from './Links';
 const TopBar = require('shared24').TopBar;
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
-import { PostsShort } from './PostsShort';
-import { Links } from './Links';
 
 export class Prognozy extends React.Component {
 

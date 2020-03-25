@@ -1,8 +1,8 @@
 import React from "react";
+import { Links } from './Links';
 const TopBar = require('shared24').TopBar;
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
-import { Links } from './Links';
 
 export class ONas extends React.Component {
     constructor(props) {
