@@ -1,6 +1,7 @@
 import React from 'react';
 import { LoadingIndicator } from './LoadingIndicator';
 import { ForecastMapList } from './ForecastMapList';
+
 interface State {
     loading: boolean;
     posts: ShortPost[];
@@ -69,7 +70,7 @@ export class PostsShort extends React.Component<{forecastCount}, State> {
                             {/*--TODO implement Router */}
                             <a href={'/api/posts/' + post.id} style={{color: "#66AAFF"}}>+ Czytaj dalej</a>
                             <br/>
-                            <ForecastMapList id={post.id}/>
+                            <ForecastMapList id={post.id} />
                         </div>
                     </div>
                 ))}

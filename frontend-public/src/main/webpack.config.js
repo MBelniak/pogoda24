@@ -8,7 +8,13 @@ module.exports = {
         path: resolve('dist'),
         filename: 'bundle.js'
     },
+    devServer: {
+        proxy: {
+            '/': 'http://localhost:8080',
+        },
+    },
     mode: "production",
+    devtool: 'inline-module-source-map',
     resolve: {
         modules: [
             'src',
@@ -66,4 +72,4 @@ module.exports = {
                 filename: "[name].css"
             })
     ]
-}
+};

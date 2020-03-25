@@ -6,15 +6,23 @@ module.exports = {
     entry: "./src/index.tsx",
     output: {
         path: resolve('dist'),
-        filename: 'bundle.js'
+        filename: 'bundle.js',
+        publicPath: '/admin'
+    },
+    devServer: {
+        proxy: {
+            '/': 'http://localhost:8080',
+        },
     },
     mode: "production",
+    devtool: 'inline-module-source-map',
     resolve: {
         modules: [
             'src',
             'node_modules'
         ],
-        extensions: ['.ts', '.tsx', '.js', '.jsx']
+        symlinks: true,
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.css']
     },
     module: {
         rules: [
@@ -30,14 +38,6 @@ module.exports = {
                 loader: 'ts-loader',
             },
             {
-                test: /\.js(x)?$/,
-                loader: 'babel',
-                query: {
-                    presets: ['es2015', 'react']
-                },
-                exclude: /node_modules/
-            },
-            {
                 test: /\.css$/,
                 use: [
                     {
@@ -46,7 +46,14 @@ module.exports = {
                             path: resolve('dist')
                         }
                     },
-                    'css-loader'
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: {
+                                localIdentName: '[local]'
+                            }
+                        }
+                    }
                 ],
             },
             {
@@ -66,4 +73,4 @@ module.exports = {
                 filename: "[name].css"
             })
     ]
-}
+};

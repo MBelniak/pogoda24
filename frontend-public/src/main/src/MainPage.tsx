@@ -1,18 +1,14 @@
 import React from 'react';
-const Copyright = require('shared24').Copyright;
-const TopBar = require('shared24').TopBar;
-const BarHolder = require('shared24').BarHolder;
 import { PostsShort } from './PostsShort';
 import { ExternalApi } from './ExternalApi';
 import { Links } from './Links';
-import img from '../public/img/bg.jpg';
+import img from './img/bg.jpg';
+const Copyright = require('shared24').Copyright;
+const TopBar = require('shared24').TopBar;
+const BarHolder = require('shared24').BarHolder;
 
 
 export class MainPage extends React.Component {
-
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return (
@@ -26,7 +22,6 @@ export class MainPage extends React.Component {
                     <Copyright/>
                 </div>
             </div>
-        )
+        );
     }
-
 }
