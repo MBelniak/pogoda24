@@ -10,10 +10,6 @@ const BarHolder = require('shared24').BarHolder;
 
 export class MainPage extends React.Component {
 
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <div className="mainFrame">
@@ -26,7 +22,6 @@ export class MainPage extends React.Component {
                     <Copyright/>
                 </div>
             </div>
-        )
+        );
     }
-
 }

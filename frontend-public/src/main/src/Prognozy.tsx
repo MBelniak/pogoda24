@@ -18,13 +18,13 @@ export class Prognozy extends React.Component {
     render() {
         return (
             <div className="mainFrame">
-                <BarHolder/>
-                <TopBar render={() => <Links/>}/>
+                <BarHolder />
+                <TopBar render={() => <Links />}/>
                 <div className="mainContent">
                     <img src="img/bg.jpg" className="bgimg"/>
-                    <PostsShort forecastCount={1}/>
-                    <Copyright/>
-                    <PagingBar/>
+                    <PostsShort forecastCount={1} />
+                    <Copyright />
+                    <PagingBar />
                 </div>
             </div>
         )
