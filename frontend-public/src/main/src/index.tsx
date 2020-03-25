@@ -6,7 +6,7 @@ import { MainPage } from './MainPage';
 import { Ciekawostki } from './Ciekawostki';
 import { ONas } from './ONas';
 import { Prognozy } from './Prognozy';
-import {Navigation} from './Navigation';
+const Navigation = require('shared24').Navigation;
 
 import './css/newstyle.css';
 import 'shared24/src/css/main.css';

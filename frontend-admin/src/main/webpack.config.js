@@ -7,9 +7,15 @@ module.exports = {
     output: {
         path: resolve('dist'),
         filename: 'bundle.js',
-        publicPath: "/admin"
+        publicPath: '/admin'
+    },
+    devServer: {
+        proxy: {
+            '/': 'http://localhost:8080',
+        },
     },
     mode: "production",
+    devtool: 'inline-module-source-map',
     resolve: {
         modules: [
             'src',
@@ -67,4 +73,4 @@ module.exports = {
                 filename: "[name].css"
             })
     ]
-}
+};
