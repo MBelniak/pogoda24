@@ -11,10 +11,16 @@ module.exports = {
     },
     devServer: {
         proxy: {
-            '/': 'http://localhost:8080',
+            '/api/': 'http://localhost:8080',
+            '/admin/': {
+                    target: 'http://localhost:3000/',
+                    pathRewrite: { '^/admin': '' },
+                },
         },
+        contentBase: resolve('dist'),
+        contentBasePublicPath: '/',
     },
-    mode: "production",
+    mode: "development",
     devtool: 'inline-module-source-map',
     resolve: {
         modules: [
@@ -38,20 +44,21 @@ module.exports = {
                 loader: 'ts-loader',
             },
             {
-                test: /\.css$/,
+                test: /\.(s)?css$/,
                 use: [
-                    {
-                        loader: MiniCssExtractPlugin.loader,
-                        options: {
-                            path: resolve('dist')
-                        }
-                    },
+                    MiniCssExtractPlugin.loader,
                     {
                         loader: 'css-loader',
                         options: {
                             modules: {
                                 localIdentName: '[local]'
                             }
+                        }
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true
                         }
                     }
                 ],
