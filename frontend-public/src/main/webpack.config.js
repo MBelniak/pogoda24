@@ -6,12 +6,14 @@ module.exports = {
     entry: "./src/index.tsx",
     output: {
         path: resolve('dist'),
-        filename: 'bundle.js'
+        filename: 'bundle.js',
+        publicPath: '/'
     },
     devServer: {
         proxy: {
-            '/': 'http://localhost:8080',
+            '/api/': 'http://localhost:8080',
         },
+        contentBase: resolve('dist'),
     },
     mode: "development",
     devtool: 'inline-module-source-map',
@@ -58,7 +60,10 @@ module.exports = {
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/,
-                loader: "file-loader?name=/img/[name].[ext]"
+                loader: "file-loader?name=/img/[name].[ext]",
+                options: {
+                    publicPath: '/'
+                }
             }
         ]
     },

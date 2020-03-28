@@ -6,8 +6,8 @@ import { MainPage } from './MainPage';
 import { Writer } from './Writer';
 import { Stats } from './Stats';
 import { Traffic } from './Traffic';
-import '../public/css/newstyle.css';
-import '../public/img/favicon.png';
+import './css/main.css';
+import './sass/main.scss';
 const Navigation = require('shared24').Navigation;
 
 ReactDOM.render(
@@ -17,6 +17,7 @@ ReactDOM.render(
             <Route path="/writer" component={Writer} />
             <Route path="/elist" component={Stats} />
             <Route path="/traffic" component={Traffic} />
+            <Route path="/" component={MainPage} />
         </Switch>
     </Router>
     , document.getElementById('root'));
