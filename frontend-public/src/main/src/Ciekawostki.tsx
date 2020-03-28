@@ -1,8 +1,8 @@
 import React from 'react';
-import { Links } from './Links';
+import { TopBar } from './TopBar';
 const Copyright = require('shared24').Copyright;
-const TopBar = require('shared24').TopBar;
 const BarHolder = require('shared24').BarHolder;
+const TopImage = require('shared24').TopImage;
 
 export class Ciekawostki extends React.Component{
 
@@ -14,9 +14,9 @@ export class Ciekawostki extends React.Component{
         return (
             <div className="mainFrame">
                 <BarHolder />
-                <TopBar render={() => <Links />} />
+                <TopBar />
                 <div className="mainContent">
-                    <img src="img/bg.jpg" className="bgimg"/>
+                    <TopImage />
                     <Copyright />
                 </div>
             </div>

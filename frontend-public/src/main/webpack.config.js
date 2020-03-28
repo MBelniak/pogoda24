@@ -13,7 +13,7 @@ module.exports = {
             '/': 'http://localhost:8080',
         },
     },
-    mode: "production",
+    mode: "development",
     devtool: 'inline-module-source-map',
     resolve: {
         modules: [
@@ -37,20 +37,21 @@ module.exports = {
                 loader: 'ts-loader',
             },
             {
-                test: /\.css$/,
+                test: /\.(s)?css$/,
                 use: [
-                    {
-                        loader: MiniCssExtractPlugin.loader,
-                        options: {
-                            path: resolve('dist')
-                        }
-                    },
+                    MiniCssExtractPlugin.loader,
                     {
                         loader: 'css-loader',
                         options: {
                             modules: {
                                 localIdentName: '[local]'
                             }
+                        }
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true
                         }
                     }
                 ],

@@ -1,10 +1,10 @@
 import React from 'react';
 import { PagingBar } from './PagingBar';
 import { PostsShort } from './PostsShort';
-import { Links } from './Links';
-const TopBar = require('shared24').TopBar;
+import { TopBar } from './TopBar';
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
+const TopImage = require('shared24').TopImage;
 
 export class Prognozy extends React.Component {
 
@@ -17,16 +17,16 @@ export class Prognozy extends React.Component {
 
     render() {
         return (
-            <div className="mainFrame">
+            <section className="mainFrame">
                 <BarHolder />
-                <TopBar render={() => <Links />}/>
-                <div className="mainContent">
-                    <img src="img/bg.jpg" className="bgimg"/>
-                    <PostsShort forecastCount={1} />
-                    <Copyright />
-                    <PagingBar />
+                <TopBar />
+                <TopImage />
+                <div className="container fluid mainContent">
+                    <PostsShort forecastCount={1} className='is-full'/>
                 </div>
-            </div>
+                <Copyright />
+                <PagingBar />
+            </section>
         )
     }
 
