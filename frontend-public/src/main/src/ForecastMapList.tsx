@@ -28,9 +28,9 @@ export class ForecastMapList extends React.Component<{id: number}, State> {
     }
 
     renderMaps() {
-        return this.state.imagesURLs.map(imageURL => (
-            <a href={imageURL}>
-                <img className="pimg" src={'api/images/' + imageURL} width='49%'/>
+        return this.state.imagesURLs.map((imageURL, i) => (
+            <a href={imageURL} key={i}>
+                <img key={i} className="pimg" src={'api/images/' + imageURL} width='49%'/>
             </a>
         ))
     }

@@ -7,7 +7,7 @@ interface State {
     posts: ShortPost[];
 }
 
-export class PostsShort extends React.Component<{forecastCount}, State> {
+export class PostsShort extends React.Component<{forecastCount: number, className: string}, State> {
     constructor(props) {
         super(props)
     }
@@ -59,16 +59,16 @@ export class PostsShort extends React.Component<{forecastCount}, State> {
             )
         }
         return (
-            <div className="postsShort">
-                {this.state.posts.map(post => (
-                    <div className="post">
-                        <div className="postdate ">
+            <div className={'column ' + this.props.className}>
+                {this.state.posts.map((post, i) => (
+                    <div className="post" key={i}>
+                        <div className="postdate">
                             {this.processDate(post.postDate)}
                         </div>
-                        <div className="bold center">
+                        <div className="bold center description">
                             {this.processDescription(post.description)}
                             {/*--TODO implement Router */}
-                            <a href={'/api/posts/' + post.id} style={{color: "#66AAFF"}}>+ Czytaj dalej</a>
+                            <a href={'/api/posts/' + post.id} style={{color: "blue"}}>+ Czytaj dalej</a>
                             <br/>
                             <ForecastMapList id={post.id} />
                         </div>

@@ -1,27 +1,28 @@
 import React from 'react';
 import { PostsShort } from './PostsShort';
 import { ExternalApi } from './ExternalApi';
-import { Links } from './Links';
-import img from './img/bg.jpg';
+import { TopBar } from './TopBar';
 const Copyright = require('shared24').Copyright;
-const TopBar = require('shared24').TopBar;
 const BarHolder = require('shared24').BarHolder;
+const TopImage = require('shared24').TopImage;
 
 
 export class MainPage extends React.Component {
 
     render() {
         return (
-            <div className="mainFrame">
+            <section className="mainFrame">
                 <BarHolder/>
-                <TopBar render={() => <Links/>}/>
-                <div className="mainContent">
-                    <img src={img} className="bgimg"/>
-                    <ExternalApi/>
-                    <PostsShort forecastCount={5}/>
-                    <Copyright/>
+                <TopBar />
+                <TopImage />
+                <div className="container fluid mainContent">
+                    <div className="columns">
+                        <PostsShort forecastCount={5} className='is-three-quarters'/>
+                        <ExternalApi/>
+                    </div>
                 </div>
-            </div>
+                <Copyright/>
+            </section>
         );
     }
 }

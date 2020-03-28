@@ -12,6 +12,8 @@
     "@types/react-router-dom": "5.1.2",
     "babel-loader": "8.0.5",
     "babel-preset-react": "^6.24.1",
+    "bulma": "^0.8.1",
+    "node-sass": "^4.13.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "5.1.2"
