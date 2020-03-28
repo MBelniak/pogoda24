@@ -4,6 +4,7 @@
     z-index: 1000;
     top: 0;
     width: 100%;
+    height: 28px;
     left: 0;
 }
 .barText {
@@ -16,6 +17,11 @@
     font-family: Arial;
     animation: bar_anim 10s infinite;
 }
+.bgimg
+{
+    width: 100%;
+    height: 400px;
+}
 .copyright
 {
     text-align: center;
@@ -24,35 +30,3 @@
     font-size: 10px;
 }
 
-.topBar
-{
-    position: absolute;
-    top:17px;
-    left: 0;
-    display: block;
-    width:100%;
-    height:50px;
-    background: black;
-}
-.topBarLink {
-    display: block;
-    margin-right: 15px;
-    list-style: none;
-}
-
-.topBarLink li
-{
-    float: right;
-    margin-right: 10px;
-}
-.topBarLink a
-{
-    color:white;
-    text-decoration: none;
-    margin-left: 10px;
-    transition: 0.3s;
-}
-.topBarLink a:hover
-{
-    color: gray;
-}

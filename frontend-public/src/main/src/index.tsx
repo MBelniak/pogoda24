@@ -8,7 +8,8 @@ import { ONas } from './ONas';
 import { Prognozy } from './Prognozy';
 const Navigation = require('shared24').Navigation;
 
-import './css/newstyle.css';
+import './css/main.css';
+import './sass/main.scss';
 import 'shared24/src/css/main.css';
 
 ReactDOM.render(

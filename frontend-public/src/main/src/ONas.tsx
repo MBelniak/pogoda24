@@ -1,8 +1,8 @@
 import React from "react";
-import { Links } from './Links';
-const TopBar = require('shared24').TopBar;
+import { TopBar } from './TopBar';
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
+const TopImage = require('shared24').TopImage;
 
 export class ONas extends React.Component {
     constructor(props) {
@@ -11,11 +11,11 @@ export class ONas extends React.Component {
 
     render() {
         return (
-            <div className="mainFrame">
+            <section className="mainFrame">
                 <BarHolder />
-                <TopBar render={() => <Links />} />
-                <div className="mainContent">
-                    <img src="img/bg.jpg" className="bgimg"/>
+                <TopBar />
+                <TopImage />
+                <div className="container fluid mainContent">
                     <div className="post">
                         Widzę,że zajrzałeś na naszą stronę.<br/>
                         Zostawiając łapkę w górę na naszym fanpage motywujesz nas do dalszej pracy,<br/>
@@ -30,7 +30,7 @@ export class ONas extends React.Component {
                     </div>
                     <Copyright />
                 </div>
-            </div>
+            </section>
         )
     }
 }
