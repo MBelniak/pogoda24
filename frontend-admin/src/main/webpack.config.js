@@ -17,10 +17,14 @@ module.exports = {
                     pathRewrite: { '^/admin': '' },
                 },
         },
+        port: 3000,
+        historyApiFallback: true,
+        watchContentBase: true,
         contentBase: resolve('dist'),
-        contentBasePublicPath: '/',
+        publicPath: '/',
+        contentBasePublicPath: '/'
     },
-    mode: "development",
+    mode: process.env.NODE_ENV,
     devtool: 'inline-module-source-map',
     resolve: {
         modules: [
@@ -65,7 +69,10 @@ module.exports = {
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/,
-                loader: "file-loader?name=/img/[name].[ext]"
+                loader: "file-loader?name=/img/[name].[ext]",
+                options: {
+                    publicPath: '/'
+                }
             }
         ]
     },
@@ -77,7 +84,7 @@ module.exports = {
         }),
         new MiniCssExtractPlugin(
             {
-                filename: "[name].css"
+                filename: "css/[name].css"
             })
     ]
 };

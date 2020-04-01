@@ -1,7 +1,6 @@
 package com.rubik.backend.controller.rest;
 
 import com.rubik.backend.dtos.PostDTO;
-import com.rubik.backend.entity.ForecastMap;
 import com.rubik.backend.entity.Post;
 import com.rubik.backend.service.ForecastMapsService;
 import com.rubik.backend.service.PostsService;
@@ -49,7 +48,7 @@ public class PostsController {
         List<PostDTO> fullPosts = new LinkedList<>();
         posts.getContent().forEach(post -> {
             PostDTO postDTO = new PostDTO(post);
-            postDTO.setImagesIds(forecastMapsService.getImagesURLs(post.getId()));
+            postDTO.setImagesIds(forecastMapsService.getImagesPublicIds(post.getId()));
             fullPosts.add(postDTO);
         });
 
