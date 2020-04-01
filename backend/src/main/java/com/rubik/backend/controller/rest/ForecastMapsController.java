@@ -23,13 +23,13 @@ public class ForecastMapsController {
         this.forecastMapsService = forecastMapsService;
     }
 
-    @GetMapping(value = "/urls")
+    @GetMapping(value = "/publicIds")
     public @ResponseBody
-    List<String> getImagesURLsByPost(@RequestParam(value = "postId", required = false) Long postId) {
+    List<String> getImagesPublicIdsByPost(@RequestParam(value = "postId", required = false) Long postId) {
         if (postId != null) {
-            return forecastMapsService.getImagesURLs(postId);
+            return forecastMapsService.getImagesPublicIds(postId);
         }
-        return forecastMapsService.getImagesURLs();
+        return forecastMapsService.getImagesPublicIds();
     }
 
     @GetMapping("/{url}")

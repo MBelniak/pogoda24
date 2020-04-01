@@ -2,7 +2,7 @@ package com.rubik.backend.service;
 
 import com.rubik.backend.config.ApiConfig;
 import com.rubik.backend.entity.ForecastMap;
-import com.rubik.backend.entity.ImageURLSOnly;
+import com.rubik.backend.entity.ImagePublicIdOnly;
 import com.rubik.backend.repository.ForecastMapsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -28,17 +28,16 @@ public class ForecastMapsService {
     }
 
     public Resource getRawImage(String url) {
-
         return resourceLoader.getResource("file:"+apiConfig.getImagesDir()+"/"+url);
     }
 
-    public List<String> getImagesURLs() {
+    public List<String> getImagesPublicIds() {
         List<ForecastMap> forecastMapsURLs = forecastMapsRepository.findAll();
-        return forecastMapsURLs.stream().map(ForecastMap::getImageUrl).collect(Collectors.toList());
+        return forecastMapsURLs.stream().map(ForecastMap::getImagePublicId).collect(Collectors.toList());
     }
 
-    public List<String> getImagesURLs(Long postId) {
-        List<ImageURLSOnly> forecastMapsURLs = forecastMapsRepository.findAllByPostId(postId, ImageURLSOnly.class);
-        return forecastMapsURLs.stream().map(ImageURLSOnly::getImageUrl).collect(Collectors.toList());
+    public List<String> getImagesPublicIds(Long postId) {
+        List<ImagePublicIdOnly> forecastMapsURLs = forecastMapsRepository.findAllByPostId(postId, ImagePublicIdOnly.class);
+        return forecastMapsURLs.stream().map(ImagePublicIdOnly::getImagePublicId).collect(Collectors.toList());
     }
 }
