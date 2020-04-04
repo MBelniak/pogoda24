@@ -40,4 +40,8 @@ public class ForecastMapsService {
         List<ImagePublicIdOnly> forecastMapsURLs = forecastMapsRepository.findAllByPostId(postId, ImagePublicIdOnly.class);
         return forecastMapsURLs.stream().map(ImagePublicIdOnly::getImagePublicId).collect(Collectors.toList());
     }
+
+    public List<ForecastMap> saveForecastMaps(List<ForecastMap> forecastMaps) {
+        return forecastMapsRepository.saveAll(forecastMaps);
+    }
 }

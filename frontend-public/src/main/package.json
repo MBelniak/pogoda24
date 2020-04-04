@@ -22,10 +22,10 @@
     "webpack": "4.41.5"
   },
   "scripts": {
-    "start": "npm link shared24 && NODE_ENV=development webpack-dev-server --entry ./src/index.tsx",
+    "start": "npm link shared24 && cross-env NODE_ENV=development webpack-dev-server --entry ./src/index.tsx",
     "eject": "react-scripts eject",
     "watch": "webpack --watch -d",
-    "build": "cross-env NODE_ENV=production webpack"
+    "build": "cross-env NODE_ENV=production cross-env webpack"
   },
   "proxy": "http://localhost:8080",
   "eslintConfig": {

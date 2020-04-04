@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image, Video, Transformation } from 'cloudinary-react';
+import {returnStatement} from "../../../../shared/node/node/node_modules/shared24/node_modules/@babel/types/lib";
 
 interface State {
     loading: boolean;
@@ -28,14 +29,6 @@ export class ForecastMapList extends React.Component<{id: number}, State> {
         }
     }
 
-    renderMaps() {
-        return this.state.imagesPublicIds.map((imagePublicId, i) => (
-                    <Image publicId="sample" format="jpg" quality="auto" key={i}>
-                        <Transformation crop="fill" gravity="faces"/>
-                    </Image>
-        ))
-    }
-
     render() {
         if (this.state.loading === true) {
             return (
@@ -53,7 +46,11 @@ export class ForecastMapList extends React.Component<{id: number}, State> {
         }
         return (
             <div>
-                {this.renderMaps()}
+                {this.state.imagesPublicIds.map((imagePublicId, i) => (
+                        <Image publicId={imagePublicId} format="png" quality="auto" key={i}>
+                            <Transformation crop="fill" gravity="faces"/>
+                        </Image>
+                    ))}
             </div>
         )
     }

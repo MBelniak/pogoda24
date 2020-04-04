@@ -1,5 +1,6 @@
 package com.rubik.backend.controller.rest;
 
+import com.rubik.backend.entity.ForecastMap;
 import com.rubik.backend.service.ForecastMapsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -23,7 +24,7 @@ public class ForecastMapsController {
         this.forecastMapsService = forecastMapsService;
     }
 
-    @GetMapping(value = "/publicIds")
+    @GetMapping("/publicIds")
     public @ResponseBody
     List<String> getImagesPublicIdsByPost(@RequestParam(value = "postId", required = false) Long postId) {
         if (postId != null) {
@@ -44,5 +45,17 @@ public class ForecastMapsController {
             return ResponseEntity.badRequest()
                     .body("Cannot find "+url+" => "+e.getMessage());
         }
+    }
+
+    @PostMapping("")
+    public String addForecastMaps(@RequestBody List<ForecastMap> forecastMaps) {
+        if (forecastMaps != null) {
+            List<ForecastMap> savedMaps = forecastMapsService.saveForecastMaps(forecastMaps);
+            if (savedMaps != null) {
+                return "Successfully saved forecast maps";
+            }
+            return null;
+        }
+        return null;
     }
 }

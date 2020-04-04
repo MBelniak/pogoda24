@@ -7,7 +7,7 @@ interface UploadedFile {
     file: File;
 }
 
-const connector = connect((state: UploadedFile[]) => ({ }),
+const connector = connect(() => ({ }),
     {
         onDeleteFile: removeFile
     });
