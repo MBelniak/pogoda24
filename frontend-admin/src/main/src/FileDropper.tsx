@@ -1,43 +1,34 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
-import {addImage, removeImage} from "./redux/actions";
+import { addFile } from "./redux/actions";
 import {connect, ConnectedProps} from "react-redux";
-import DirectUpload from "./DirectUpload";
 
-interface FileDropperProps {
-    submitHandler: (event) => void;
-}
-
-interface UploadedPhoto {
+interface UploadedFile {
     id: number;
     content: File;
 }
 
 const connector = connect(
-    (state: UploadedPhoto[]) => ({ }),
+    (state: UploadedFile[]) => ({ }),
     {
-        onAddImage: addImage,
-        onDeleteImage: removeImage
+        onAddFile: addFile
     });
 
 
 type PropsFromRedux = ConnectedProps<typeof connector>
 
-class FileDropper extends React.Component<FileDropperProps & PropsFromRedux, {}> {
-
-    private dropzone;
+class FileDropper extends React.Component<PropsFromRedux, {}> {
 
     constructor(props) {
         super(props);
-        this.dropzone = React.createRef();
-        this.onImagesAdded = this.onImagesAdded.bind(this);
+        this.onFilesAdded = this.onFilesAdded.bind(this);
     }
 
-    private onImagesAdded(files) {
+    private onFilesAdded(files) {
         for (let file of files) {
-            this.props.onAddImage(file);
+            this.props.onAddFile(file);
         }
-        this.dropzone.removeAllFiles();
+        console.log("Images added via dropzone.");
     }
 
     render() {
@@ -45,16 +36,15 @@ class FileDropper extends React.Component<FileDropperProps & PropsFromRedux, {}>
             <Dropzone
                 multiple={true}
                 accept="image/*"
-                onDrop={this.onImagesAdded}
-                ref={this.dropzone}
+                onDrop={this.onFilesAdded}
+                noClick={true}
             >
                 {({getRootProps, getInputProps}) => (
-                    <div className="section" {...getRootProps()}>
+                    <div className="section dropzone" {...getRootProps()}>
                         <div className="container fluid">
                             <input {...getInputProps()} />
-                            <p>Drag 'n' drop some files here, or click to select files</p>
+                            <h2 className="title is-4 dropzone-text">Upuść pliki tutaj</h2>
                         </div>
-                        <DirectUpload submitHandler={this.props.submitHandler} />
                     </div>
                 )}
             </Dropzone>

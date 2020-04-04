@@ -1,7 +1,7 @@
 import React from 'react';
 import img from './img/bg.jpg';
 import { Links } from "./Links";
-
+const Copyright = require('shared24').Copyright;
 
 export class MainPage extends React.Component {
 
@@ -16,6 +16,7 @@ export class MainPage extends React.Component {
                     <img src={img} className="bgimg"/>
                     <Links />
                 </div>
+                <Copyright />
             </section>
         )
     }

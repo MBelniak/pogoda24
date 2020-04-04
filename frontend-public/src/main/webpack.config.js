@@ -18,7 +18,7 @@ module.exports = {
         historyApiFallback: true,
         watchContentBase: true,
     },
-    mode: "development",
+    mode: process.env.NODE_ENV,
     devtool: 'inline-module-source-map',
     resolve: {
         modules: [
@@ -74,7 +74,8 @@ module.exports = {
         new HtmlWebPackPlugin({
             template: "./public/index.html",
             filename: "./index.html",
-            stats: { children: false }
+            stats: { children: false },
+            favicon: "./public/favicon.png"
         }),
         new MiniCssExtractPlugin(
             {

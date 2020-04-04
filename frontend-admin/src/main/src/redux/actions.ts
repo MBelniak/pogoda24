@@ -1,18 +1,18 @@
-export const ADD_IMAGE = "ADD_IMAGE";
-export const REMOVE_IMAGE = "REMOVE_IMAGE";
+export const ADD_FILE = "ADD_FILE";
+export const REMOVE_FILE = "REMOVE_FILE";
 
-let imageId = 0;
+let fileId = 0;
 
-export const addImage = content => ({
-    type: ADD_IMAGE,
+export const addFile = content => ({
+    type: ADD_FILE,
     payload: {
-        id: ++imageId,
-        content: content
+        id: ++fileId,
+        file: content
     }
 });
 
-export const removeImage = id => ({
-    type: REMOVE_IMAGE,
+export const removeFile = id => ({
+    type: REMOVE_FILE,
     payload: { id }
 });
 

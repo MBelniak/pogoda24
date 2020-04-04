@@ -71,7 +71,7 @@ module.exports = {
                 test: /\.(jpe?g|png|gif|svg)$/,
                 loader: "file-loader?name=/img/[name].[ext]",
                 options: {
-                    publicPath: '/'
+                    publicPath: '/admin'
                 }
             }
         ]
@@ -80,7 +80,8 @@ module.exports = {
         new HtmlWebPackPlugin({
             template: "./public/index.html",
             filename: "./index.html",
-            stats: { children: false }
+            stats: { children: false },
+            favicon: "./public/favicon.png"
         }),
         new MiniCssExtractPlugin(
             {
