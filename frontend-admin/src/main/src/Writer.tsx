@@ -6,6 +6,7 @@ import img from './img/bg.jpg';
 import UploadedFilesItem from "./UploadedFilesItem";
 import {addFile} from "./redux/actions";
 const Copyright = require('shared24').Copyright;
+const LoadingIndicator = require('shared24').LoadingIndicator;
 const {cloud_name, upload_preset, api_key, api_secret} = config;
 const sha1 = require('js-sha1');
 
@@ -24,7 +25,8 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 interface State {
     postType: PostType,
     addWarnToBar: boolean,
-    postDescription: string
+    postDescription: string,
+    loading: boolean
 }
 
 interface Post {
@@ -48,7 +50,8 @@ class Writer extends React.Component<PropsFromRedux, State> {
     state: State = {
         postType: PostType.Prognoza,
         addWarnToBar: false,
-        postDescription: ""
+        postDescription: "",
+        loading: false
     };
 
     private fileId;
@@ -76,52 +79,52 @@ class Writer extends React.Component<PropsFromRedux, State> {
 
     private handleSubmit(event) {
         event.preventDefault();
+        this.setState({loading: true});
         this.savePost();
-        this.uploadFiles();
     }
 
     private savePost() {
-
-    }
-
-    private uploadFiles() {
-        const url = `https://api.cloudinary.com/v1_1/${
-            cloud_name
-            }/upload`;
+        const url = `https://api.cloudinary.com/v1_1/${cloud_name}/upload`;
 
         const uploadedFilesIds: number[] = [];
-        for (let photo of this.props.files) {
+        const uploadPromises: Promise<Response>[] = this.props.files.map(file => {
             let timestamp = new Date().getTime().toString();
             timestamp = timestamp.substr(0, timestamp.toString().length-3);
-            const signature = this.prepareSignature(photo, timestamp);
+            const signature = this.prepareSignature(file, timestamp);
+
             const formData = new FormData();
             formData.append('upload_preset', upload_preset);
             formData.append('timestamp', timestamp.toString());
-            formData.append('public_id', photo.file.name + timestamp);
+            formData.append('public_id', file.file.name + timestamp);
             formData.append('api_key', api_key);
-            formData.append('file', photo.file);
+            formData.append('file', file.file);
             formData.append('signature', signature);
-            fetch(url, {
+
+            return fetch(url, {
                 method: 'POST',
                 body: formData
-            }).then(response => {
-                if (response && response.ok) {
-                    response.json().then(data => {
+            });
+        });
+
+        Promise.all(uploadPromises).then(responses => {
+            if (responses.every(response => response && response.ok)) {
+                responses.map(async response => {
+                    await response.json().then(data => {
                         console.log(data);
                         uploadedFilesIds.push(data.public_id);
-                        if (uploadedFilesIds.length === this.props.files.length) {
-                            this.sendPostToBackend(uploadedFilesIds)
-                        }
                     });
-                }
-                else {
-
-                }
-            }).catch(error => {
-                console.log(error);
-                this.showErrorMessage("Nie udało się wysłać obrazów. Powód: " + error);
-            });
-        }
+                });
+                this.sendPostToBackend(uploadedFilesIds);
+            } else {
+                console.log("Nie udało się wysłać wszystkich obrazów.");
+                this.showErrorMessage("Nie udało się wysłać wszystkich obrazów.");
+                this.setState({loading: false});
+            }
+        }).catch(error => {
+            console.log(error);
+            this.showErrorMessage("Nie udało się wysłać obrazów. Powód: " + error);
+            this.setState({loading: false});
+        });
     }
 
     private prepareSignature(photo: UploadedFile, timestamp: string): string {
@@ -149,14 +152,16 @@ class Writer extends React.Component<PropsFromRedux, State> {
             if (response && response.ok) {  //post saved, send images ids
                 response.json().then(data => {
                     this.sendImagesToBackend(data, uploadedFilesIds);
-
                 })
             } else {
                 console.log(response);
+                this.setState({loading: false});
+                this.showErrorMessage("Nie udało się zapisać posta. Odpowiedź z serwera: " + response);
             }
         }).catch(error => {
             console.log(error);
             this.showErrorMessage("Nie udało się zapisać posta. Powód: " + error);
+            this.setState({loading: false});
         })
     }
 
@@ -177,12 +182,15 @@ class Writer extends React.Component<PropsFromRedux, State> {
             body: JSON.stringify(requestBodyForecastMaps)
         }).then(response => {
             if (response && response.ok) {
+                this.setState({loading: false});
                 this.showSuccessMessage();
             } else {
+                this.setState({loading: false});
                 this.showErrorMessage("Coś poszło nie tak przy zapisywaniu obrazów.");
             }
         }).catch(error => {
             console.log(error);
+            this.setState({loading: false});
             this.showErrorMessage("Nie udało się zapisać obrazów. Powód: " + error);
         })
     }
@@ -216,6 +224,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
     render() {
         return (
             <section>
+                <LoadingIndicator isShown={this.state.loading}/>
                 <div className="container fluid">
                     <img src={img} className="bgimg"/>
                     <h2 className="title">Witaj w edytorze wpisów.</h2>
