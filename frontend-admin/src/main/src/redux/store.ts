@@ -1,40 +1,38 @@
 import { createStore } from 'redux';
-import { ADD_IMAGE, REMOVE_IMAGE } from "./actions";
+import { ADD_FILE, REMOVE_FILE } from "./actions";
 
-interface UploadedPhoto {
+interface UploadedFile {
     id: number;
-    content: File;
+    file: File;
 }
 
-const uploadedImagesReducer = (uploadedPhotos: UploadedPhoto[] = [], action) => {
+const uploadedFilesReducer = (uploadedFiles: UploadedFile[] = [], action) => {
     switch (action.type) {
-        case ADD_IMAGE:
+        case ADD_FILE:
         {
-            let photoIndex = -1;
-            const updatedPhotos = uploadedPhotos.map((photo, index) => {
-                if (photo.id === action.uploadedPhoto.id) {
-                    photoIndex = index;
-                    return { ...photo, ...action.uploadedPhoto };
+            let fileIndex = -1;
+            const updatedFiles = uploadedFiles.map((file, index) => {
+                if (file.id === action.payload.id) {
+                    fileIndex = index;
+                    return { ...file, ...action.payload };
                 }
 
-                return photo;
+                return file;
             });
 
-            return photoIndex !== -1
-                ? updatedPhotos
-                : [action.uploadedPhoto, ...uploadedPhotos];
+            return fileIndex !== -1
+                ? updatedFiles
+                : [...uploadedFiles, action.payload];
         }
-        case REMOVE_IMAGE:
+        case REMOVE_FILE:
         {
             const id = action.payload.id;
-            uploadedPhotos = uploadedPhotos.filter(uploadedPhoto => uploadedPhoto.id != id);
-            return uploadedPhotos;
+            return uploadedFiles.filter(uploadedFile => uploadedFile.id != id);
         }
         default:
-            return uploadedPhotos;
+            return uploadedFiles;
     }
-}
+};
 
-
-export const store = createStore(uploadedImagesReducer);
+export const store = createStore(uploadedFilesReducer);
 

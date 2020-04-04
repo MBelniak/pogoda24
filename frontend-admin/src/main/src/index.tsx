@@ -9,7 +9,6 @@ import { Traffic } from './Traffic';
 import { CloudinaryContext } from 'cloudinary-react';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
-import './css/main.css';
 import './sass/main.scss';
 import 'shared24/src/css/main.css';
 const Navigation = require('shared24').Navigation;
