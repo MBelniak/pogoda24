@@ -33,14 +33,15 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
         return date + ' o ' + time;
     }
 
-    private processDescription(description: string) {
-        let result = description;
-        if (description.length > 170) {
+    private processDescription(post: any) {
+        let result = post.description;
+        if (post.description.length > 170) {
             let length = 170;
-            while (description.substr(length, 1) != ' ') {
+            while (post.description.substr(length, 1) != ' ') {
                 --length;
             }
-            result = description.substr(0, length) + '...';
+            result = post.description.substr(0, length) + '...';
+            result +=  <a href={'/api/posts/' + post.id} style={{color: "blue"}}>+ Czytaj dalej</a>
         }
 
         result.replace("\r\n", "<br/>");
@@ -66,9 +67,8 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
                             {this.processDate(post.postDate)}
                         </div>
                         <div className="bold center description">
-                            {this.processDescription(post.description)}
+                            {this.processDescription(post)}
                             {/*--TODO implement Router */}
-                            <a href={'/api/posts/' + post.id} style={{color: "blue"}}>+ Czytaj dalej</a>
                             <br/>
                             <ForecastMapList id={post.id} />
                         </div>
