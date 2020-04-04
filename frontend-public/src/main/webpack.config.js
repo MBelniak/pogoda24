@@ -34,7 +34,8 @@ module.exports = {
                 test: /\.ts(x)?$/,
                 loader: 'babel-loader',
                 query: {
-                    presets: ['@babel/preset-env', '@babel/preset-react']
+                    presets: ['@babel/preset-env', '@babel/preset-react'],
+                    plugins: ["emotion"]
                 },
             },
             {
