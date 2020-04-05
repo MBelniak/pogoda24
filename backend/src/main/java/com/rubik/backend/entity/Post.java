@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 public class Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Timestamp postDate;

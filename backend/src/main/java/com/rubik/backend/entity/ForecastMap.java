@@ -6,10 +6,12 @@ import javax.persistence.*;
 public class ForecastMap {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String imageUrl;
+    private String imagePublicId;
+
+    private Integer ordinal;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Post post;
@@ -22,12 +24,20 @@ public class ForecastMap {
         this.id = id;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
+    public String getImagePublicId() {
+        return imagePublicId;
     }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+    public void setImagePublicId(String imagePublicId) {
+        this.imagePublicId = imagePublicId;
+    }
+
+    public Integer getOrdinal() {
+        return ordinal;
+    }
+
+    public void setOrdinal(Integer ordinal) {
+        this.ordinal = ordinal;
     }
 
     public Post getPost() {

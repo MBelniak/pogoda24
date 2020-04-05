@@ -29,4 +29,8 @@ public class PostsService {
         Pageable pageable = PageRequest.of(page, count, Sort.by("postDate").descending());
         return postsRepository.findAll(pageable);
     }
+
+    public Post savePost(Post post) {
+        return postsRepository.save(post);
+    }
 }

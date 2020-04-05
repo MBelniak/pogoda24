@@ -11,11 +11,11 @@ export class MainPage extends React.Component {
 
     render() {
         return (
-            <section className="mainFrame">
+            <section>
                 <BarHolder/>
                 <TopBar />
                 <TopImage />
-                <div className="container fluid mainContent">
+                <div className="container fluid">
                     <div className="columns">
                         <PostsShort forecastCount={5} className='is-three-quarters'/>
                         <ExternalApi/>

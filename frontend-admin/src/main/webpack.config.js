@@ -11,10 +11,20 @@ module.exports = {
     },
     devServer: {
         proxy: {
-            '/': 'http://localhost:8080',
+            '/api/': 'http://localhost:8080',
+            '/admin/': {
+                    target: 'http://localhost:3000/',
+                    pathRewrite: { '^/admin': '' },
+                },
         },
+        port: 3000,
+        historyApiFallback: true,
+        watchContentBase: true,
+        contentBase: resolve('dist'),
+        publicPath: '/',
+        contentBasePublicPath: '/'
     },
-    mode: "production",
+    mode: process.env.NODE_ENV,
     devtool: 'inline-module-source-map',
     resolve: {
         modules: [
@@ -22,7 +32,10 @@ module.exports = {
             'node_modules'
         ],
         symlinks: true,
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.css']
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.css'],
+        alias: {
+            react: resolve('./node_modules/react')
+        }
     },
     module: {
         rules: [
@@ -30,7 +43,8 @@ module.exports = {
                 test: /\.ts(x)?$/,
                 loader: 'babel-loader',
                 query: {
-                    presets: ['@babel/preset-env', '@babel/preset-react']
+                    presets: ['@babel/preset-env', '@babel/preset-react'],
+                    plugins: ["emotion"]
                 },
             },
             {
@@ -38,14 +52,9 @@ module.exports = {
                 loader: 'ts-loader',
             },
             {
-                test: /\.css$/,
+                test: /\.(s)?css$/,
                 use: [
-                    {
-                        loader: MiniCssExtractPlugin.loader,
-                        options: {
-                            path: resolve('dist')
-                        }
-                    },
+                    MiniCssExtractPlugin.loader,
                     {
                         loader: 'css-loader',
                         options: {
@@ -53,12 +62,21 @@ module.exports = {
                                 localIdentName: '[local]'
                             }
                         }
+                    },
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true
+                        }
                     }
                 ],
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/,
-                loader: "file-loader?name=/img/[name].[ext]"
+                loader: "file-loader?name=/img/[name].[ext]",
+                options: {
+                    publicPath: '/admin'
+                }
             }
         ]
     },
@@ -66,11 +84,12 @@ module.exports = {
         new HtmlWebPackPlugin({
             template: "./public/index.html",
             filename: "./index.html",
-            stats: { children: false }
+            stats: { children: false },
+            favicon: "./public/favicon.png"
         }),
         new MiniCssExtractPlugin(
             {
-                filename: "[name].css"
+                filename: "css/[name].css"
             })
     ]
 };

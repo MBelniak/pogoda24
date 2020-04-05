@@ -6,14 +6,19 @@ module.exports = {
     entry: "./src/index.tsx",
     output: {
         path: resolve('dist'),
-        filename: 'bundle.js'
+        filename: 'bundle.js',
+        publicPath: '/'
     },
     devServer: {
         proxy: {
-            '/': 'http://localhost:8080',
+            '/api/': 'http://localhost:8080'
         },
+        contentBase: resolve('dist'),
+        port: 3000,
+        historyApiFallback: true,
+        watchContentBase: true,
     },
-    mode: "development",
+    mode: process.env.NODE_ENV,
     devtool: 'inline-module-source-map',
     resolve: {
         modules: [
@@ -29,7 +34,8 @@ module.exports = {
                 test: /\.ts(x)?$/,
                 loader: 'babel-loader',
                 query: {
-                    presets: ['@babel/preset-env', '@babel/preset-react']
+                    presets: ['@babel/preset-env', '@babel/preset-react'],
+                    plugins: ["emotion"]
                 },
             },
             {
@@ -58,7 +64,10 @@ module.exports = {
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/,
-                loader: "file-loader?name=/img/[name].[ext]"
+                loader: "file-loader?name=/img/[name].[ext]",
+                options: {
+                    publicPath: '/'
+                }
             }
         ]
     },
@@ -66,11 +75,12 @@ module.exports = {
         new HtmlWebPackPlugin({
             template: "./public/index.html",
             filename: "./index.html",
-            stats: { children: false }
+            stats: { children: false },
+            favicon: "./public/favicon.png"
         }),
         new MiniCssExtractPlugin(
             {
-                filename: "[name].css"
+                filename: "css/[name].css"
             })
     ]
 };

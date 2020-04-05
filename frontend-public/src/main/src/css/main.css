@@ -2,17 +2,6 @@
     --primary-color: #23425f;
     --secondary-color: #25abae;
 }
-
-#root {
-    left: auto;
-    right: auto;
-    top: 0;
-}
-.mainFrame {
-    min-height: 100vh;
-    width: 100%;
-    left: 0;
-}
 .truecontent {
     margin-top: 15px;
 }
@@ -31,10 +20,6 @@ transition: 0.3s;
 color: blue;
 }
 
-.mainContent {
-    /*display: flex;*/
-    /*flex-direction: row;*/
-}
 .externalApi {
     height: 450px;
     font-family: Arial;

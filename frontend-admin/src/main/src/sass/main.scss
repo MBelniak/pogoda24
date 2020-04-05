@@ -1,0 +1,179 @@
+@charset "utf-8";
+$primary-color: #23425f;
+$secondary-color: #25abae;
+$background: $primary-color;
+$body-background-color: $primary-color;
+$navbar-background-color: $secondary-color;
+$navbar-item-hover-color: $primary-color;
+$title-color: white;
+$divider-color: white;
+// Import only what you need from Bulma
+@import "../../node_modules/bulma/sass/utilities/_all.sass";
+@import "../../node_modules/bulma/sass/base/_all.sass";
+@import "../../node_modules/bulma/sass/elements/button.sass";
+@import "../../node_modules/bulma/sass/elements/container.sass";
+@import "../../node_modules/bulma/sass/elements/title.sass";
+@import "../../node_modules/bulma/sass/form/_all.sass";
+@import "../../node_modules/bulma/sass/components/navbar.sass";
+@import "../../node_modules/bulma/sass/layout/hero.sass";
+@import "../../node_modules/bulma/sass/layout/section.sass";
+@import "../../node_modules/bulma/sass/layout/all.sass";
+@import "../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass";
+
+.writerForm * {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+:root {
+  --primary-color: #23425f;
+  --secondary-color: #25abae;
+}
+p, span, label {
+  color: white;
+}
+.dropzone {
+  border: 2px var(--secondary-color) solid;
+  border-radius: 20px;
+  background: repeating-linear-gradient(45deg, var(--primary-color) 1px, var(--secondary-color) 5px);
+  cursor: default;
+  }
+.truecontent
+{
+    text-align: left;
+    margin-top: 15px;
+  }
+.title {
+  text-align: left;
+  margin-top: 10px;
+}
+.dropzone-text {
+  text-align: center;
+}
+.subtitle {
+  color: white;
+  margin-top: 10px;
+}
+.bold2
+{
+  font-weight: bold;
+}
+
+.barTitle
+{
+  font-family: Sans;
+  position: absolute;
+  top: 10px;
+  font-weight: bold;
+  font-size: 23px;
+  margin-left: 10px;
+}
+
+.bgimg
+{
+  width: 100%;
+  height: 400px;
+}
+.post_flen
+{
+  display: block;
+  margin-left: 5px;
+  padding: 5px;
+
+  width: 90%;
+  background: black;
+  margin-top: 15px;
+  box-shadow: 0 0 5px black;
+  font-family: Arial;
+  font-size: 15px;
+}
+.pimg
+{
+  margin-top: 5px;
+  border-top: 1px solid black;
+  padding: 5px 1px 1px;
+}
+.zrzutka
+{
+  position: relative;
+  width: 100%;
+  margin-top: 10px;
+}
+.personRow
+{
+  margin-left: 100px;
+  height:96px;
+}
+.ekipaImg
+{
+  position: absolute;
+}
+.panelIcon:hover
+{
+  opacity: 0.8;
+}
+.uploadedFilesItem {
+  border: 2px solid var(--secondary-color);
+  border-radius: 20px;
+  margin: 10px 0 5px 5px;
+  position: relative;
+}
+.uploadedFilesItemContent {
+  margin: 5px;
+  padding: 5px;
+}
+.uploadedFilesItemOverlayWrapper {
+  display: none;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+.uploadedFilesItemOverlay {
+  background-color: var(--secondary-color);
+  border-radius: 20px;
+  opacity: 0.8;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+.uploadedFilesItemOverlayContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  position: absolute;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.uploadedFilesItemDelete:hover {
+  cursor: pointer;
+}
+.uploadedFilesItemDelete:after {
+  height: 50px;
+  width: 50px;
+  border: 2px solid white;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  content: "\00D7";
+  color: white;
+  font-family: helvetica, arial, sans-serif;
+  font-size: 50px;
+}
+.deleteFile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.arrowRight:hover, .arrowLeft:hover {
+  cursor: pointer;
+}
+.dialogMessage {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}
