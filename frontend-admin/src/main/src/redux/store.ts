@@ -1,5 +1,5 @@
 import { createStore } from 'redux';
-import { ADD_FILE, REMOVE_FILE, MOVE_FILE_BACK, MOVE_FILE_FORWARD } from "./actions";
+import { ADD_FILE, CLEAR_FILES, REMOVE_FILE, MOVE_FILE_BACK, MOVE_FILE_FORWARD } from "./actions";
 
 interface UploadedFile {
     id: number;
@@ -45,6 +45,10 @@ const uploadedFilesReducer = (uploadedFiles: UploadedFile[] = [], action) => {
                 uploadedFiles.splice(id + 1, 0, uploadedFiles.splice(id, 1)[0]);
             }
             return [...uploadedFiles];
+        }
+        case CLEAR_FILES:
+        {
+            return [];
         }
         default:
             return uploadedFiles;
