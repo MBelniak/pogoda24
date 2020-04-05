@@ -75,6 +75,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
         this.onFilesAdded = this.onFilesAdded.bind(this);
         this.handleTextAreaChange = this.handleTextAreaChange.bind(this);
         this.clearEverything = this.clearEverything.bind(this);
+        this.closeModal = this.closeModal.bind(this);
     }
 
     private onFilesAdded(files) {
@@ -95,34 +96,67 @@ class Writer extends React.Component<PropsFromRedux, State> {
     private handleSubmit(event) {
         event.preventDefault();
         this.showModal(<LoadingIndicator />);
-        const uploadPromises: Promise<Response>[] = this.uploadImages();
-        Promise.all(uploadPromises).then(responses => {
-            if (responses.every(response => response && response.ok)) {
-                switch (this.state.postType) {
-                    case (PostType.Prognoza): {
-                        this.sendPostToBackend();
-                        break;
-                    }
-                    case (PostType.Ostrtzezenie): {
-                        this.sendWarningToBackend();
-                        break;
-                    }
-                    case (PostType.Ciekawostka): {
-                        this.sendFactToBackend();
-                        break;
-                    }
-                }
+        const responsePromise = this.sendPostToBackend();
 
+        responsePromise.then(response => {
+            if (response && response.ok) {
+                response.json().then((data: any) => {
+                    if (data !== null) {    //post saved, send images to cloudinary
+                        const uploadPromises: Promise<Response>[] = this.uploadImages();
+                        Promise.all(uploadPromises).then(responses => {
+                            if (responses.every(response => response && response.ok)) { //all images uploaded successfully
+                                this.sendImagesPublicIdsToBackend(data);
+                            } else {
+                                responses = responses.filter(response => !response || !response.ok);
+                                console.log(responses.toString());
+                                this.closeModal();
+                                this.showErrorMessage("Nie udało się wysłać wszystkich plików. Post nie został zapisany.");
+                                this.removePostFromBackend(data.id);
+                            }
+                        }).catch(error => {
+                            console.log(error);
+                            this.closeModal();
+                            this.showErrorMessage("Wystąpił błąd przy wysyłaniu plików. Post nie został zapisany. Powód: " + error);
+                            this.removePostFromBackend(data.id);
+                        });
+                    } else {
+                        this.closeModal();
+                        this.showErrorMessage("Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.");
+                        this.removePostFromBackend(data.id);
+                    }
+                });
             } else {
-                responses = responses.filter(response => !response || !response.ok);
-                console.log(responses);
-                this.showErrorMessage("Nie udało się wysłać wszystkich obrazów. Post nie został zapisany.");
+                console.log(response);
                 this.closeModal();
+                this.showErrorMessage("Nie udało się zapisać postu. Odpowiedź z serwera: " + response.statusText);
+
             }
         }).catch(error => {
             console.log(error);
-            this.showErrorMessage("Nie udało się wysłać obrazów. Powód: " + error);
             this.closeModal();
+            this.showErrorMessage("Nie udało się zapisać postu. Powód: " + error);
+        })
+    }
+
+    private sendPostToBackend(): Promise<Response> {
+        let requestBodyPost;
+        if (this.state.postType === PostType.Ostrtzezenie) {
+            //TODO request body for warning
+        } else {
+            requestBodyPost = {
+                description: this.postDescriptionTextArea.current.value,
+                postDate: new Date().getTime()
+            };
+        }
+        const url = this.state.postType === PostType.Prognoza ? "/api/posts"
+            : this.state.postType === PostType.Ostrtzezenie ? "/api/warnings"
+                : "/api/facts";
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBodyPost)
         });
     }
 
@@ -160,35 +194,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
         return hash;
     }
 
-    private sendPostToBackend() {
-        const requestBodyPost = {
-            description: this.postDescriptionTextArea.current.value,
-            postDate: new Date().getTime()
-        };
-        fetch('/api/posts', {
-            method: 'POST',
-                headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBodyPost)
-        }).then(response => {
-            if (response && response.ok) {  //post saved, send images ids
-                response.json().then(data => {
-                    this.sendImagesToBackend(data);
-                })
-            } else {
-                console.log(response);
-                this.closeModal();
-                this.showErrorMessage("Nie udało się zapisać posta. Odpowiedź z serwera: " + response);
-            }
-        }).catch(error => {
-            console.log(error);
-            this.closeModal();
-            this.showErrorMessage("Nie udało się zapisać posta. Powód: " + error);
-        })
-    }
-
-    private sendImagesToBackend(data: any) {
+    private sendImagesPublicIdsToBackend(data: any) {
         const requestBodyForecastMaps: ForecastMap[] = [];
         const uploadedFiles = this.props.files;
         for (let i = 0; i < uploadedFiles.length; ++i) {
@@ -219,75 +225,23 @@ class Writer extends React.Component<PropsFromRedux, State> {
         })
     }
 
-    private sendWarningToBackend() {
-        const requestBodyPost = {
-            description: this.postDescriptionTextArea.current.value,
-            postDate: new Date().getTime()
-        };
-        fetch('/api/warnings', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBodyPost)
-        }).then(response => {
-            if (response && response.ok) {  //post saved, send images ids
-                response.json().then(data => {
-                    this.sendImagesToBackend(data);
-                })
-            } else {
-                console.log(response);
-                this.closeModal();
-                this.showErrorMessage("Nie udało się zapisać ostrzeżenia. Odpowiedź z serwera: " + response);
-            }
-        }).catch(error => {
-            console.log(error);
-            this.closeModal();
-            this.showErrorMessage("Nie udało się zapisać ostrzeżenia. Powód: " + error);
-        })
-    }
+    private removePostFromBackend(postId: number) {
 
-    private sendFactToBackend() {
-        const requestBodyPost = {
-            description: this.state.postDescription,
-            postDate: new Date().getTime()
-        };
-        fetch('/api/facts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBodyPost)
-        }).then(response => {
-            if (response && response.ok) {  //post saved, send images ids
-                response.json().then(data => {
-                    this.sendImagesToBackend(data);
-                })
-            } else {
-                console.log(response);
-                this.closeModal();
-                this.showErrorMessage("Nie udało się zapisać ciekawostki. Odpowiedź z serwera: " + response);
-            }
-        }).catch(error => {
-            console.log(error);
-            this.closeModal();
-            this.showErrorMessage("Nie udało się zapisać ciekawostki. Powód: " + error);
-        })
     }
 
     private showSuccessMessage() {
         let postType;
         switch (this.state.postType) {
             case (PostType.Prognoza): {
-                postType = "prognozę";
+                postType = "prognozę.";
                 break;
             }
             case (PostType.Ostrtzezenie): {
-                postType = "ostrzeżenie";
+                postType = "ostrzeżenie.";
                 break;
             }
             case (PostType.Ciekawostka): {
-                postType = "ciekawostkę";
+                postType = "ciekawostkę.";
                 break;
             }
         }
@@ -296,12 +250,18 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 <p className="dialogMessage">Pomyślnie zapisano {postType}</p>
                 <button className="button" style={{float: "right"}} onClick={this.clearEverything}>Ok</button>
             </div>
-        )
+        );
         this.showModal(toRender);
     }
 
     private showErrorMessage(errorMessage: string) {
-
+        const toRender = (
+            <div>
+                <p className="dialogMessage">{errorMessage}</p>
+                <button className="button" style={{float: "right"}} onClick={this.closeModal}>Ok</button>
+            </div>
+        );
+        this.showModal(toRender);
     }
 
     private clearEverything() {
