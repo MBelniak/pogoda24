@@ -173,3 +173,7 @@ p, span, label {
 .arrowRight:hover, .arrowLeft:hover {
   cursor: pointer;
 }
+.dialogMessage {
+  color: var(--primary-color);
+  margin-bottom: 10px;
+}

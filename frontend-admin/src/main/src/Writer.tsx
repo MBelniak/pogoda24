@@ -4,7 +4,7 @@ import FileDropper from "./FileDropper";
 import {connect, ConnectedProps} from "react-redux";
 import img from './img/bg.jpg';
 import UploadedFilesItem from "./UploadedFilesItem";
-import {addFile} from "./redux/actions";
+import {addFile, clearFiles} from "./redux/actions";
 const Copyright = require('shared24').Copyright;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 const ModalWindow = require('shared24').ModalWindow;
@@ -19,7 +19,8 @@ interface UploadedFile {
 
 const connector = connect((state: UploadedFile[]) => ({ files: state }),
     {
-            onAddImage: addFile
+            onAddImage: addFile,
+            onClearFiles: clearFiles
     });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -28,7 +29,8 @@ interface State {
     postType: PostType,
     addWarnToBar: boolean,
     postDescription: string,
-    loading: boolean
+    showModal: boolean,
+    renderModal: JSX.Element | undefined
 }
 
 interface Post {
@@ -54,23 +56,25 @@ class Writer extends React.Component<PropsFromRedux, State> {
         postType: PostType.Prognoza,
         addWarnToBar: false,
         postDescription: "",
-        loading: false
+        showModal: false,
+        renderModal: undefined
     };
 
     private fileId;
     private fileInput;
     private warningCheckBox;
-    private postDescription;
+    private postDescriptionTextArea;
 
     constructor(props) {
         super(props);
         this.fileId = 0;
         this.fileInput = React.createRef();
         this.warningCheckBox = React.createRef();
-        this.postDescription = React.createRef();
+        this.postDescriptionTextArea = React.createRef();
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFilesAdded = this.onFilesAdded.bind(this);
         this.handleTextAreaChange = this.handleTextAreaChange.bind(this);
+        this.clearEverything = this.clearEverything.bind(this);
     }
 
     private onFilesAdded(files) {
@@ -80,9 +84,17 @@ class Writer extends React.Component<PropsFromRedux, State> {
         this.fileInput.value = null;
     }
 
+    private showModal(toRender: JSX.Element) {
+        this.setState({showModal: true, renderModal: toRender});
+    }
+
+    private closeModal() {
+        this.setState({showModal: false});
+    }
+
     private handleSubmit(event) {
         event.preventDefault();
-        this.setState({loading: true});
+        this.showModal(<LoadingIndicator />);
         const uploadPromises: Promise<Response>[] = this.uploadImages();
         Promise.all(uploadPromises).then(responses => {
             if (responses.every(response => response && response.ok)) {
@@ -105,12 +117,12 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 responses = responses.filter(response => !response || !response.ok);
                 console.log(responses);
                 this.showErrorMessage("Nie udało się wysłać wszystkich obrazów. Post nie został zapisany.");
-                this.setState({loading: false});
+                this.closeModal();
             }
         }).catch(error => {
             console.log(error);
             this.showErrorMessage("Nie udało się wysłać obrazów. Powód: " + error);
-            this.setState({loading: false});
+            this.closeModal();
         });
     }
 
@@ -150,7 +162,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
 
     private sendPostToBackend() {
         const requestBodyPost = {
-            description: this.postDescription.current.value,
+            description: this.postDescriptionTextArea.current.value,
             postDate: new Date().getTime()
         };
         fetch('/api/posts', {
@@ -166,13 +178,13 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 })
             } else {
                 console.log(response);
-                this.setState({loading: false});
+                this.closeModal();
                 this.showErrorMessage("Nie udało się zapisać posta. Odpowiedź z serwera: " + response);
             }
         }).catch(error => {
             console.log(error);
+            this.closeModal();
             this.showErrorMessage("Nie udało się zapisać posta. Powód: " + error);
-            this.setState({loading: false});
         })
     }
 
@@ -194,22 +206,22 @@ class Writer extends React.Component<PropsFromRedux, State> {
             body: JSON.stringify(requestBodyForecastMaps)
         }).then(response => {
             if (response && response.ok) {
-                this.setState({loading: false});
+                this.closeModal();
                 this.showSuccessMessage();
             } else {
-                this.setState({loading: false});
+                this.closeModal();
                 this.showErrorMessage("Coś poszło nie tak przy zapisywaniu obrazów.");
             }
         }).catch(error => {
             console.log(error);
-            this.setState({loading: false});
+            this.closeModal();
             this.showErrorMessage("Nie udało się zapisać obrazów. Powód: " + error);
         })
     }
 
     private sendWarningToBackend() {
         const requestBodyPost = {
-            description: this.postDescription.current.value,
+            description: this.postDescriptionTextArea.current.value,
             postDate: new Date().getTime()
         };
         fetch('/api/warnings', {
@@ -225,19 +237,19 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 })
             } else {
                 console.log(response);
-                this.setState({loading: false});
+                this.closeModal();
                 this.showErrorMessage("Nie udało się zapisać ostrzeżenia. Odpowiedź z serwera: " + response);
             }
         }).catch(error => {
             console.log(error);
+            this.closeModal();
             this.showErrorMessage("Nie udało się zapisać ostrzeżenia. Powód: " + error);
-            this.setState({loading: false});
         })
     }
 
     private sendFactToBackend() {
         const requestBodyPost = {
-            description: this.postDescription.current.value,
+            description: this.state.postDescription,
             postDate: new Date().getTime()
         };
         fetch('/api/facts', {
@@ -253,22 +265,49 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 })
             } else {
                 console.log(response);
-                this.setState({loading: false});
+                this.closeModal();
                 this.showErrorMessage("Nie udało się zapisać ciekawostki. Odpowiedź z serwera: " + response);
             }
         }).catch(error => {
             console.log(error);
+            this.closeModal();
             this.showErrorMessage("Nie udało się zapisać ciekawostki. Powód: " + error);
-            this.setState({loading: false});
         })
     }
 
     private showSuccessMessage() {
-
+        let postType;
+        switch (this.state.postType) {
+            case (PostType.Prognoza): {
+                postType = "prognozę";
+                break;
+            }
+            case (PostType.Ostrtzezenie): {
+                postType = "ostrzeżenie";
+                break;
+            }
+            case (PostType.Ciekawostka): {
+                postType = "ciekawostkę";
+                break;
+            }
+        }
+        const toRender = (
+            <div>
+                <p className="dialogMessage">Pomyślnie zapisano {postType}</p>
+                <button className="button" style={{float: "right"}} onClick={this.clearEverything}>Ok</button>
+            </div>
+        )
+        this.showModal(toRender);
     }
 
     private showErrorMessage(errorMessage: string) {
 
+    }
+
+    private clearEverything() {
+        this.props.onClearFiles();
+        this.setState({postType: PostType.Prognoza, postDescription: ""});
+        this.closeModal();
     }
 
     private warningOptionChosen() {
@@ -292,7 +331,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
     render() {
         return (
             <section>
-                <ModalWindow isShown={this.state.loading} render={<LoadingIndicator/>}/>
+                <ModalWindow isShown={this.state.showModal} render={this.state.renderModal}/>
                 <div className="container fluid">
                     <img src={img} className="bgimg"/>
                     <h2 className="title">Witaj w edytorze wpisów.</h2>
@@ -303,7 +342,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                                 <div className="column">
                                     <p>Dodaj opis do {this.state.postType.toString()}: </p>
                                     <textarea required={true} cols={100} rows={10} placeholder='Treść posta...'
-                                              ref={this.postDescription} onChange={this.handleTextAreaChange}
+                                              ref={this.postDescriptionTextArea} onChange={this.handleTextAreaChange}
                                               value={this.state.postDescription}/>
                                 </div>
                                 <div className="column">
@@ -329,10 +368,11 @@ class Writer extends React.Component<PropsFromRedux, State> {
                                     <label htmlFor="ciekawostka"> Ciekawostka</label>
                                 </div>
                             </div>
-                            <p>Dodaj mapki z prognozą. Możesz przeciągnąć swoje mapki z dysku na kreskowane pole:</p>
+                            <p>Dodaj mapki z prognozą/ostrzeżeniem lub zdjęcia do ciekawostki.
+                                Możesz przeciągnąć swoje pliki z dysku na kreskowane pole:</p>
                             <FileDropper/>
-                            <span>...lub skorzystać z klasycznego dodawania plików: </span>
-                            <input type="button" id="loadFile" value="Wybierz pliki"
+                            <p>...lub skorzystać z klasycznego dodawania plików: </p>
+                            <input type="button" className="button" id="loadFile" value="Wybierz pliki"
                                    onClick={() => document.getElementById('mapsFiles')?.click()}/>
                             <input
                                 type="file"
@@ -357,7 +397,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                         </div>
                         <div className="is-divider"/>
                         <form onSubmit={this.handleSubmit}>
-                            <input type="submit" value="Wyślij"/>
+                            <input type="submit" className="button" value="Wyślij"/>
                         </form>
                     </div>
                 </div>

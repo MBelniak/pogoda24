@@ -2,6 +2,7 @@ export const ADD_FILE = "ADD_FILE";
 export const REMOVE_FILE = "REMOVE_FILE";
 export const MOVE_FILE_BACK = "MOVE_FILE_BACK";
 export const MOVE_FILE_FORWARD = "MOVE_FILE_FORWARD";
+export const CLEAR_FILES = "CLEAR_FILES";
 
 let fileId = 0;
 
@@ -29,4 +30,7 @@ export const moveFileForward = id => ({
     payload: { id }
 });
 
+export const clearFiles = () => ({
+   type: CLEAR_FILES
+});
 
