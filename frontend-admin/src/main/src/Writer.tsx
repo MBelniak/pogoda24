@@ -7,12 +7,14 @@ import UploadedFilesItem from "./UploadedFilesItem";
 import {addFile} from "./redux/actions";
 const Copyright = require('shared24').Copyright;
 const LoadingIndicator = require('shared24').LoadingIndicator;
+const ModalWindow = require('shared24').ModalWindow;
 const {cloud_name, upload_preset, api_key, api_secret} = config;
 const sha1 = require('js-sha1');
 
 interface UploadedFile {
     id: number,
-    file: File
+    file: File,
+    publicId: string
 }
 
 const connector = connect((state: UploadedFile[]) => ({ files: state }),
@@ -35,7 +37,8 @@ interface Post {
 }
 
 interface ForecastMap {
-    imagePublicId: number,
+    imagePublicId: string,
+    ordinal: number,
     post: Post;
 }
 
@@ -80,44 +83,28 @@ class Writer extends React.Component<PropsFromRedux, State> {
     private handleSubmit(event) {
         event.preventDefault();
         this.setState({loading: true});
-        this.savePost();
-    }
-
-    private savePost() {
-        const url = `https://api.cloudinary.com/v1_1/${cloud_name}/upload`;
-
-        const uploadedFilesIds: number[] = [];
-        const uploadPromises: Promise<Response>[] = this.props.files.map(file => {
-            let timestamp = new Date().getTime().toString();
-            timestamp = timestamp.substr(0, timestamp.toString().length-3);
-            const signature = this.prepareSignature(file, timestamp);
-
-            const formData = new FormData();
-            formData.append('upload_preset', upload_preset);
-            formData.append('timestamp', timestamp.toString());
-            formData.append('public_id', file.file.name + timestamp);
-            formData.append('api_key', api_key);
-            formData.append('file', file.file);
-            formData.append('signature', signature);
-
-            return fetch(url, {
-                method: 'POST',
-                body: formData
-            });
-        });
-
+        const uploadPromises: Promise<Response>[] = this.uploadImages();
         Promise.all(uploadPromises).then(responses => {
             if (responses.every(response => response && response.ok)) {
-                responses.map(async response => {
-                    await response.json().then(data => {
-                        console.log(data);
-                        uploadedFilesIds.push(data.public_id);
-                    });
-                });
-                this.sendPostToBackend(uploadedFilesIds);
+                switch (this.state.postType) {
+                    case (PostType.Prognoza): {
+                        this.sendPostToBackend();
+                        break;
+                    }
+                    case (PostType.Ostrtzezenie): {
+                        this.sendWarningToBackend();
+                        break;
+                    }
+                    case (PostType.Ciekawostka): {
+                        this.sendFactToBackend();
+                        break;
+                    }
+                }
+
             } else {
-                console.log("Nie udało się wysłać wszystkich obrazów.");
-                this.showErrorMessage("Nie udało się wysłać wszystkich obrazów.");
+                responses = responses.filter(response => !response || !response.ok);
+                console.log(responses);
+                this.showErrorMessage("Nie udało się wysłać wszystkich obrazów. Post nie został zapisany.");
                 this.setState({loading: false});
             }
         }).catch(error => {
@@ -127,31 +114,55 @@ class Writer extends React.Component<PropsFromRedux, State> {
         });
     }
 
+    private uploadImages() {
+        const url = `https://api.cloudinary.com/v1_1/${cloud_name}/upload`;
+
+        return this.props.files.map(file => {
+            let timestamp = new Date().getTime().toString();
+            timestamp = timestamp.substr(0, timestamp.toString().length-3);
+            const public_id = file.file.name + timestamp;
+            file.publicId = public_id;
+            const signature = this.prepareSignature(file, timestamp);
+
+            const formData = new FormData();
+            formData.append('upload_preset', upload_preset);
+            formData.append('timestamp', timestamp.toString());
+            formData.append('public_id', public_id);
+            formData.append('api_key', api_key);
+            formData.append('file', file.file);
+            formData.append('signature', signature);
+
+            return fetch(url, {
+                method: 'POST',
+                body: formData
+            });
+        });
+    }
+
     private prepareSignature(photo: UploadedFile, timestamp: string): string {
         const publicId = photo.file.name + timestamp;
         const hash = sha1.create();
         const stringToSign = "public_id=" + publicId + "&timestamp=" + timestamp + "&upload_preset=" + upload_preset
             + api_secret;
         hash.update(stringToSign);
-        console.log(stringToSign);
         return hash;
     }
 
-    private sendPostToBackend(uploadedFilesIds: number[]) {
+    private sendPostToBackend() {
         const requestBodyPost = {
             description: this.postDescription.current.value,
             postDate: new Date().getTime()
         };
         fetch('/api/posts', {
             method: 'POST',
-            headers: {
+                headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBodyPost)
         }).then(response => {
             if (response && response.ok) {  //post saved, send images ids
                 response.json().then(data => {
-                    this.sendImagesToBackend(data, uploadedFilesIds);
+                    this.sendImagesToBackend(data);
                 })
             } else {
                 console.log(response);
@@ -165,15 +176,16 @@ class Writer extends React.Component<PropsFromRedux, State> {
         })
     }
 
-    private sendImagesToBackend(data: any, uploadedFilesIds: number[]) {
-        console.log(uploadedFilesIds);
+    private sendImagesToBackend(data: any) {
         const requestBodyForecastMaps: ForecastMap[] = [];
-        uploadedFilesIds.map(id => {
+        const uploadedFiles = this.props.files;
+        for (let i = 0; i < uploadedFiles.length; ++i) {
             requestBodyForecastMaps.push({
-                imagePublicId: id,
+                imagePublicId: uploadedFiles[i].publicId,
+                ordinal: i,
                 post: data
-            })
-        });
+            });
+        }
         fetch('/api/images', {
             method: 'POST',
             headers: {
@@ -192,6 +204,62 @@ class Writer extends React.Component<PropsFromRedux, State> {
             console.log(error);
             this.setState({loading: false});
             this.showErrorMessage("Nie udało się zapisać obrazów. Powód: " + error);
+        })
+    }
+
+    private sendWarningToBackend() {
+        const requestBodyPost = {
+            description: this.postDescription.current.value,
+            postDate: new Date().getTime()
+        };
+        fetch('/api/warnings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBodyPost)
+        }).then(response => {
+            if (response && response.ok) {  //post saved, send images ids
+                response.json().then(data => {
+                    this.sendImagesToBackend(data);
+                })
+            } else {
+                console.log(response);
+                this.setState({loading: false});
+                this.showErrorMessage("Nie udało się zapisać ostrzeżenia. Odpowiedź z serwera: " + response);
+            }
+        }).catch(error => {
+            console.log(error);
+            this.showErrorMessage("Nie udało się zapisać ostrzeżenia. Powód: " + error);
+            this.setState({loading: false});
+        })
+    }
+
+    private sendFactToBackend() {
+        const requestBodyPost = {
+            description: this.postDescription.current.value,
+            postDate: new Date().getTime()
+        };
+        fetch('/api/facts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBodyPost)
+        }).then(response => {
+            if (response && response.ok) {  //post saved, send images ids
+                response.json().then(data => {
+                    this.sendImagesToBackend(data);
+                })
+            } else {
+                console.log(response);
+                this.setState({loading: false});
+                this.showErrorMessage("Nie udało się zapisać ciekawostki. Odpowiedź z serwera: " + response);
+            }
+        }).catch(error => {
+            console.log(error);
+            this.showErrorMessage("Nie udało się zapisać ciekawostki. Powód: " + error);
+            this.setState({loading: false});
         })
     }
 
@@ -224,7 +292,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
     render() {
         return (
             <section>
-                <LoadingIndicator isShown={this.state.loading}/>
+                <ModalWindow isShown={this.state.loading} render={<LoadingIndicator/>}/>
                 <div className="container fluid">
                     <img src={img} className="bgimg"/>
                     <h2 className="title">Witaj w edytorze wpisów.</h2>
@@ -276,12 +344,13 @@ class Writer extends React.Component<PropsFromRedux, State> {
                                 onChange={() => this.onFilesAdded(this.fileInput.files)}
                             />
                         </div>
+                        <p style={{paddingTop: "10px"}}>Pamiętaj, aby przed wysłaniem plików ustawić je w odpowiedniej kolejnośći!</p>
                         <p style={{paddingTop: "10px"}}>Obecnie dodane pliki:</p>
                         <div className="columns is-multiline">
                             {this.props.files.map((file, key) => {
                                 return (
                                     <div key={key} className="column is-one-quarter">
-                                        <UploadedFilesItem file={file}/>)}
+                                        <UploadedFilesItem listId={key} file={file}/>
                                     </div>
                                 )
                             })}
