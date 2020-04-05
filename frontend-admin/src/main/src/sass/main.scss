@@ -144,8 +144,8 @@ p, span, label {
   display: flex;
   position: absolute;
   align-items: center;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
 }
 .uploadedFilesItemDelete:hover {
   cursor: pointer;
@@ -163,4 +163,13 @@ p, span, label {
   color: white;
   font-family: helvetica, arial, sans-serif;
   font-size: 50px;
+}
+.deleteFile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.arrowRight:hover, .arrowLeft:hover {
+  cursor: pointer;
 }

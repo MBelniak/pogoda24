@@ -11,6 +11,8 @@ public class ForecastMap {
 
     private String imagePublicId;
 
+    private Integer ordinal;
+
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Post post;
 
@@ -28,6 +30,14 @@ public class ForecastMap {
 
     public void setImagePublicId(String imagePublicId) {
         this.imagePublicId = imagePublicId;
+    }
+
+    public Integer getOrdinal() {
+        return ordinal;
+    }
+
+    public void setOrdinal(Integer ordinal) {
+        this.ordinal = ordinal;
     }
 
     public Post getPost() {

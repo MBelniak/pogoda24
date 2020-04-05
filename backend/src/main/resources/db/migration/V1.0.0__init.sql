@@ -1,6 +1,7 @@
 CREATE TABLE forecast_map (
   id                BIGINT PRIMARY KEY AUTO_INCREMENT,
   image_public_id   nvarchar not null,
+  ordinal           INT not null,
   post_id           BIGINT not null
 );
 
