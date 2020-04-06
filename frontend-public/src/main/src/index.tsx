@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom';
 import { Switch, Route } from 'react-router';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { MainPage } from './MainPage';
+import { Prognozy } from './Prognozy';
+import { Ostrzezenia } from './Ostrzezenia';
 import { Ciekawostki } from './Ciekawostki';
 import { ONas } from './ONas';
-import { Prognozy } from './Prognozy';
 import { CloudinaryContext } from 'cloudinary-react';
 import config from './config/config';
 const Navigation = require('shared24').Navigation;
@@ -21,9 +22,10 @@ ReactDOM.render(
         <Router>
             <Switch>
                 <Route exact path="/" component={MainPage}/>
-                <Route path="/about" component={ONas}/>
-                <Route path="/ciekawostki" component={Ciekawostki}/>
                 <Route path="/prognozy" component={Prognozy}/>
+                <Route path="/ostrzezenia" component={Ostrzezenia}/>
+                <Route path="/ciekawostki" component={Ciekawostki}/>
+                <Route path="/about" component={ONas}/>
             </Switch>
         </Router>
     </CloudinaryContext>

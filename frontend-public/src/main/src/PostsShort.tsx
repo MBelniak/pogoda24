@@ -1,11 +1,18 @@
 import React from 'react';
-import { LoadingIndicator } from './LoadingIndicator';
 import { ForecastMapList } from './ForecastMapList';
 
 interface State {
     loading: boolean;
-    posts: ShortPost[];
+    posts: Post[];
 }
+
+interface Post {
+    id: number;
+    postDate: Date;
+    description: string;
+    imagesPublicIds: string[];
+}
+
 
 export class PostsShort extends React.Component<{forecastCount: number, className: string}, State> {
     constructor(props) {
@@ -19,7 +26,7 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
 
     async componentDidMount() {
         try {
-            let response = await fetch("api/posts?page=0&count="+this.props.forecastCount);
+            let response = await fetch("api/forecasts?page=0&count="+this.props.forecastCount);
             let data = await response.json();
             this.setState({ loading: false, posts: data });
         } catch (error) {
@@ -50,12 +57,12 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
 
     render() {
         if (this.state.loading) {
-            return <LoadingIndicator />
+            return <div />
         }
-        if (this.state.posts === null) {
+        if (!this.state.posts || this.state.posts.length === 0) {
             return (
-                <div className="postsShort">
-                    No posts available
+                <div className={'column ' + this.props.className}>
+                    <p>No posts available</p>
                 </div>
             )
         }
@@ -70,7 +77,7 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
                             {this.processDescription(post)}
                             {/*--TODO implement Router */}
                             <br/>
-                            <ForecastMapList id={post.id} />
+                            <ForecastMapList post={post} />
                         </div>
                     </div>
                 ))}
@@ -79,14 +86,3 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
     }
 }
 
-class ShortPost {
-    id: number;
-    postDate: Date;
-    description: string;
-
-    constructor(id, postDate, description) {
-            this.id = id;
-            this.postDate = postDate;
-            this.description = description;
-    }
-}

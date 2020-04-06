@@ -38,9 +38,10 @@ export class TopBar extends React.Component {
                 </div>
                 <div id="pogodaMenu" className="navbar-menu">
                     <div className="navbar-end">
-                          <Link to="/about" className="navbar-item">O Nas</Link>
-                          <Link to="/ciekawostki" className="navbar-item">Ciekawostki</Link>
-                          <Link to="/prognozy" className="navbar-item">Ostrzeżenia i Prognozy</Link>
+                        <Link to="/prognozy" className="navbar-item">Prognozy</Link>
+                        <Link to="/ostrzezenia" className="navbar-item">Ostrzeżenia</Link>
+                        <Link to="/ciekawostki" className="navbar-item">Ciekawostki</Link>
+                        <Link to="/about" className="navbar-item">O Nas</Link>
                     </div>
                 </div>
             </nav>
