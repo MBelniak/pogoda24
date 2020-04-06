@@ -1,17 +1,26 @@
-CREATE TABLE forecast_map (
-  id                BIGINT PRIMARY KEY AUTO_INCREMENT,
-  image_public_id   nvarchar not null,
-  ordinal           INT not null,
-  post_id           BIGINT not null
+CREATE TABLE fact (
+  id                       BIGINT PRIMARY KEY AUTO_INCREMENT,
+  post_date                TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
+  description              nvarchar,
+  images_public_ids_json   nvarchar
 );
 
-CREATE TABLE post (
-  id          BIGINT PRIMARY KEY AUTO_INCREMENT,
-  post_date   TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
-  description nvarchar
+CREATE TABLE forecast (
+  id                       BIGINT PRIMARY KEY AUTO_INCREMENT,
+  post_date                TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
+  description              nvarchar,
+  images_public_ids        nvarchar
+);
+
+CREATE TABLE warning (
+  id                      BIGINT PRIMARY KEY AUTO_INCREMENT,
+  post_date               TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
+  description             nvarchar,
+  images_public_ids_json  nvarchar,
+  is_added_to_top_bar     boolean,
+  due_date                DATE,
+  due_time                TIME,
+  short_description       nvarchar
 );
 
 create sequence hibernate_sequence;
-
-ALTER TABLE forecast_map
-    ADD FOREIGN KEY (post_id) references post(id);

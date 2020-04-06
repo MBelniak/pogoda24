@@ -23,10 +23,9 @@ export class ONas extends React.Component {
                         Podajemy informacje pogodowe, ostrzeżenia, komunikaty i dużo dużo więcej.<br/>
                         Pracujemy nad stroną 24 godziny na dobę, 7 dni w tygodniu za darmo.<br/>
                         Ekipę tworzą: Sebastian, Patryk, Przemek, Michał, Krzysztof, Krystian oraz Wojtek.<br/>
-                        To właśnie my czuwamy nad waszym bezpieczeństwem,ostrzegamy was w porę i przekazujemy wam
+                        To właśnie my czuwamy nad waszym bezpieczeństwem, ostrzegamy was w porę i przekazujemy wam
                         najświeższe informacje pogodowe z naszego kraju.<br/>
                         Cieszymy się,że wybrałeś/wybrałaś naszą stronę,że zaufałeś/zaufałaś nam i naszym prognozom ☺
-
                     </div>
                     <Copyright />
                 </div>

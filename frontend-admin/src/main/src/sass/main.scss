@@ -27,6 +27,16 @@ $divider-color: white;
 :root {
   --primary-color: #23425f;
   --secondary-color: #25abae;
+  --tertiary-color: #25828f;
+}
+.button.is-primary {
+  background-color: var(--primary-color);
+}
+.button.is-primary:hover {
+  background-color: var(--primary-color);
+}
+.button.is-primary:active {
+  background-color: var(--tertiary-color);
 }
 p, span, label {
   color: white;

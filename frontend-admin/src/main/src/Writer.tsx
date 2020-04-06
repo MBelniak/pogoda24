@@ -148,7 +148,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 postDate: new Date().getTime()
             };
         }
-        const url = this.state.postType === PostType.Prognoza ? "/api/posts"
+        const url = this.state.postType === PostType.Prognoza ? "/api/forecasts"
             : this.state.postType === PostType.Ostrtzezenie ? "/api/warnings"
                 : "/api/facts";
         return fetch(url, {
@@ -195,28 +195,32 @@ class Writer extends React.Component<PropsFromRedux, State> {
     }
 
     private sendImagesPublicIdsToBackend(data: any) {
-        const requestBodyForecastMaps: ForecastMap[] = [];
+        const requestBodyUpdatedForecast = {
+            id: data.id,
+            postDate: data.postDate,
+            description: data.description,
+            imagesPublicIdsJSON: ""
+        };
         const uploadedFiles = this.props.files;
+        const uploadedFilesIdsOrdered: string[] = [];
         for (let i = 0; i < uploadedFiles.length; ++i) {
-            requestBodyForecastMaps.push({
-                imagePublicId: uploadedFiles[i].publicId,
-                ordinal: i,
-                post: data
-            });
+            uploadedFilesIdsOrdered.push(uploadedFiles[i].publicId);
         }
-        fetch('/api/images', {
-            method: 'POST',
+        requestBodyUpdatedForecast['imagesPublicIdsJSON'] = JSON.stringify(uploadedFilesIdsOrdered);
+
+        fetch('/api/forecasts', {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(requestBodyForecastMaps)
+            body: JSON.stringify(requestBodyUpdatedForecast)
         }).then(response => {
             if (response && response.ok) {
                 this.closeModal();
                 this.showSuccessMessage();
             } else {
                 this.closeModal();
-                this.showErrorMessage("Coś poszło nie tak przy zapisywaniu obrazów.");
+                this.showErrorMessage("Wystąpił błąd przy zapisywaniu obrazów.");
             }
         }).catch(error => {
             console.log(error);
@@ -226,7 +230,15 @@ class Writer extends React.Component<PropsFromRedux, State> {
     }
 
     private removePostFromBackend(postId: number) {
-
+        fetch("/api/forecasts/" + postId).then(response => {
+            if (response && response.ok) {
+                console.log("Removed post with id: " + postId);
+            } else {
+                console.log("Cannot remove post with id: " + postId + ". Server response: " + response);
+            }
+        }).catch(error => {
+            console.log("Error while deleting post. Error message: " + error);
+        })
     }
 
     private showSuccessMessage() {
@@ -248,7 +260,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
         const toRender = (
             <div>
                 <p className="dialogMessage">Pomyślnie zapisano {postType}</p>
-                <button className="button" style={{float: "right"}} onClick={this.clearEverything}>Ok</button>
+                <button className="button is-primary" style={{float: "right"}} onClick={this.clearEverything}>Ok</button>
             </div>
         );
         this.showModal(toRender);
@@ -258,7 +270,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
         const toRender = (
             <div>
                 <p className="dialogMessage">{errorMessage}</p>
-                <button className="button" style={{float: "right"}} onClick={this.closeModal}>Ok</button>
+                <button className="button is-primary" style={{float: "right"}} onClick={this.closeModal}>Ok</button>
             </div>
         );
         this.showModal(toRender);

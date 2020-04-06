@@ -1,6 +1,6 @@
 package com.rubik.backend.repository;
 
-import com.rubik.backend.entity.Post;
+import com.rubik.backend.entity.Forecast;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,13 +9,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PostsRepository extends JpaRepository<Post, Long> {
+public interface ForecastsRepository extends JpaRepository<Forecast, Long> {
 
-    Post findPostById(Long id);
+    Forecast findAllById(Long id);
 
-    List<Post> findAll();
+    List<Forecast> findAll();
 
-    Page<Post> findAll(Pageable pageable);
-    
-    
+    Page<Forecast> findAll(Pageable pageable);
 }
