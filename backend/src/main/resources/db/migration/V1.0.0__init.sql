@@ -2,7 +2,7 @@ CREATE TABLE fact (
   id                       BIGINT PRIMARY KEY AUTO_INCREMENT,
   post_date                TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
   description              nvarchar,
-  images_public_ids_json   nvarchar
+  images_public_ids        nvarchar
 );
 
 CREATE TABLE forecast (
@@ -16,7 +16,7 @@ CREATE TABLE warning (
   id                      BIGINT PRIMARY KEY AUTO_INCREMENT,
   post_date               TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
   description             nvarchar,
-  images_public_ids_json  nvarchar,
+  images_public_ids       nvarchar,
   is_added_to_top_bar     boolean,
   due_date                DATE,
   due_time                TIME,
