@@ -3,12 +3,15 @@ package com.rubik.backend.controller.rest;
 import com.rubik.backend.entity.Forecast;
 import com.rubik.backend.service.ForecastsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/forecasts")
@@ -27,24 +30,23 @@ public class ForecastsController {
             return forecastsService.getForecastsOrderedByDate();
 
         Page<Forecast> forecasts = forecastsService.getForecastsOrderedByDate(page, count);
-        if (forecasts == null) {
-            return new ArrayList<>();
-        }
-
         return forecasts.getContent();
     }
 
     @PostMapping("")
-    public Forecast addForecast(@RequestBody Forecast forecast) {
-        if (forecast != null) {
+    public ResponseEntity<Object> addForecast(@RequestBody Forecast forecast, BindingResult bindingResult) {
+        if (!bindingResult.hasErrors()) {
             forecastsService.saveForecast(forecast);
             forecast = forecastsService.getForecastById(forecast.getId());
             if (forecast != null) {
-                return forecast;
+                return new ResponseEntity<>(forecast, HttpStatus.OK);
             }
-            return null;
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return null;
+        return new ResponseEntity<>(bindingResult.getAllErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toList()), HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping("")

@@ -8,7 +8,7 @@ import {addFile, clearFiles} from "./redux/actions";
 const Copyright = require('shared24').Copyright;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 const ModalWindow = require('shared24').ModalWindow;
-const {cloud_name, upload_preset, api_key, api_secret} = config;
+const {cloud_name, upload_preset, api_key, api_secret, MAX_IMAGES_FOR_POST} = config;
 const sha1 = require('js-sha1');
 
 interface UploadedFile {
@@ -17,31 +17,13 @@ interface UploadedFile {
     publicId: string
 }
 
-const connector = connect((state: UploadedFile[]) => ({ files: state }),
-    {
-            onAddImage: addFile,
-            onClearFiles: clearFiles
-    });
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
 interface State {
     postType: PostType,
     addWarnToBar: boolean,
+    warningDaysValid: number | undefined,
     postDescription: string,
     showModal: boolean,
     renderModal: JSX.Element | undefined
-}
-
-interface Post {
-    postDate: number,
-    description: string
-}
-
-interface ForecastMap {
-    imagePublicId: string,
-    ordinal: number,
-    post: Post;
 }
 
 enum PostType {
@@ -50,11 +32,20 @@ enum PostType {
     Ciekawostka = "ciekawostki"
 }
 
+const connector = connect((state: UploadedFile[]) => ({ files: state }),
+    {
+        onAddImage: addFile,
+        onClearFiles: clearFiles
+    });
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
 class Writer extends React.Component<PropsFromRedux, State> {
 
     state: State = {
         postType: PostType.Prognoza,
         addWarnToBar: false,
+        warningDaysValid: undefined,
         postDescription: "",
         showModal: false,
         renderModal: undefined
@@ -64,6 +55,8 @@ class Writer extends React.Component<PropsFromRedux, State> {
     private fileInput;
     private warningCheckBox;
     private postDescriptionTextArea;
+    private daysValidInput;
+    private warningShortInput;
 
     constructor(props) {
         super(props);
@@ -71,18 +64,32 @@ class Writer extends React.Component<PropsFromRedux, State> {
         this.fileInput = React.createRef();
         this.warningCheckBox = React.createRef();
         this.postDescriptionTextArea = React.createRef();
+        this.daysValidInput = React.createRef();
+        this.warningShortInput = React.createRef();
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFilesAdded = this.onFilesAdded.bind(this);
-        this.handleTextAreaChange = this.handleTextAreaChange.bind(this);
+        this.handleDescriptionTextAreaChange = this.handleDescriptionTextAreaChange.bind(this);
         this.clearEverything = this.clearEverything.bind(this);
+        this.showModal = this.showModal.bind(this);
         this.closeModal = this.closeModal.bind(this);
+        this.validateField = this.validateField.bind(this);
     }
 
     private onFilesAdded(files) {
+        if (this.props.files.length + files.length > MAX_IMAGES_FOR_POST) {
+            this.showModal(
+                <div>
+                    <p className="dialogMessage">Do jednego postu możesz dodać tylko 6 plików!</p>
+                    <button className="button is-primary" style={{float: "right"}} onClick={this.closeModal}>Ok</button>
+                </div>
+            );
+            this.fileInput.current.value = null;
+            return;
+        }
         for (let file of files) {
             this.props.onAddImage(file);
         }
-        this.fileInput.value = null;
+        this.fileInput.current.value = null;
     }
 
     private showModal(toRender: JSX.Element) {
@@ -95,9 +102,30 @@ class Writer extends React.Component<PropsFromRedux, State> {
 
     private handleSubmit(event) {
         event.preventDefault();
+        if (this.state.postType === PostType.Ostrtzezenie) {
+            let formValid = this.validateField(this.daysValidInput.current);
+            formValid = this.validateField(this.warningShortInput.current) && formValid;
+            if (!formValid)
+                return;
+        }
         this.showModal(<LoadingIndicator />);
         const responsePromise = this.sendPostToBackend();
+        this.afterPostRequestSend(responsePromise);
+    }
 
+    private validateField(htmlInput) {
+        if (this.state.postType !== PostType.Ostrtzezenie)
+            return;
+        if (!htmlInput.value) {
+            htmlInput.style.borderColor = "red";
+            return false;
+        } else {
+            htmlInput.style.borderColor = "";
+            return true;
+        }
+    }
+
+    private afterPostRequestSend(responsePromise: Promise<Response>) {
         responsePromise.then(response => {
             if (response && response.ok) {
                 response.json().then((data: any) => {
@@ -116,36 +144,40 @@ class Writer extends React.Component<PropsFromRedux, State> {
                         }).catch(error => {
                             console.log(error);
                             this.closeModal();
-                            this.showErrorMessage("Wystąpił błąd przy wysyłaniu plików. Post nie został zapisany. Powód: " + error);
+                            this.showErrorMessage("Wystąpił błąd przy wysyłaniu plików. Post nie został zapisany.");
                             this.removePostFromBackend(data.id);
                         });
                     } else {
                         this.closeModal();
                         this.showErrorMessage("Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.");
-                        this.removePostFromBackend(data.id);
                     }
                 });
             } else {
-                console.log(response);
+                console.log(response.statusText + ", " + response.body);
                 this.closeModal();
-                this.showErrorMessage("Nie udało się zapisać postu. Odpowiedź z serwera: " + response.statusText);
-
+                this.showErrorMessage("Wystąpił błąd serwera. Nie udało się zapisać postu.");
             }
         }).catch(error => {
             console.log(error);
             this.closeModal();
-            this.showErrorMessage("Nie udało się zapisać postu. Powód: " + error);
-        })
+            this.showErrorMessage("Niestety, nie udało się zapisać postu.");
+        });
     }
 
     private sendPostToBackend(): Promise<Response> {
         let requestBodyPost;
         if (this.state.postType === PostType.Ostrtzezenie) {
-            //TODO request body for warning
+            requestBodyPost = {
+                postDate: new Date().getTime(),
+                description: this.postDescriptionTextArea.current.value,
+                isAddedToTopBar: this.state.addWarnToBar,
+                daysValid: this.daysValidInput.current.value,
+                shortDescription: this.warningShortInput.current.value
+            };
         } else {
             requestBodyPost = {
-                description: this.postDescriptionTextArea.current.value,
-                postDate: new Date().getTime()
+                postDate: new Date().getTime(),
+                description: this.postDescriptionTextArea.current.value
             };
         }
         const url = this.state.postType === PostType.Prognoza ? "/api/forecasts"
@@ -219,13 +251,14 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 this.closeModal();
                 this.showSuccessMessage();
             } else {
+                console.log(response.statusText + ", " + response.body);
                 this.closeModal();
                 this.showErrorMessage("Wystąpił błąd przy zapisywaniu obrazów.");
             }
         }).catch(error => {
             console.log(error);
             this.closeModal();
-            this.showErrorMessage("Nie udało się zapisać obrazów. Powód: " + error);
+            this.showErrorMessage("Nie udało się zapisać obrazów.");
         })
     }
 
@@ -257,23 +290,21 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 break;
             }
         }
-        const toRender = (
+        this.showModal(
             <div>
                 <p className="dialogMessage">Pomyślnie zapisano {postType}</p>
                 <button className="button is-primary" style={{float: "right"}} onClick={this.clearEverything}>Ok</button>
             </div>
         );
-        this.showModal(toRender);
     }
 
     private showErrorMessage(errorMessage: string) {
-        const toRender = (
+        this.showModal(
             <div>
                 <p className="dialogMessage">{errorMessage}</p>
                 <button className="button is-primary" style={{float: "right"}} onClick={this.closeModal}>Ok</button>
             </div>
         );
-        this.showModal(toRender);
     }
 
     private clearEverything() {
@@ -282,21 +313,42 @@ class Writer extends React.Component<PropsFromRedux, State> {
         this.closeModal();
     }
 
-    private warningOptionChosen() {
-        if (this.state.postType === PostType.Ostrtzezenie) {
-            return (
-                <div>
-                    <input id="addToBar" type="checkbox"
-                           onChange={() => this.setState({addWarnToBar: !this.state.addWarnToBar})}
-                           ref={this.warningCheckBox}/>
-                    <label htmlFor="addToBar"> Dodaj do paska u góry strony</label>
+    private renderForWarning() {
+        return (
+            <div className="columns">
+                <div className="column is-half">
+                    <div style={{margin: "10px"}}>
+                        <input id="addToBar" type="checkbox"
+                               onChange={() => this.setState({addWarnToBar: !this.state.addWarnToBar})}
+                               ref={this.warningCheckBox}/>
+                        <label htmlFor="addToBar"> Dodaj ostrzeżenie do paska u góry strony</label>
+                    </div>
+                    <div className="columns">
+                        <div className="column">
+                            <label htmlFor="warningDaysValidInput">Czas trwania ostrzeżenia (0 = do końca dzisiejszego dnia: </label>
+                        </div>
+                        <div className="column">
+                            <input id="warningDaysValidInput" type="number" required={true} ref={this.daysValidInput} min="0" max="7"
+                                    onBlur={e => this.validateField(e.target)}/>
+                        </div>
+                    </div>
+                    <div className="columns">
+                        <div className="column">
+                            <label htmlFor="warningShortInput">Krótki opis (zostanie wyświetlony na pasku u góry strony): </label>
+                        </div>
+                        <div className="column">
+                            <input id="warningShortInput" type="text" required={true} maxLength={80} ref={this.warningShortInput}
+                                   onBlur={e => this.validateField(e.target)}/>
+                        </div>
+                    </div>
                 </div>
-            )
-        }
-        return <br/>;
+                <div className="column is-half">
+                </div>
+            </div>
+        )
     }
 
-    private handleTextAreaChange(event) {
+    private handleDescriptionTextAreaChange(event) {
         this.setState({postDescription: event.target.value});
     }
 
@@ -314,7 +366,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                                 <div className="column">
                                     <p>Dodaj opis do {this.state.postType.toString()}: </p>
                                     <textarea required={true} cols={100} rows={10} placeholder='Treść posta...'
-                                              ref={this.postDescriptionTextArea} onChange={this.handleTextAreaChange}
+                                              ref={this.postDescriptionTextArea} onChange={this.handleDescriptionTextAreaChange}
                                               value={this.state.postDescription}/>
                                 </div>
                                 <div className="column">
@@ -329,8 +381,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                                     <input type="radio" id="warning" name="postType" value="Ostrzeżenie"
                                            checked={this.state.postType === PostType.Ostrtzezenie}
                                            onChange={() => this.setState({postType: PostType.Ostrtzezenie})}/>
-                                    <label htmlFor="warning"> Ostrzeżenie</label>
-                                    {this.warningOptionChosen()}
+                                    <label htmlFor="warning"> Ostrzeżenie</label><br/>
                                     <input type="radio" id="ciekawostka" name="postType" value="Ciekawostka"
                                            checked={this.state.postType === PostType.Ciekawostka}
                                            onChange={() => this.setState({
@@ -342,7 +393,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                             </div>
                             <p>Dodaj mapki z prognozą/ostrzeżeniem lub zdjęcia do ciekawostki.
                                 Możesz przeciągnąć swoje pliki z dysku na kreskowane pole:</p>
-                            <FileDropper/>
+                            <FileDropper onFilesAdded={this.onFilesAdded}/>
                             <p>...lub skorzystać z klasycznego dodawania plików: </p>
                             <input type="button" className="button" id="loadFile" value="Wybierz pliki"
                                    onClick={() => document.getElementById('mapsFiles')?.click()}/>
@@ -362,12 +413,15 @@ class Writer extends React.Component<PropsFromRedux, State> {
                             {this.props.files.map((file, key) => {
                                 return (
                                     <div key={key} className="column is-one-quarter">
-                                        <UploadedFilesItem listId={key} file={file}/>
+                                        <UploadedFilesItem listId={key} file={file} showModal={this.showModal} closeModal={this.closeModal}/>
                                     </div>
                                 )
                             })}
                         </div>
                         <div className="is-divider"/>
+                        {this.state.postType === PostType.Ostrtzezenie
+                            ? this.renderForWarning()
+                            : null}
                         <form onSubmit={this.handleSubmit}>
                             <input type="submit" className="button" value="Wyślij"/>
                         </form>

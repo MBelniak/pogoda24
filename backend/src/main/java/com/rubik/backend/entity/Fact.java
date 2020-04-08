@@ -1,5 +1,6 @@
 package com.rubik.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,6 +17,11 @@ public class Fact {
     private Timestamp postDate;
 
     private String description;
+
+    @JsonIgnore
+    @Access(AccessType.PROPERTY)
+    @Column(name ="images_public_ids")
+    private String imagesPublicIds;
 
     @Transient
     private JsonNode imagesPublicIdsJSON;
@@ -44,6 +50,7 @@ public class Fact {
         this.description = description;
     }
 
+    @Transient
     public JsonNode getImagesPublicIdsJSON() {
         return imagesPublicIdsJSON;
     }
@@ -52,16 +59,19 @@ public class Fact {
         this.imagesPublicIdsJSON = json;
     }
 
-    @Column(name ="images_public_ids_json")
-    public String getJsonString() { // This is for JPA
-        return this.imagesPublicIdsJSON.toString();
+    @JsonIgnore
+    public String getImagesPublicIds() {
+        if (imagesPublicIdsJSON == null) {
+            return "";
+        }
+        return imagesPublicIdsJSON.toString();
     }
 
-    public void setJsonString(String jsonString) {  // This is for JPA
-        // parse from String to JsonNode object
+    @JsonIgnore
+    public void setImagesPublicIds(String imagesPublicIds) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            this.imagesPublicIdsJSON = mapper.readTree(jsonString);
+            imagesPublicIdsJSON = mapper.readTree(imagesPublicIds);
         } catch (Exception e) {
             e.printStackTrace();
         }

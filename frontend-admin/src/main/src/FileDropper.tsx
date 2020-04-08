@@ -1,34 +1,14 @@
 import React from 'react';
 import Dropzone from 'react-dropzone';
-import { addFile } from "./redux/actions";
-import {connect, ConnectedProps} from "react-redux";
 
-interface UploadedFile {
-    id: number;
-    content: File;
+interface FileDropperProps {
+    onFilesAdded: (files) => void;
 }
 
-const connector = connect(
-    (state: UploadedFile[]) => ({ }),
-    {
-        onAddFile: addFile
-    });
-
-
-type PropsFromRedux = ConnectedProps<typeof connector>
-
-class FileDropper extends React.Component<PropsFromRedux, {}> {
+export default class FileDropper extends React.Component<FileDropperProps> {
 
     constructor(props) {
         super(props);
-        this.onFilesAdded = this.onFilesAdded.bind(this);
-    }
-
-    private onFilesAdded(files) {
-        for (let file of files) {
-            this.props.onAddFile(file);
-        }
-        console.log("Images added via dropzone.");
     }
 
     render() {
@@ -36,7 +16,7 @@ class FileDropper extends React.Component<PropsFromRedux, {}> {
             <Dropzone
                 multiple={true}
                 accept="image/*"
-                onDrop={this.onFilesAdded}
+                onDrop={this.props.onFilesAdded}
                 noClick={true}
             >
                 {({getRootProps, getInputProps}) => (
@@ -51,5 +31,3 @@ class FileDropper extends React.Component<PropsFromRedux, {}> {
         )
     }
 }
-
-export default connector(FileDropper);
