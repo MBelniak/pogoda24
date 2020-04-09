@@ -19,6 +19,8 @@ export class TopBar extends React.Component {
                 });
             });
         }
+        const links = Array.prototype.slice.call(document.getElementsByClassName('navbar-item'), 0);
+        links.forEach(link => link.addEventListener('focus', () => link.blur()));
     }
 
     render() {
@@ -27,7 +29,7 @@ export class TopBar extends React.Component {
                 <div className="navbar-brand">
                     <Link to="/" className="navbar-item" >
                         <img width="30" height="35" src={img}/>
-                        <span>E-Pogoda24</span>
+                        <div style={{marginLeft: "5px"}}>E-Pogoda24</div>
                     </Link>
                     <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false"
                        data-target="pogodaMenu">

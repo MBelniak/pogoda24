@@ -17,16 +17,18 @@ export class Prognozy extends React.Component {
 
     render() {
         return (
-            <section className="mainFrame">
+            <div className="main">
                 <BarHolder />
                 <TopBar />
                 <TopImage />
-                <div className="container fluid mainContent">
-                    <PostsShort forecastCount={1} className='is-full'/>
-                </div>
+                <section className="container fluid">
+                    <div className="columns">
+                        <PostsShort forecastCount={1} className='is-full'/>
+                    </div>
+                    <PagingBar />
+                </section>
                 <Copyright />
-                <PagingBar />
-            </section>
+            </div>
         )
     }
 

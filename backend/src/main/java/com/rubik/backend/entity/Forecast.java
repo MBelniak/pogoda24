@@ -21,10 +21,10 @@ public class Forecast {
     @JsonIgnore
     @Access(AccessType.PROPERTY)
     @Column(name ="images_public_ids")
-    private String imagesPublicIds;
+    private String imagesPublicIdsString;
 
     @Transient
-    private JsonNode imagesPublicIdsJSON;
+    private JsonNode imagesPublicIds;
 
     public Long getId() {
         return id;
@@ -51,27 +51,27 @@ public class Forecast {
     }
 
     @Transient
-    public JsonNode getImagesPublicIdsJSON() {
-        return imagesPublicIdsJSON;
+    public JsonNode getImagesPublicIds() {
+        return imagesPublicIds;
     }
 
-    public void setImagesPublicIdsJSON(JsonNode json) {
-        this.imagesPublicIdsJSON = json;
+    public void setImagesPublicIds(JsonNode json) {
+        this.imagesPublicIds = json;
     }
 
     @JsonIgnore
-    public String getImagesPublicIds() {
-        if (imagesPublicIdsJSON == null) {
+    public String getImagesPublicIdsString() {
+        if (imagesPublicIds == null) {
             return "";
         }
-        return imagesPublicIdsJSON.toString();
+        return imagesPublicIds.toString();
     }
 
     @JsonIgnore
-    public void setImagesPublicIds(String imagesPublicIds) {
+    public void setImagesPublicIdsString(String imagesPublicIdsString) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            imagesPublicIdsJSON = mapper.readTree(imagesPublicIds);
+            imagesPublicIds = mapper.readTree(imagesPublicIdsString);
         } catch (Exception e) {
             e.printStackTrace();
         }
