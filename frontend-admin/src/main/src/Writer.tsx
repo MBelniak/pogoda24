@@ -231,14 +231,14 @@ class Writer extends React.Component<PropsFromRedux, State> {
             id: data.id,
             postDate: data.postDate,
             description: data.description,
-            imagesPublicIdsJSON: ""
+            imagesPublicIds: [] as string[]
         };
         const uploadedFiles = this.props.files;
         const uploadedFilesIdsOrdered: string[] = [];
         for (let i = 0; i < uploadedFiles.length; ++i) {
             uploadedFilesIdsOrdered.push(uploadedFiles[i].publicId);
         }
-        requestBodyUpdatedForecast['imagesPublicIdsJSON'] = JSON.stringify(uploadedFilesIdsOrdered);
+        requestBodyUpdatedForecast['imagesPublicIds'] = uploadedFilesIdsOrdered;
 
         fetch('/api/forecasts', {
             method: 'PUT',
@@ -354,9 +354,9 @@ class Writer extends React.Component<PropsFromRedux, State> {
 
     render() {
         return (
-            <section>
+            <div className="main">
                 <ModalWindow isShown={this.state.showModal} render={this.state.renderModal}/>
-                <div className="container fluid">
+                <section className="container fluid">
                     <img src={img} className="bgimg"/>
                     <h2 className="title">Witaj w edytorze wpisów.</h2>
                     <h2 className="title is-5">Możesz tutaj tworzyć nowe posty do umieszczenia na stronie.</h2>
@@ -426,9 +426,9 @@ class Writer extends React.Component<PropsFromRedux, State> {
                             <input type="submit" className="button" value="Wyślij"/>
                         </form>
                     </div>
-                </div>
+                </section>
                 <Copyright/>
-            </section>
+            </div>
         )
     }
 }

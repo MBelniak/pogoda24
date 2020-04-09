@@ -23,5 +23,5 @@ export const Navigation = () => {
         })
     }, [ locationKeys, ]);
 
-    return (<div className="navigation"></div>);
-}
+    return null;
+};

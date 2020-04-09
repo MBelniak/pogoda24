@@ -11,13 +11,13 @@ export class MainPage extends React.Component {
 
     render() {
         return (
-            <section>
-                <div className="container fluid">
+            <div className="main">
+                <section className="container fluid">
                     <img src={img} className="bgimg"/>
                     <Links />
-                </div>
+                </section>
                 <Copyright />
-            </section>
+            </div>
         )
     }
 

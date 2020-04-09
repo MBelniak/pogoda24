@@ -15,19 +15,20 @@ interface Post {
 
 
 export class PostsShort extends React.Component<{forecastCount: number, className: string}, State> {
-    constructor(props) {
-        super(props)
-    }
-
     state: State = {
         loading: true,
         posts: []
     };
 
+    constructor(props) {
+        super(props)
+    }
+
     async componentDidMount() {
         try {
             let response = await fetch("api/forecasts?page=0&count="+this.props.forecastCount);
             let data = await response.json();
+            console.log(data);
             this.setState({ loading: false, posts: data });
         } catch (error) {
             this.setState({ loading: false, posts: [] })
@@ -61,7 +62,7 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
         }
         if (!this.state.posts || this.state.posts.length === 0) {
             return (
-                <div className={'column ' + this.props.className}>
+                <div className={'column ' + this.props.className} style={{textAlign: "center", marginTop: "20px"}}>
                     <p>No posts available</p>
                 </div>
             )
@@ -77,7 +78,7 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
                             {this.processDescription(post)}
                             {/*--TODO implement Router */}
                             <br/>
-                            <ForecastMapList post={post} />
+                            <ForecastMapList imagesPublicIds={post.imagesPublicIds} />
                         </div>
                     </div>
                 ))}

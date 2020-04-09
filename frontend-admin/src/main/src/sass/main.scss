@@ -7,6 +7,8 @@ $navbar-background-color: $secondary-color;
 $navbar-item-hover-color: $primary-color;
 $title-color: white;
 $divider-color: white;
+$footer-background-color: $primary-color;
+$footer-padding: 3rem 1.5rem 3rem;
 // Import only what you need from Bulma
 @import "../../node_modules/bulma/sass/utilities/_all.sass";
 @import "../../node_modules/bulma/sass/base/_all.sass";
@@ -20,14 +22,16 @@ $divider-color: white;
 @import "../../node_modules/bulma/sass/layout/all.sass";
 @import "../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass";
 
-.writerForm * {
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
 :root {
-  --primary-color: #23425f;
-  --secondary-color: #25abae;
-  --tertiary-color: #25828f;
+    --primary-color: #23425f;
+    --secondary-color: #25abae;
+    --tertiary-color: #25828f;
+}
+.main {
+  min-width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 .button.is-primary {
   background-color: var(--primary-color);
@@ -46,12 +50,12 @@ p, span, label {
   border-radius: 20px;
   background: repeating-linear-gradient(45deg, var(--primary-color) 1px, var(--secondary-color) 5px);
   cursor: default;
-  }
+}
 .truecontent
 {
-    text-align: left;
-    margin-top: 15px;
-  }
+  text-align: left;
+  margin-top: 15px;
+}
 .title {
   text-align: left;
   margin-top: 10px;
@@ -76,6 +80,10 @@ p, span, label {
   font-weight: bold;
   font-size: 23px;
   margin-left: 10px;
+}
+.writerForm * {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .bgimg

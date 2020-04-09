@@ -11,9 +11,8 @@ import { CloudinaryContext } from 'cloudinary-react';
 import config from './config/config';
 const Navigation = require('shared24').Navigation;
 
-import './css/main.css';
 import './sass/main.scss';
-import 'shared24/src/css/main.css';
+import 'shared24/src/sass/main.scss';
 
 const {cloud_name, upload_preset, api_key, api_secret} = config;
 

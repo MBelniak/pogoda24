@@ -11,18 +11,18 @@ export class MainPage extends React.Component {
 
     render() {
         return (
-            <section>
+            <div className="main">
                 <BarHolder/>
                 <TopBar />
                 <TopImage />
-                <div className="container fluid">
+                <section className="container fluid">
                     <div className="columns">
                         <PostsShort forecastCount={5} className='is-three-quarters'/>
                         <ExternalApi/>
                     </div>
-                </div>
+                </section>
                 <Copyright/>
-            </section>
+            </div>
         );
     }
 }
