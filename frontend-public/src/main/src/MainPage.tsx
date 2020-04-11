@@ -4,7 +4,6 @@ import { ExternalApi } from './ExternalApi';
 import { TopBar } from './TopBar';
 const Copyright = require('shared24').Copyright;
 const BarHolder = require('shared24').BarHolder;
-const TopImage = require('shared24').TopImage;
 
 
 export class MainPage extends React.Component {
@@ -12,12 +11,11 @@ export class MainPage extends React.Component {
     render() {
         return (
             <div className="main">
-                <BarHolder/>
+                <BarHolder />
                 <TopBar />
-                <TopImage />
-                <section className="container fluid">
+                <section className="container fluid mainContent">
                     <div className="columns">
-                        <PostsShort forecastCount={5} className='is-three-quarters'/>
+                        <PostsShort forecastCount={3} className='is-three-fifths is-offset-one-fifth'/>
                         <ExternalApi/>
                     </div>
                 </section>

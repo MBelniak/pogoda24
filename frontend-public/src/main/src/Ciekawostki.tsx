@@ -2,7 +2,6 @@ import React from 'react';
 import { TopBar } from './TopBar';
 const Copyright = require('shared24').Copyright;
 const BarHolder = require('shared24').BarHolder;
-const TopImage = require('shared24').TopImage;
 
 export class Ciekawostki extends React.Component{
 
@@ -12,13 +11,10 @@ export class Ciekawostki extends React.Component{
 
     render() {
         return (
-            <div className="mainFrame">
+            <div className="main">
                 <BarHolder />
                 <TopBar />
-                <div className="mainContent">
-                    <TopImage />
-                    <Copyright />
-                </div>
+                <Copyright />
             </div>
         )
     }

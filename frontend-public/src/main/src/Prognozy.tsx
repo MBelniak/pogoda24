@@ -4,7 +4,6 @@ import { PostsShort } from './PostsShort';
 import { TopBar } from './TopBar';
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
-const TopImage = require('shared24').TopImage;
 
 export class Prognozy extends React.Component {
 
@@ -20,10 +19,9 @@ export class Prognozy extends React.Component {
             <div className="main">
                 <BarHolder />
                 <TopBar />
-                <TopImage />
-                <section className="container fluid">
+                <section className="container fluid mainContent">
                     <div className="columns">
-                        <PostsShort forecastCount={1} className='is-full'/>
+                        <PostsShort forecastCount={1} className=''/>
                     </div>
                     <PagingBar />
                 </section>
