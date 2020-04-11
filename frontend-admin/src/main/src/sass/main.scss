@@ -1,6 +1,7 @@
 @charset "utf-8";
 $primary-color: #23425f;
-$secondary-color: #25abae;
+$secondary-color: #159f9f;
+$tertiary-color: #25828f;
 $background: $primary-color;
 $body-background-color: $primary-color;
 $navbar-background-color: $secondary-color;
@@ -22,11 +23,6 @@ $footer-padding: 3rem 1.5rem 3rem;
 @import "../../node_modules/bulma/sass/layout/all.sass";
 @import "../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass";
 
-:root {
-    --primary-color: #23425f;
-    --secondary-color: #25abae;
-    --tertiary-color: #25828f;
-}
 .main {
   min-width: 100%;
   min-height: 100vh;
@@ -34,21 +30,21 @@ $footer-padding: 3rem 1.5rem 3rem;
   flex-direction: column;
 }
 .button.is-primary {
-  background-color: var(--primary-color);
+  background-color: $primary-color;
 }
 .button.is-primary:hover {
-  background-color: var(--primary-color);
+  background-color: $primary-color;
 }
 .button.is-primary:active {
-  background-color: var(--tertiary-color);
+  background-color: $tertiary-color;
 }
 p, span, label {
   color: white;
 }
 .dropzone {
-  border: 2px var(--secondary-color) solid;
+  border: 2px $secondary-color solid;
   border-radius: 20px;
-  background: repeating-linear-gradient(45deg, var(--primary-color) 1px, var(--secondary-color) 5px);
+  background: repeating-linear-gradient(45deg, $primary-color 1px, $secondary-color 5px);
   cursor: default;
 }
 .truecontent
@@ -130,7 +126,7 @@ p, span, label {
   opacity: 0.8;
 }
 .uploadedFilesItem {
-  border: 2px solid var(--secondary-color);
+  border: 2px solid $secondary-color;
   border-radius: 20px;
   margin: 10px 0 5px 5px;
   position: relative;
@@ -149,7 +145,7 @@ p, span, label {
   z-index: 10;
 }
 .uploadedFilesItemOverlay {
-  background-color: var(--secondary-color);
+  background-color: $secondary-color;
   border-radius: 20px;
   opacity: 0.8;
   width: 100%;
@@ -192,6 +188,6 @@ p, span, label {
   cursor: pointer;
 }
 .dialogMessage {
-  color: var(--primary-color);
+  color: $primary-color;
   margin-bottom: 10px;
 }

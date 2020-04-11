@@ -2,7 +2,6 @@ import React from "react";
 import { TopBar } from './TopBar';
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
-const TopImage = require('shared24').TopImage;
 
 export class ONas extends React.Component {
     constructor(props) {
@@ -11,11 +10,10 @@ export class ONas extends React.Component {
 
     render() {
         return (
-            <section className="mainFrame">
+            <div className="main">
                 <BarHolder />
                 <TopBar />
-                <TopImage />
-                <div className="container fluid mainContent">
+                <section className="container fluid mainContent">
                     <div className="post">
                         Widzę,że zajrzałeś na naszą stronę.<br/>
                         Zostawiając łapkę w górę na naszym fanpage motywujesz nas do dalszej pracy,<br/>
@@ -27,9 +25,9 @@ export class ONas extends React.Component {
                         najświeższe informacje pogodowe z naszego kraju.<br/>
                         Cieszymy się,że wybrałeś/wybrałaś naszą stronę,że zaufałeś/zaufałaś nam i naszym prognozom ☺
                     </div>
-                    <Copyright />
-                </div>
-            </section>
+                </section>
+                <Copyright />
+            </div>
         )
     }
 }

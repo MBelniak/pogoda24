@@ -4,6 +4,7 @@ import { ForecastMapList } from './ForecastMapList';
 interface State {
     loading: boolean;
     posts: Post[];
+    expandedPosts: number[];
 }
 
 interface Post {
@@ -13,23 +14,21 @@ interface Post {
     imagesPublicIds: string[];
 }
 
-
 export class PostsShort extends React.Component<{forecastCount: number, className: string}, State> {
     state: State = {
         loading: true,
-        posts: []
+        posts: [],
+        expandedPosts: []
     };
 
     constructor(props) {
-        super(props)
+        super(props);
     }
 
     async componentDidMount() {
         try {
             let response = await fetch("api/forecasts?page=0&count="+this.props.forecastCount);
-            let data = await response.json();
-            console.log(data);
-            this.setState({ loading: false, posts: data });
+            this.setState({ loading: false, posts: await response.json() });
         } catch (error) {
             this.setState({ loading: false, posts: [] })
         }
@@ -41,19 +40,49 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
         return date + ' o ' + time;
     }
 
-    private processDescription(post: any) {
-        let result = post.description;
-        if (post.description.length > 170) {
+    private expandPost(id: number) {
+        const expandedPosts = this.state.expandedPosts;
+        this.setState({expandedPosts: [...expandedPosts, id]});
+    }
+
+    private processDescription(post: Post) {
+        let description = post.description;
+        const expanded = this.state.expandedPosts.indexOf(post.id) > -1 || post.description.length < 170;
+        if (!expanded) {
             let length = 170;
             while (post.description.substr(length, 1) != ' ') {
                 --length;
             }
-            result = post.description.substr(0, length) + '...';
-            result +=  <a href={'/api/posts/' + post.id} style={{color: "blue"}}>+ Czytaj dalej</a>
+            description  = post.description.substr(0, length) + ' ...';
         }
 
-        result.replace("\r\n", "<br/>");
-        return result;
+        description = description.replace("\r\n", "<br/><br/>").replace("\n", "<br/><br/>");
+        return (
+            <div className="postDescription">
+                <span dangerouslySetInnerHTML={{ __html: description }}>
+                </span>
+                {expanded ? null
+                    : <a style={{color: "blue"}}
+                         onClick={() => this.expandPost(post.id)}> więcej</a>
+                }
+            </div>
+        );
+    }
+
+    private renderPost(post: Post, i: number) {
+        return (
+            <div  style={{padding: "10px"}} key={i}>
+                <div className="postdate">
+                    {this.processDate(post.postDate)}
+                </div>
+                <br/>
+                {this.processDescription(post)}
+                <div className="is-divider" style={{margin: "15px 0 10px 0"}}/>
+                <div style={{textAlign: "center"}}>
+                    <ForecastMapList imagesPublicIds={post.imagesPublicIds} />
+                </div>
+            </div>
+        );
     }
 
     render() {
@@ -68,20 +97,8 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
             )
         }
         return (
-            <div className={'column ' + this.props.className}>
-                {this.state.posts.map((post, i) => (
-                    <div className="post" key={i}>
-                        <div className="postdate">
-                            {this.processDate(post.postDate)}
-                        </div>
-                        <div className="bold center description">
-                            {this.processDescription(post)}
-                            {/*--TODO implement Router */}
-                            <br/>
-                            <ForecastMapList imagesPublicIds={post.imagesPublicIds} />
-                        </div>
-                    </div>
-                ))}
+            <div className={'column post ' + this.props.className}>
+                {this.state.posts.map((post, i) => this.renderPost(post, i))}
             </div>
         )
     }

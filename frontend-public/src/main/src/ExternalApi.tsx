@@ -8,14 +8,25 @@ export class ExternalApi extends React.Component {
     render() {
         return (
             <div className="column externalApi" >
-                <h3>Wyładowania</h3>
-                <img width="80%" style={{marginBottom: '20px'}} src="http://images.blitzortung.org/Images/image_b_pl.png?t=25180377" />
-
+                <h3>Wyładowania (blitzortung)</h3>
+                <a href="http://pl.blitzortung.org/live_lightning_maps.php?map=15" target="_blank">
+                    <img width="80%" className="externalApiImg" src="http://images.blitzortung.org/Images/image_b_pl.png?t=25180377"
+                        alt="Wyładowania"/>
+                </a>
                 <h3>Zachmurzenie (Sat24)</h3>
-                <img width="80%" style={{marginBottom: '20px'}} src="https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time/7296177" />
-
+                <a href="https://pl.sat24.com/pl/pl/visual" target="_blank">
+                    <img width="80%" className="externalApiImg" src="https://api.sat24.com/animated/PL/visual/1/Central%20European%20Standard%20Time/7296177"
+                        alt="Zachmurzenie"/>
+                </a>
                 <h3>Opady (Sat24)</h3>
-                <img width="80%" src="https://api.sat24.com/animated/PL/rainTMC/1/Central%20European%20Standard%20Time/847023" />
+                <a href="https://pl.sat24.com/pl/pl/rainTMC" target="_blank">
+                    <img width="80%" className="externalApiImg" src="https://api.sat24.com/animated/PL/rainTMC/1/Central%20European%20Standard%20Time/847023"
+                         alt="Opady"/>
+                </a>
+                <h3>Ostrzeżenia (PŁB)</h3>
+                <a href="http://burze.dzis.net/?page=mapa_ostrzezen" target="_blank">
+                    <img width="80%" src="http://burze.dzis.net/img/zagrozenia.gif" alt="Mapa ostrzeżeń dla Polski"/>
+                </a>
             </div>
         )
     }

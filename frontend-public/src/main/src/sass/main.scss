@@ -1,14 +1,17 @@
 @charset "utf-8";
 $primary-color: #23425f;
-$secondary-color: #25abae;
+$secondary-color: #159f9f;
 $background: $primary-color;
 $body-background-color: $primary-color;
 $navbar-background-color: $secondary-color;
 $navbar-item-hover-color: $primary-color;
-$footer-background-color: $primary-color;
+$footer-background-color: transparent;
 $footer-padding: 3rem 1.5rem 3rem;
+$divider-color: white;
+$divider-thickness: 1px;
 $gap: 64px;
 $desktop: 960px + (2 * $gap);
+$navbar-item-img-max-height: none;
 // Import only what you need from Bulma
 @import "../../node_modules/bulma/sass/utilities/_all.sass";
 @import "../../node_modules/bulma/sass/utilities/initial-variables.sass";
@@ -23,84 +26,79 @@ $desktop: 960px + (2 * $gap);
 @import "../../node_modules/bulma/sass/layout/all.sass";
 @import "../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass";
 
-:root {
-  --primary-color: #23425f;
-  --secondary-color: #25abae;
-  --tertiary-color: #25828f;
+body {
+  background: url("../img/logo_bg.jpg") no-repeat fixed;
+  //background-color: $primary-color;
+  background-size: 100vw 100vh;
 }
 .main {
   min-width: 100%;
   min-height: 100vh;
+  text-align: center;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+}
+.mainContent {
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 p, span, label {
-  color: white;
-}
+    color: white;
+  }
 .truecontent {
-  margin-top: 15px;
-}
+    margin-top: 15px;
+  }
 .bold2
 {
-  font-weight: bold;
+    font-weight: bold;
+  }
+.post {
+  margin-left: 5px;
+  padding: 5px;
+  background: $secondary-color;
+  color: black;
+  margin-top: 15px;
+  box-shadow: 0 0 5px $secondary-color;
 }
-
 .postlink
 {
   color: lightblue;
   transition: 0.3s;
 }
-.postlink:hover
+  .postlink:hover
 {
   color: blue;
 }
 
 .externalApi {
   height: 100%;
-  font-family: Arial;
   color: white;
   font-size: 15px;
   text-align: center;
+  margin-top: 15px;
 }
 
-.post {
-  margin-left: 5px;
-  padding: 5px;
-  background: var(--secondary-color);
-  color: black;
-  margin-top: 15px;
-  box-shadow: 0px 0px 5px var(--secondary-color);
-  font-family: Arial;
-  font-size: 15px;
-}
-.post_flen
-{
-  display: block;
-  margin-left: 5px;
-  padding: 5px;
-
-  width: 90%;
-  background: var(--secondary-color);
-  margin-top: 15px;
-  box-shadow: 0px 0px 5px var(--secondary-color);
-  font-family: Arial;
-  font-size: 15px;
-}
 .postdate
 {
-  color: black;
+  color: #222222;
   cursor: default;
+  float: right;
+  font-size: 14px;
 }
-.description
+.postDescription
 {
   color: black;
+  font-size: 15px;
+  text-align: center;
+  margin-top: 5px;
 }
 .pimg
 {
   margin-top: 5px;
   padding-top: 5px;
   padding: 1px;
-  border-top: 1px solid var(--secondary-color);
+  border-top: 1px solid $secondary-color;
   padding: 1px;
 }
 
@@ -134,11 +132,12 @@ p, span, label {
 {
   overflow: hidden;
   margin-top: 28px;
+  width: 100%;
 }
 
-.topBar div * {
-  margin-top: 5px;
-  margin-bottom: 5px;
+.topBar div * :not(.logoImg){
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .topBar a
@@ -147,4 +146,12 @@ p, span, label {
   text-decoration: none;
   margin-right: 10px;
   transition: 0.4s;
+}
+.logoImg {
+  display: block;
+  height: 50px;
+  width: 52px;
+}
+.externalApiImg {
+  margin-bottom: 20px;
 }
