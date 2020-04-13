@@ -1,8 +1,8 @@
 import React from 'react';
-import { PagingBar } from './PagingBar';
-import { Posts } from './Posts';
-import { TopBar } from './TopBar';
-import {LoadingIndicator} from "../../../../shared/src/main/shared24/src/LoadingIndicator";
+import {TopBar} from './TopBar';
+import {Posts} from "./Posts";
+import {PagingBar} from "./PagingBar";
+
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
 
@@ -14,32 +14,26 @@ interface Post {
 }
 
 interface State {
-    forecastsCount: number;
     posts: Post[];
     loading: boolean;
+    warningsCount: number;
 }
 
-export class Prognozy extends React.Component<{}, State> {
+export class Ostrzezenia extends React.Component<{}, State> {
 
-    private readonly forecastsPerPage = 4;
+    private readonly warningsPerPage = 4;
 
     state: State = {
-        forecastsCount: 0,
         posts: [],
-        loading: true
+        loading: true,
+        warningsCount: 0
     };
 
-    constructor(props) {
-        super(props);
-        this.handlePageClick = this.handlePageClick.bind(this);
-    }
-
     componentDidMount() {
-        fetch("api/forecasts/count").then(response => response.json().then(data => {
-            this.setState({ forecastsCount: data });
-            fetch("api/forecasts?page=0&count=" + this.forecastsPerPage)
+        fetch("api/warnings/count").then(response => response.json().then(data => {
+            this.setState({ warningsCount: data });
+            fetch("api/warnings/dtos?page=0&count=" + this.warningsPerPage)
                 .then(response => response.json().then(data => {
-                    console.log(data);
                     this.setState({ posts: data, loading: false });
                 }));
         }));
@@ -47,7 +41,7 @@ export class Prognozy extends React.Component<{}, State> {
 
     private handlePageClick(data) {
         const selected = data.selected;
-        fetch("api/forecasts?page=" + selected +  "&count=" + this.forecastsPerPage)
+        fetch("api/warnings/dtos?page=" + selected +  "&count=" + this.warningsPerPage)
             .then(response => response.json().then(data => {
                 this.setState({ posts: data });
             }));
@@ -62,11 +56,13 @@ export class Prognozy extends React.Component<{}, State> {
                     <div className="columns">
                         <div className="column is-1"/>
                         {this.state.loading
-                            ? <div className='column is-10'/>
+                            ? <div className='column is-10'>
+                                <div/>
+                            </div>
                             : <div className="column is-10 posts">
                                 <Posts posts={this.state.posts}/>
-                                <PagingBar pages={Math.ceil(this.state.forecastsCount / this.forecastsPerPage)}
-                                            handlePageClick={this.handlePageClick}/>
+                                <PagingBar pages={Math.ceil(this.state.warningsCount / this.warningsPerPage)}
+                                           handlePageClick={this.handlePageClick}/>
                             </div>
                         }
                         <div className="column is-1"/>
@@ -76,5 +72,4 @@ export class Prognozy extends React.Component<{}, State> {
             </div>
         )
     }
-
 }

@@ -7,9 +7,11 @@ export class Copyright extends React.Component {
 
     render() {
         return (
-            <div className="copyright">
-                Copyright &copy; 2020 by Pogoda24/7
-            </div>
+            <footer className="footer">
+                <div className="content has-text-centered">
+                    <p>Copyright &copy; 2020 by Pogoda24/7</p>
+                </div>
+            </footer>
         )
     }
 }

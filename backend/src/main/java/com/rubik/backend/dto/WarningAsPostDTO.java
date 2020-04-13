@@ -1,23 +1,24 @@
-package com.rubik.backend.dtos;
+package com.rubik.backend.dto;
 
-import com.rubik.backend.entity.Post;
+import com.rubik.backend.entity.Warning;
 
 import java.sql.Timestamp;
-import java.util.List;
 
-public class PostDTO {
+public class WarningAsPostDTO {
+
     private Long id;
 
     private Timestamp postDate;
 
     private String description;
 
-    private List<String> imagesIds;
+    private String imagesPublicIds;
 
-    public PostDTO(Post post) {
-        this.id = post.getId();
-        this.postDate = post.getPostDate();
-        this.description = post.getDescription();
+    public WarningAsPostDTO(Warning warning) {
+        this.id = warning.getId();
+        this.postDate = warning.getPostDate();
+        this.description = warning.getDescription();
+        this.imagesPublicIds = warning.getImagesPublicIds();
     }
 
     public Long getId() {
@@ -44,11 +45,11 @@ public class PostDTO {
         this.description = description;
     }
 
-    public List<String> getImagesIds() {
-        return imagesIds;
+    public String getImagesPublicIds() {
+        return imagesPublicIds;
     }
 
-    public void setImagesIds(List<String> imagesIds) {
-        this.imagesIds = imagesIds;
+    public void setImagesPublicIds(String imagesPublicIds) {
+        this.imagesPublicIds = imagesPublicIds;
     }
 }

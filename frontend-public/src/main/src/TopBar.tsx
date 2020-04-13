@@ -1,7 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import img from './img/logoimg.jpg';
-
 
 export class TopBar extends React.Component {
 
@@ -19,6 +17,8 @@ export class TopBar extends React.Component {
                 });
             });
         }
+        const links = Array.prototype.slice.call(document.getElementsByClassName('navbar-item'), 0);
+        links.forEach(link => link.addEventListener('focus', () => link.blur()));
     }
 
     render() {
@@ -26,8 +26,8 @@ export class TopBar extends React.Component {
             <nav className="topBar navbar" role="navigation" aria-label="main navigation">
                 <div className="navbar-brand">
                     <Link to="/" className="navbar-item" >
-                        <img width="30" height="35" src={img}/>
-                        <span>E-Pogoda24</span>
+                        <img src="./img/logo-wHalo.png" className="logoImg"/>
+                        <div style={{marginLeft: "5px"}}>E-Pogoda24/7</div>
                     </Link>
                     <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false"
                        data-target="pogodaMenu">
@@ -38,9 +38,10 @@ export class TopBar extends React.Component {
                 </div>
                 <div id="pogodaMenu" className="navbar-menu">
                     <div className="navbar-end">
-                          <Link to="/about" className="navbar-item">O Nas</Link>
-                          <Link to="/ciekawostki" className="navbar-item">Ciekawostki</Link>
-                          <Link to="/prognozy" className="navbar-item">Ostrzeżenia i Prognozy</Link>
+                        <Link to="/prognozy" className="navbar-item">Prognozy</Link>
+                        <Link to="/ostrzezenia" className="navbar-item">Ostrzeżenia</Link>
+                        <Link to="/ciekawostki" className="navbar-item">Ciekawostki</Link>
+                        <Link to="/about" className="navbar-item">O Nas</Link>
                     </div>
                 </div>
             </nav>

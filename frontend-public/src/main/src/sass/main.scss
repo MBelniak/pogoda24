@@ -1,13 +1,20 @@
 @charset "utf-8";
 $primary-color: #23425f;
-$secondary-color: #25abae;
-$body-color: white;
+$secondary-color: #159f9f;
 $background: $primary-color;
 $body-background-color: $primary-color;
 $navbar-background-color: $secondary-color;
 $navbar-item-hover-color: $primary-color;
+$footer-background-color: transparent;
+$footer-padding: 3rem 1.5rem 3rem;
+$divider-color: white;
+$divider-thickness: 1px;
+$gap: 64px;
+$desktop: 960px + (2 * $gap);
+$navbar-item-img-max-height: none;
 // Import only what you need from Bulma
 @import "../../node_modules/bulma/sass/utilities/_all.sass";
+@import "../../node_modules/bulma/sass/utilities/initial-variables.sass";
 @import "../../node_modules/bulma/sass/base/_all.sass";
 @import "../../node_modules/bulma/sass/elements/button.sass";
 @import "../../node_modules/bulma/sass/elements/container.sass";
@@ -16,3 +23,187 @@ $navbar-item-hover-color: $primary-color;
 @import "../../node_modules/bulma/sass/components/navbar.sass";
 @import "../../node_modules/bulma/sass/layout/hero.sass";
 @import "../../node_modules/bulma/sass/layout/section.sass";
+@import "../../node_modules/bulma/sass/layout/all.sass";
+@import "../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass";
+
+body {
+  background: url("../img/logo_bg.jpg") no-repeat fixed;
+  //background-color: $primary-color;
+  background-size: 100vw 100vh;
+}
+
+.main {
+  min-width: 100%;
+  min-height: 100vh;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mainContent {
+  padding: 2rem 3rem 1.4rem 3rem ;
+  width: 100%;
+  flex-grow: 2;
+}
+
+.mainContentEkipa {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+p, span, label {
+    color: white;
+}
+
+.columns {
+  min-height: 100%;
+}
+
+.basicLink {
+  color: white;
+  transition: 0.3s;
+  text-decoration: underline;
+}
+
+.basicLink:hover {
+  transition: 0.3s;
+  color: $primary-color;
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.post {
+  margin-top: 1rem;
+  padding: 0.6rem;
+  background: $secondary-color;
+  box-shadow: 0 0 10px $secondary-color;
+}
+
+.postLink {
+  color: $primary-color;
+  transition: 0.3s;
+}
+
+.postLink:hover {
+  color: black;
+  transition: 0.3s;
+}
+
+.postdate
+{
+  color: #222222;
+  cursor: default;
+  float: right;
+  font-size: 14px;
+}
+
+.postDescription
+{
+  font-size: 16px;
+  text-align: center;
+  margin-top: 0.35rem;
+}
+
+.externalApi {
+  height: 100%;
+  color: white;
+  font-size: 15px;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+@keyframes bar_anim {
+  0% {
+    left: 100%;
+  }
+  25% {
+    left: 0%;
+  }
+  50% {
+    left: 0%;
+  }
+  100% {
+    left: -100%;
+  }
+}
+
+.topBar
+{
+  overflow: hidden;
+  margin-top: 1.8rem;
+  width: 100%;
+}
+
+.topBar div * :not(.logoImg){
+  margin-top: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.topBar a
+{
+  color:white;
+  text-decoration: none;
+  margin-right: 0.5rem;
+  transition: 0.4s;
+}
+.topBar a:hover {
+  color: $primary-color
+}
+.logoImg {
+  display: block;
+  height: 3.1rem;
+  width: 3.2rem;
+}
+.externalApiImg {
+  margin-bottom: 1.4rem;
+}
+.ekipa {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.ekipa * {
+  font-size: 17px;
+}
+.ekipaItem {
+  border: solid 2px $primary-color;
+  border-radius: 15px;
+  margin: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.ekipaImg {
+  margin: 0.7rem;
+  min-width: 6.5rem;
+  max-width: 6.5rem;
+  min-height: 6.5rem;
+  max-height: 6.5rem;
+}
+.ekipaPersonDescription {
+  text-align: start;
+  margin: 0.7rem;
+}
+
+.pagingBar {
+  align-self: flex-end;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 2rem 0 0.7rem 0;
+  font-size: 18px;
+  background-color: $secondary-color;
+  box-shadow: 0 0 10px $secondary-color;
+}
+.pagingBar li {
+  margin: 0.5rem;
+  color: white;
+}
+.pagingBarPrevious {
+  color: white;
+}

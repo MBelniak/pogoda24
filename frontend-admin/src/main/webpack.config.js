@@ -13,14 +13,14 @@ module.exports = {
         proxy: {
             '/api/': 'http://localhost:8080',
             '/admin/': {
-                    target: 'http://localhost:3000/',
+                    target: 'http://localhost:3001/',
                     pathRewrite: { '^/admin': '' },
                 },
         },
-        port: 3000,
+        port: 3001,
         historyApiFallback: true,
         watchContentBase: true,
-        contentBase: resolve('dist'),
+        contentBase: resolve('src'),
         publicPath: '/',
         contentBasePublicPath: '/'
     },
@@ -89,7 +89,7 @@ module.exports = {
         }),
         new MiniCssExtractPlugin(
             {
-                filename: "css/[name].css"
+                filename: "css/main.css"
             })
     ]
 };

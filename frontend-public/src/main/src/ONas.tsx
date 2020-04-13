@@ -1,8 +1,9 @@
 import React from "react";
 import { TopBar } from './TopBar';
+import config from './config/config';
+import StaffItem from "./StaffItem";
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
-const TopImage = require('shared24').TopImage;
 
 export class ONas extends React.Component {
     constructor(props) {
@@ -11,26 +12,32 @@ export class ONas extends React.Component {
 
     render() {
         return (
-            <section className="mainFrame">
+            <div className="main">
                 <BarHolder />
                 <TopBar />
-                <TopImage />
-                <div className="container fluid mainContent">
-                    <div className="post">
-                        Widzę,że zajrzałeś na naszą stronę.<br/>
-                        Zostawiając łapkę w górę na naszym fanpage motywujesz nas do dalszej pracy,<br/>
-                        a my w zamian za to zaoferujemy Ci prognozę pogody pewną w 100% ☺<br/>
-                        Podajemy informacje pogodowe, ostrzeżenia, komunikaty i dużo dużo więcej.<br/>
-                        Pracujemy nad stroną 24 godziny na dobę, 7 dni w tygodniu za darmo.<br/>
-                        Ekipę tworzą: Sebastian, Patryk, Przemek, Michał, Krzysztof, Krystian oraz Wojtek.<br/>
-                        To właśnie my czuwamy nad waszym bezpieczeństwem,ostrzegamy was w porę i przekazujemy wam
+                <section className="container fluid mainContentEkipa">
+                    <div className="post ekipa">
+                        <p style={{margin: "15px", wordWrap: "break-word"}}>Dziękujemy, że zajrzałeś na naszą stronę.<br/>
+                            Zostawiając łapkę w górę na naszej stronie na <a
+                                href="https://www.facebook.com/Polska24nadobe"
+                                target="_blank"
+                                className="basicLink">facebooku</a> motywujesz nas do dalszej pracy, <br/>
+                            a my w zamian za to zaoferujemy Ci prognozę pogody pewną w 100 procentach.<br/>
+                        Podajemy informacje pogodowe, ostrzeżenia, komunikaty i dużo dużo więcej.
+                        Pracujemy nad stroną 24 godziny na dobę, 7 dni w tygodniu za darmo.<br/><br/>
+                        Ekipę tworzą:</p>
+                        {config.staff.map(((person, i) => {
+                            return <StaffItem person={person} key={i}/>
+                        }))}
+                        <p style={{margin: "15px", wordWrap: "break-word"}}>
+                        To właśnie my czuwamy nad waszym bezpieczeństwem, ostrzegamy was w porę oraz przekazujemy wam
                         najświeższe informacje pogodowe z naszego kraju.<br/>
-                        Cieszymy się,że wybrałeś/wybrałaś naszą stronę,że zaufałeś/zaufałaś nam i naszym prognozom ☺
-
+                        Cieszymy się, że wybrałeś/wybrałaś naszą stronę i zaufałeś/zaufałaś nam i naszym prognozom.
+                        </p>
                     </div>
-                    <Copyright />
-                </div>
-            </section>
+                </section>
+                <Copyright />
+            </div>
         )
     }
 }
