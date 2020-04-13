@@ -40,4 +40,8 @@ public class ForecastsService {
     public void deleteForecast(Long id) {
         forecastsRepository.deleteById(id);
     }
+
+    public Long getForecastsCount() {
+        return forecastsRepository.count();
+    }
 }

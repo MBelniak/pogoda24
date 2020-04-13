@@ -1,9 +1,6 @@
 package com.rubik.backend.entity;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +23,7 @@ public class Warning {
     private Long id;
 
     @NotNull(message = "Property 'postDate' cannot be null.")
+    @JsonFormat(timezone="GMT+02")
     private Timestamp postDate;
 
     @NotNull(message = "Property 'description' cannot be null.")

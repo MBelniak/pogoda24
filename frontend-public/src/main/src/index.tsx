@@ -9,6 +9,7 @@ import { Ciekawostki } from './Ciekawostki';
 import { ONas } from './ONas';
 import { CloudinaryContext } from 'cloudinary-react';
 import config from './config/config';
+const images = require.context('./img/', false, /\.(png|jpe?g|svg)$/);
 const Navigation = require('shared24').Navigation;
 
 import './sass/main.scss';

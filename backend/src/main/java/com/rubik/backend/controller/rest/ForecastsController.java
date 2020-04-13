@@ -3,15 +3,14 @@ package com.rubik.backend.controller.rest;
 import com.rubik.backend.entity.Forecast;
 import com.rubik.backend.service.ForecastsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/forecasts")
@@ -24,6 +23,11 @@ public class ForecastsController {
         this.forecastsService = forecastsService;
     }
 
+    @GetMapping("/count")
+    public Long getForecastsCount() {
+        return forecastsService.getForecastsCount();
+    }
+
     @GetMapping("")
     public List<Forecast> getForecasts(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer count) {
         if (page == null || count == null)
@@ -34,7 +38,7 @@ public class ForecastsController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Object> addForecast(@RequestBody Forecast forecast, BindingResult bindingResult) {
+    public ResponseEntity<Object> addForecast(@RequestBody Forecast forecast, BindingResult bindingResult) throws BindException {
         if (!bindingResult.hasErrors()) {
             forecastsService.saveForecast(forecast);
             forecast = forecastsService.getForecastById(forecast.getId());
@@ -43,10 +47,7 @@ public class ForecastsController {
             }
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(bindingResult.getAllErrors()
-                .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.toList()), HttpStatus.BAD_REQUEST);
+        throw new BindException(bindingResult);
     }
 
     @PutMapping("")

@@ -2,8 +2,6 @@ import React from 'react';
 import { ForecastMapList } from './ForecastMapList';
 
 interface State {
-    loading: boolean;
-    posts: Post[];
     expandedPosts: number[];
 }
 
@@ -14,10 +12,13 @@ interface Post {
     imagesPublicIds: string[];
 }
 
-export class PostsShort extends React.Component<{forecastCount: number, className: string}, State> {
+interface PostsProps {
+    posts: Post[];
+}
+
+export class Posts extends React.Component<PostsProps, State> {
+
     state: State = {
-        loading: true,
-        posts: [],
         expandedPosts: []
     };
 
@@ -25,14 +26,6 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
         super(props);
     }
 
-    async componentDidMount() {
-        try {
-            let response = await fetch("api/forecasts?page=0&count="+this.props.forecastCount);
-            this.setState({ loading: false, posts: await response.json() });
-        } catch (error) {
-            this.setState({ loading: false, posts: [] })
-        }
-    }
 
     private processDate(postDate: Date) {
         const date = postDate.toString().split("T")[0];
@@ -62,7 +55,7 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
                 <span dangerouslySetInnerHTML={{ __html: description }}>
                 </span>
                 {expanded ? null
-                    : <a style={{color: "blue"}}
+                    : <a className="postLink"
                          onClick={() => this.expandPost(post.id)}> więcej</a>
                 }
             </div>
@@ -71,7 +64,7 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
 
     private renderPost(post: Post, i: number) {
         return (
-            <div  style={{padding: "10px"}} key={i}>
+            <div key={i} className="post">
                 <div className="postdate">
                     {this.processDate(post.postDate)}
                 </div>
@@ -86,19 +79,16 @@ export class PostsShort extends React.Component<{forecastCount: number, classNam
     }
 
     render() {
-        if (this.state.loading) {
-            return <div />
-        }
-        if (!this.state.posts || this.state.posts.length === 0) {
+        if (!this.props.posts || this.props.posts.length === 0) {
             return (
-                <div className={'column ' + this.props.className} style={{textAlign: "center", marginTop: "20px"}}>
+                <div style={{textAlign: "center", marginTop: "20px"}}>
                     <p>No posts available</p>
                 </div>
             )
         }
         return (
-            <div className={'column post ' + this.props.className}>
-                {this.state.posts.map((post, i) => this.renderPost(post, i))}
+            <div>
+                {this.props.posts.map((post, i) => this.renderPost(post, i))}
             </div>
         )
     }
