@@ -1,21 +1,28 @@
 package com.rubik.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 
 @Entity
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Fact {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "Property 'postDate' cannot be null.")
+    @JsonFormat(timezone="GMT+02")
     private Timestamp postDate;
 
+    @NotNull(message = "Property 'description' cannot be null.")
     private String description;
 
     @JsonIgnore
@@ -25,6 +32,9 @@ public class Fact {
 
     @Transient
     private JsonNode imagesPublicIdsJSON;
+
+    public Fact() {
+    }
 
     public Long getId() {
         return id;

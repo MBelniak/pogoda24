@@ -8,7 +8,6 @@ export class ForecastMapList extends React.Component<{imagesPublicIds: string[]}
     }
 
     render() {
-        console.log(this.props.imagesPublicIds);
         return (
             <div>
                 {this.props.imagesPublicIds

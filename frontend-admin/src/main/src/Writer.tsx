@@ -28,7 +28,7 @@ interface State {
 
 enum PostType {
     Prognoza = "prognozy",
-    Ostrtzezenie = "ostrzeżenia",
+    Ostrzezenie = "ostrzeżenia",
     Ciekawostka = "ciekawostki"
 }
 
@@ -102,7 +102,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
 
     private handleSubmit(event) {
         event.preventDefault();
-        if (this.state.postType === PostType.Ostrtzezenie) {
+        if (this.state.postType === PostType.Ostrzezenie) {
             let formValid = this.validateField(this.daysValidInput.current);
             formValid = this.validateField(this.warningShortInput.current) && formValid;
             if (!formValid)
@@ -114,7 +114,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
     }
 
     private validateField(htmlInput) {
-        if (this.state.postType !== PostType.Ostrtzezenie)
+        if (this.state.postType !== PostType.Ostrzezenie)
             return;
         if (!htmlInput.value) {
             htmlInput.style.borderColor = "red";
@@ -166,7 +166,8 @@ class Writer extends React.Component<PropsFromRedux, State> {
 
     private sendPostToBackend(): Promise<Response> {
         let requestBodyPost;
-        if (this.state.postType === PostType.Ostrtzezenie) {
+        console.log(new Date());
+        if (this.state.postType === PostType.Ostrzezenie) {
             requestBodyPost = {
                 postDate: new Date().getTime(),
                 description: this.postDescriptionTextArea.current.value,
@@ -181,7 +182,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
             };
         }
         const url = this.state.postType === PostType.Prognoza ? "/api/forecasts"
-            : this.state.postType === PostType.Ostrtzezenie ? "/api/warnings"
+            : this.state.postType === PostType.Ostrzezenie ? "/api/warnings"
                 : "/api/facts";
         return fetch(url, {
             method: 'POST',
@@ -281,7 +282,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 postType = "prognozę.";
                 break;
             }
-            case (PostType.Ostrtzezenie): {
+            case (PostType.Ostrzezenie): {
                 postType = "ostrzeżenie.";
                 break;
             }
@@ -379,8 +380,8 @@ class Writer extends React.Component<PropsFromRedux, State> {
                                            })}/>
                                     <label htmlFor="forecast"> Prognoza</label><br/>
                                     <input type="radio" id="warning" name="postType" value="Ostrzeżenie"
-                                           checked={this.state.postType === PostType.Ostrtzezenie}
-                                           onChange={() => this.setState({postType: PostType.Ostrtzezenie})}/>
+                                           checked={this.state.postType === PostType.Ostrzezenie}
+                                           onChange={() => this.setState({postType: PostType.Ostrzezenie})}/>
                                     <label htmlFor="warning"> Ostrzeżenie</label><br/>
                                     <input type="radio" id="ciekawostka" name="postType" value="Ciekawostka"
                                            checked={this.state.postType === PostType.Ciekawostka}
@@ -419,7 +420,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                             })}
                         </div>
                         <div className="is-divider"/>
-                        {this.state.postType === PostType.Ostrtzezenie
+                        {this.state.postType === PostType.Ostrzezenie
                             ? this.renderForWarning()
                             : null}
                         <form onSubmit={this.handleSubmit}>

@@ -29,40 +29,50 @@ $footer-padding: 3rem 1.5rem 3rem;
   display: flex;
   flex-direction: column;
 }
+
 .button.is-primary {
   background-color: $primary-color;
 }
+
 .button.is-primary:hover {
   background-color: $primary-color;
 }
+
 .button.is-primary:active {
   background-color: $tertiary-color;
 }
+
 p, span, label {
   color: white;
 }
+
 .dropzone {
   border: 2px $secondary-color solid;
   border-radius: 20px;
   background: repeating-linear-gradient(45deg, $primary-color 1px, $secondary-color 5px);
   cursor: default;
 }
+
 .truecontent
 {
   text-align: left;
-  margin-top: 15px;
+  margin-top: 1rem;
 }
+
 .title {
   text-align: left;
-  margin-top: 10px;
+  margin-top: 0.7rem;
 }
+
 .dropzone-text {
   text-align: center;
 }
+
 .subtitle {
   color: white;
-  margin-top: 10px;
+  margin-top: 0.7rem;
 }
+
 .bold2
 {
   font-weight: bold;
@@ -72,68 +82,39 @@ p, span, label {
 {
   font-family: Sans;
   position: absolute;
-  top: 10px;
+  top: 0.7rem;
   font-weight: bold;
   font-size: 23px;
-  margin-left: 10px;
+  margin-left: 0.7rem;
 }
+
 .writerForm * {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 0.7rem;
+  margin-bottom: 0.7rem;
 }
 
 .bgimg
 {
   width: 100%;
-  height: 400px;
+  height: 25rem;
 }
-.post_flen
-{
-  display: block;
-  margin-left: 5px;
-  padding: 5px;
 
-  width: 90%;
-  background: black;
-  margin-top: 15px;
-  box-shadow: 0 0 5px black;
-  font-family: Arial;
-  font-size: 15px;
-}
-.pimg
-{
-  margin-top: 5px;
-  border-top: 1px solid black;
-  padding: 5px 1px 1px;
-}
 .zrzutka
 {
   position: relative;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 0.7rem;
 }
-.personRow
-{
-  margin-left: 100px;
-  height:96px;
-}
-.ekipaImg
-{
-  position: absolute;
-}
-.panelIcon:hover
-{
-  opacity: 0.8;
-}
+
 .uploadedFilesItem {
   border: 2px solid $secondary-color;
   border-radius: 20px;
-  margin: 10px 0 5px 5px;
+  margin: 0.7rem 0 0.3rem 0.3rem;
   position: relative;
 }
 .uploadedFilesItemContent {
-  margin: 5px;
-  padding: 5px;
+  margin: 0.3rem;
+  padding: 0.3rem;
 }
 .uploadedFilesItemOverlayWrapper {
   display: none;
@@ -165,10 +146,10 @@ p, span, label {
   cursor: pointer;
 }
 .uploadedFilesItemDelete:after {
-  height: 50px;
-  width: 50px;
+  height: 3rem;
+  width: 3rem;
   border: 2px solid white;
-  border-radius: 30px;
+  border-radius: 2rem;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -189,5 +170,5 @@ p, span, label {
 }
 .dialogMessage {
   color: $primary-color;
-  margin-bottom: 10px;
+  margin-bottom: 0.7rem;
 }

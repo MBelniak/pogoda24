@@ -31,6 +31,7 @@ body {
   //background-color: $primary-color;
   background-size: 100vw 100vh;
 }
+
 .main {
   min-width: 100%;
   min-height: 100vh;
@@ -39,44 +40,58 @@ body {
   flex-direction: column;
   justify-content: space-between;
 }
+
 .mainContent {
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-p, span, label {
-    color: white;
-  }
-.truecontent {
-    margin-top: 15px;
-  }
-.bold2
-{
-    font-weight: bold;
-  }
-.post {
-  margin-left: 5px;
-  padding: 5px;
-  background: $secondary-color;
-  color: black;
-  margin-top: 15px;
-  box-shadow: 0 0 5px $secondary-color;
-}
-.postlink
-{
-  color: lightblue;
-  transition: 0.3s;
-}
-  .postlink:hover
-{
-  color: blue;
+  padding: 2rem 3rem 1.4rem 3rem ;
+  width: 100%;
+  flex-grow: 2;
 }
 
-.externalApi {
-  height: 100%;
+.mainContentEkipa {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+p, span, label {
+    color: white;
+}
+
+.columns {
+  min-height: 100%;
+}
+
+.basicLink {
   color: white;
-  font-size: 15px;
-  text-align: center;
-  margin-top: 15px;
+  transition: 0.3s;
+  text-decoration: underline;
+}
+
+.basicLink:hover {
+  transition: 0.3s;
+  color: $primary-color;
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.post {
+  margin-top: 1rem;
+  padding: 0.6rem;
+  background: $secondary-color;
+  box-shadow: 0 0 10px $secondary-color;
+}
+
+.postLink {
+  color: $primary-color;
+  transition: 0.3s;
+}
+
+.postLink:hover {
+  color: black;
+  transition: 0.3s;
 }
 
 .postdate
@@ -86,20 +101,20 @@ p, span, label {
   float: right;
   font-size: 14px;
 }
+
 .postDescription
 {
-  color: black;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 0.35rem;
+}
+
+.externalApi {
+  height: 100%;
+  color: white;
   font-size: 15px;
   text-align: center;
-  margin-top: 5px;
-}
-.pimg
-{
-  margin-top: 5px;
-  padding-top: 5px;
-  padding: 1px;
-  border-top: 1px solid $secondary-color;
-  padding: 1px;
+  margin-top: 1rem;
 }
 
 @keyframes bar_anim {
@@ -115,43 +130,80 @@ p, span, label {
   100% {
     left: -100%;
   }
-
-}
-
-.personRow
-{
-  margin-left: 100px;
-  height:96px;
-}
-.ekipaImg
-{
-  position: absolute;
 }
 
 .topBar
 {
   overflow: hidden;
-  margin-top: 28px;
+  margin-top: 1.8rem;
   width: 100%;
 }
 
 .topBar div * :not(.logoImg){
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin-top: 0.6rem;
+  margin-bottom: 0.6rem;
 }
 
 .topBar a
 {
   color:white;
   text-decoration: none;
-  margin-right: 10px;
+  margin-right: 0.5rem;
   transition: 0.4s;
+}
+.topBar a:hover {
+  color: $primary-color
 }
 .logoImg {
   display: block;
-  height: 50px;
-  width: 52px;
+  height: 3.1rem;
+  width: 3.2rem;
 }
 .externalApiImg {
-  margin-bottom: 20px;
+  margin-bottom: 1.4rem;
+}
+.ekipa {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.ekipa * {
+  font-size: 17px;
+}
+.ekipaItem {
+  border: solid 2px $primary-color;
+  border-radius: 15px;
+  margin: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.ekipaImg {
+  margin: 0.7rem;
+  min-width: 6.5rem;
+  max-width: 6.5rem;
+  min-height: 6.5rem;
+  max-height: 6.5rem;
+}
+.ekipaPersonDescription {
+  text-align: start;
+  margin: 0.7rem;
+}
+
+.pagingBar {
+  align-self: flex-end;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 2rem 0 0.7rem 0;
+  font-size: 18px;
+  background-color: $secondary-color;
+  box-shadow: 0 0 10px $secondary-color;
+}
+.pagingBar li {
+  margin: 0.5rem;
+  color: white;
+}
+.pagingBarPrevious {
+  color: white;
 }

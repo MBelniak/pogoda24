@@ -1,9 +1,9 @@
 package com.rubik.backend.controller.rest;
 
+import com.rubik.backend.dto.WarningAsPostDTO;
 import com.rubik.backend.entity.Warning;
 import com.rubik.backend.service.WarningsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +25,30 @@ public class WarningsController {
         this.warningsService = warningsService;
     }
 
+    @GetMapping("/count")
+    public Long getWarningssCount() {
+        return warningsService.getWarningsCount();
+    }
+
     @GetMapping("")
-    public List<Warning> getWarnings(@RequestParam(required = false) Integer page, @RequestParam(required = false) Integer count) {
+    public List<Warning> getWarnings(@RequestParam(required = false) Integer page,
+                                     @RequestParam(required = false) Integer count) {
         if (page == null || count == null)
             return warningsService.getWarningsOrderedByDate();
 
         Page<Warning> warnings = warningsService.getWarningsOrderedByDate(page, count);
         return warnings.getContent();
+    }
+
+    @GetMapping("/dtos")
+    public List<WarningAsPostDTO> getWarningsDTOs(@RequestParam(required = false) Integer page,
+                                                  @RequestParam(required = false) Integer count) {
+        List<Warning> warnings;
+        if (page == null || count == null)
+            warnings = warningsService.getWarningsOrderedByDate();
+        else
+            warnings = warningsService.getWarningsOrderedByDate(page, count).getContent();
+        return warnings.stream().map(WarningAsPostDTO::new).collect(Collectors.toList());
     }
 
     @PostMapping("")

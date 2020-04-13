@@ -13,7 +13,7 @@ module.exports = {
         proxy: {
             '/api/': 'http://localhost:8080'
         },
-        contentBase: resolve('dist'),
+        contentBase: resolve('src'),
         port: 3000,
         historyApiFallback: true,
         watchContentBase: true,

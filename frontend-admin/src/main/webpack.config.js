@@ -20,7 +20,7 @@ module.exports = {
         port: 3001,
         historyApiFallback: true,
         watchContentBase: true,
-        contentBase: resolve('dist'),
+        contentBase: resolve('src'),
         publicPath: '/',
         contentBasePublicPath: '/'
     },

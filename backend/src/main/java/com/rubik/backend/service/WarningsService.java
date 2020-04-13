@@ -40,4 +40,8 @@ public class WarningsService {
     public void deleteWarning(Long id) {
         warningsRepository.deleteById(id);
     }
+
+    public Long getWarningsCount() {
+        return warningsRepository.count();
+    }
 }
