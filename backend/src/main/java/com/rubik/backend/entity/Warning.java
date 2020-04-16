@@ -40,13 +40,9 @@ public class Warning {
     @NotNull(message = "Property 'isAddedToTopBar' cannot be null.")
     private Boolean isAddedToTopBar;
 
-    @Temporal(TemporalType.DATE)
     @NotNull(message = "Property 'dueDate' cannot be null.")
-    private Date dueDate;
-
-    @Temporal(TemporalType.TIME)
-    @NotNull(message = "Property 'dueTime' cannot be null.")
-    private Date dueTime;
+    @JsonFormat(timezone="GMT+02")
+    private Timestamp dueDate;
 
     @NotNull(message = "Property 'shortDescription' cannot be null.")
     private String shortDescription;
@@ -74,7 +70,7 @@ public class Warning {
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);
             calendar.add(Calendar.DATE, daysValid);
-            this.dueDate = this.dueTime = calendar.getTime();
+            this.dueDate = new Timestamp(calendar.getTime().getTime());
         }
         this.shortDescription = shortDescription;
     }
@@ -138,20 +134,12 @@ public class Warning {
         isAddedToTopBar = addedToTopBar;
     }
 
-    public Date getDueDate() {
+    public Timestamp getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(Timestamp dueDate) {
         this.dueDate = dueDate;
-    }
-
-    public Date getDueTime() {
-        return dueTime;
-    }
-
-    public void setDueTime(Date dueTime) {
-        this.dueTime = dueTime;
     }
 
     public String getShortDescription() {

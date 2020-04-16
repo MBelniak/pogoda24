@@ -82,7 +82,7 @@ export class Posts extends React.Component<PostsProps, State> {
         if (!this.props.posts || this.props.posts.length === 0) {
             return (
                 <div style={{textAlign: "center", marginTop: "20px"}}>
-                    <p>No posts available</p>
+                    <p>Brak postów.</p>
                 </div>
             )
         }

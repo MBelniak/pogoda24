@@ -32,7 +32,7 @@ export class Ostrzezenia extends React.Component<{}, State> {
     componentDidMount() {
         fetch("api/warnings/count").then(response => response.json().then(data => {
             this.setState({ warningsCount: data });
-            fetch("api/warnings/dtos?page=0&count=" + this.warningsPerPage)
+            fetch("api/warnings?page=0&count=" + this.warningsPerPage)
                 .then(response => response.json().then(data => {
                     this.setState({ posts: data, loading: false });
                 }));
@@ -41,7 +41,7 @@ export class Ostrzezenia extends React.Component<{}, State> {
 
     private handlePageClick(data) {
         const selected = data.selected;
-        fetch("api/warnings/dtos?page=" + selected +  "&count=" + this.warningsPerPage)
+        fetch("api/warnings?page=" + selected +  "&count=" + this.warningsPerPage)
             .then(response => response.json().then(data => {
                 this.setState({ posts: data });
             }));
@@ -49,27 +49,22 @@ export class Ostrzezenia extends React.Component<{}, State> {
 
     render() {
         return (
-            <div className="main">
-                <BarHolder />
-                <TopBar />
-                <section className="mainContent">
-                    <div className="columns">
-                        <div className="column is-1"/>
-                        {this.state.loading
-                            ? <div className='column is-10'>
-                                <div/>
-                            </div>
-                            : <div className="column is-10 posts">
-                                <Posts posts={this.state.posts}/>
-                                <PagingBar pages={Math.ceil(this.state.warningsCount / this.warningsPerPage)}
-                                           handlePageClick={this.handlePageClick}/>
-                            </div>
-                        }
-                        <div className="column is-1"/>
-                    </div>
-                </section>
-                <Copyright />
-            </div>
-        )
+            <section className="mainContent">
+                <div className="columns">
+                    <div className="column is-1"/>
+                    {this.state.loading
+                        ? <div className='column is-10'>
+                            <div/>
+                        </div>
+                        : <div className="column is-10 posts">
+                            <Posts posts={this.state.posts}/>
+                            <PagingBar pages={Math.ceil(this.state.warningsCount / this.warningsPerPage)}
+                                       handlePageClick={this.handlePageClick}/>
+                        </div>
+                    }
+                    <div className="column is-1"/>
+                </div>
+            </section>
+        );
     }
 }

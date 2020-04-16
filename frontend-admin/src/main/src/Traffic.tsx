@@ -1,6 +1,6 @@
 import React from 'react';
 
-export class Traffic extends React.Component {
+export default class Traffic extends React.Component {
 
     render() {
         return (

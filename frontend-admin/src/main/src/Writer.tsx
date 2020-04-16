@@ -361,55 +361,53 @@ class Writer extends React.Component<PropsFromRedux, State> {
                     <img src={img} className="bgimg"/>
                     <h2 className="title">Witaj w edytorze wpisów.</h2>
                     <h2 className="title is-5">Możesz tutaj tworzyć nowe posty do umieszczenia na stronie.</h2>
-                    <div className="container fluid">
-                        <div className="writerForm">
-                            <div className="columns">
-                                <div className="column">
-                                    <p>Dodaj opis do {this.state.postType.toString()}: </p>
-                                    <textarea required={true} cols={100} rows={10} placeholder='Treść posta...'
-                                              ref={this.postDescriptionTextArea} onChange={this.handleDescriptionTextAreaChange}
-                                              value={this.state.postDescription}/>
-                                </div>
-                                <div className="column">
-                                    <p>Typ postu: </p>
-                                    <input type="radio" id="forecast" name="postType" value="Prognoza"
-                                           checked={this.state.postType === PostType.Prognoza}
-                                           onChange={() => this.setState({
-                                               postType: PostType.Prognoza,
-                                               addWarnToBar: false
-                                           })}/>
-                                    <label htmlFor="forecast"> Prognoza</label><br/>
-                                    <input type="radio" id="warning" name="postType" value="Ostrzeżenie"
-                                           checked={this.state.postType === PostType.Ostrzezenie}
-                                           onChange={() => this.setState({postType: PostType.Ostrzezenie})}/>
-                                    <label htmlFor="warning"> Ostrzeżenie</label><br/>
-                                    <input type="radio" id="ciekawostka" name="postType" value="Ciekawostka"
-                                           checked={this.state.postType === PostType.Ciekawostka}
-                                           onChange={() => this.setState({
-                                               postType: PostType.Ciekawostka,
-                                               addWarnToBar: false
-                                           })}/>
-                                    <label htmlFor="ciekawostka"> Ciekawostka</label>
-                                </div>
+                    <div className="container fluid writerForm">
+                        <div className="columns">
+                            <div className="column">
+                                <p>Dodaj opis do {this.state.postType.toString()}: </p>
+                                <textarea required={true} cols={100} rows={10} placeholder='Treść posta...'
+                                          ref={this.postDescriptionTextArea} onChange={this.handleDescriptionTextAreaChange}
+                                          value={this.state.postDescription}/>
                             </div>
-                            <p>Dodaj mapki z prognozą/ostrzeżeniem lub zdjęcia do ciekawostki.
-                                Możesz przeciągnąć swoje pliki z dysku na kreskowane pole:</p>
-                            <FileDropper onFilesAdded={this.onFilesAdded}/>
-                            <p>...lub skorzystać z klasycznego dodawania plików: </p>
-                            <input type="button" className="button" id="loadFile" value="Wybierz pliki"
-                                   onClick={() => document.getElementById('mapsFiles')?.click()}/>
-                            <input
-                                type="file"
-                                id="mapsFiles"
-                                style={{display: "none"}}
-                                accept="image/*"
-                                multiple={true}
-                                ref={this.fileInput}
-                                onChange={() => this.onFilesAdded(this.fileInput.files)}
-                            />
+                            <div className="column">
+                                <p>Typ postu: </p>
+                                <input type="radio" id="forecast" name="postType" value="Prognoza"
+                                       checked={this.state.postType === PostType.Prognoza}
+                                       onChange={() => this.setState({
+                                           postType: PostType.Prognoza,
+                                           addWarnToBar: false
+                                       })}/>
+                                <label htmlFor="forecast"> Prognoza</label><br/>
+                                <input type="radio" id="warning" name="postType" value="Ostrzeżenie"
+                                       checked={this.state.postType === PostType.Ostrzezenie}
+                                       onChange={() => this.setState({postType: PostType.Ostrzezenie})}/>
+                                <label htmlFor="warning"> Ostrzeżenie</label><br/>
+                                <input type="radio" id="ciekawostka" name="postType" value="Ciekawostka"
+                                       checked={this.state.postType === PostType.Ciekawostka}
+                                       onChange={() => this.setState({
+                                           postType: PostType.Ciekawostka,
+                                           addWarnToBar: false
+                                       })}/>
+                                <label htmlFor="ciekawostka"> Ciekawostka</label>
+                            </div>
                         </div>
-                        <p style={{paddingTop: "10px"}}>Pamiętaj, aby przed wysłaniem plików ustawić je w odpowiedniej kolejnośći!</p>
-                        <p style={{paddingTop: "10px"}}>Obecnie dodane pliki:</p>
+                        <p>Dodaj mapki z prognozą/ostrzeżeniem lub zdjęcia do ciekawostki.
+                            Możesz przeciągnąć swoje pliki z dysku na kreskowane pole:</p>
+                        <FileDropper onFilesAdded={this.onFilesAdded}/>
+                        <p>...lub skorzystać z klasycznego dodawania plików: </p>
+                        <input type="button" className="button" id="loadFile" value="Wybierz pliki"
+                               onClick={() => document.getElementById('mapsFiles')?.click()}/>
+                        <input
+                            type="file"
+                            id="mapsFiles"
+                            style={{display: "none"}}
+                            accept="image/*"
+                            multiple={true}
+                            ref={this.fileInput}
+                            onChange={() => this.onFilesAdded(this.fileInput.files)}
+                        />
+                        <p>Pamiętaj, aby przed wysłaniem plików ustawić je w odpowiedniej kolejnośći!</p>
+                        <p>Obecnie dodane pliki:</p>
                         <div className="columns is-multiline">
                             {this.props.files.map((file, key) => {
                                 return (

@@ -4,7 +4,7 @@ import com.rubik.backend.entity.Warning;
 
 import java.sql.Timestamp;
 
-public class WarningAsPostDTO {
+public class WarningDTO {
 
     private Long id;
 
@@ -14,7 +14,7 @@ public class WarningAsPostDTO {
 
     private String imagesPublicIds;
 
-    public WarningAsPostDTO(Warning warning) {
+    public WarningDTO(Warning warning) {
         this.id = warning.getId();
         this.postDate = warning.getPostDate();
         this.description = warning.getDescription();

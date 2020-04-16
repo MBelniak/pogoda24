@@ -18,8 +18,7 @@ CREATE TABLE warning (
   description             nvarchar,
   images_public_ids       nvarchar,
   is_added_to_top_bar     boolean,
-  due_date                DATE,
-  due_time                TIME,
+  due_date                TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
   short_description       nvarchar
 );
 

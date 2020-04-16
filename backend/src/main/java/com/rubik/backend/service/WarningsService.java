@@ -9,6 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -43,5 +46,13 @@ public class WarningsService {
 
     public Long getWarningsCount() {
         return warningsRepository.count();
+    }
+
+    public List<Warning> getCurrentWarnings() {
+        return warningsRepository.findAllValidWarnings(new Timestamp(new Date().getTime()));
+    }
+
+    public List<Warning> getCurrentWarnings(boolean isAddedToTopBar) {
+        return warningsRepository.findAllValidWarnings(new Timestamp(new Date().getTime()), isAddedToTopBar);
     }
 }
