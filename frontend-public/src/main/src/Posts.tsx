@@ -8,12 +8,12 @@ interface State {
 interface Post {
     id: number;
     postDate: Date;
-    postType: string
+    postType: string;
     description: string;
     imagesPublicIdsJSON: string[];
-    addedToTopBar: boolean,
-    dueDate: string,
-    shortDescription: string
+    addedToTopBar: boolean;
+    dueDate: string;
+    shortDescription: string;
 }
 
 interface PostsProps {
@@ -21,7 +21,6 @@ interface PostsProps {
 }
 
 export class Posts extends React.Component<PostsProps, State> {
-
     state: State = {
         expandedPosts: []
     };
@@ -30,38 +29,44 @@ export class Posts extends React.Component<PostsProps, State> {
         super(props);
     }
 
-
     private processDate(postDate: Date) {
-        const date = postDate.toString().split("T")[0];
-        const time = postDate.toString().split("T")[1].substr(0, 5);
+        const date = postDate.toString().split('T')[0];
+        const time = postDate.toString().split('T')[1].substr(0, 5);
         return date + ' o ' + time;
     }
 
     private expandPost(id: number) {
         const expandedPosts = this.state.expandedPosts;
-        this.setState({expandedPosts: [...expandedPosts, id]});
+        this.setState({ expandedPosts: [...expandedPosts, id] });
     }
 
     private processDescription(post: Post) {
         let description = post.description;
-        const expanded = this.state.expandedPosts.indexOf(post.id) > -1 || post.description.length < 170;
+        const expanded =
+            this.state.expandedPosts.indexOf(post.id) > -1 ||
+            post.description.length < 170;
         if (!expanded) {
             let length = 170;
             while (post.description.substr(length, 1) != ' ') {
                 --length;
             }
-            description  = post.description.substr(0, length) + ' ...';
+            description = post.description.substr(0, length) + ' ...';
         }
 
-        description = description.replace("\r\n", "<br/><br/>").replace("\n", "<br/><br/>");
+        description = description
+            .replace('\r\n', '<br/><br/>')
+            .replace('\n', '<br/><br/>');
         return (
             <div className="postDescription">
-                <span dangerouslySetInnerHTML={{ __html: description }}>
-                </span>
-                {expanded ? null
-                    : <a className="postLink"
-                         onClick={() => this.expandPost(post.id)}> więcej</a>
-                }
+                <span dangerouslySetInnerHTML={{ __html: description }}></span>
+                {expanded ? null : (
+                    <a
+                        className="postLink"
+                        onClick={() => this.expandPost(post.id)}>
+                        {' '}
+                        więcej
+                    </a>
+                )}
             </div>
         );
     }
@@ -72,11 +77,16 @@ export class Posts extends React.Component<PostsProps, State> {
                 <div className="postdate">
                     {this.processDate(post.postDate)}
                 </div>
-                <br/>
+                <br />
                 {this.processDescription(post)}
-                <div className="is-divider" style={{margin: "15px 0 10px 0"}}/>
-                <div style={{textAlign: "center"}}>
-                    <ForecastMapList imagesPublicIds={post.imagesPublicIdsJSON} />
+                <div
+                    className="is-divider"
+                    style={{ margin: '15px 0 10px 0' }}
+                />
+                <div style={{ textAlign: 'center' }}>
+                    <ForecastMapList
+                        imagesPublicIds={post.imagesPublicIdsJSON}
+                    />
                 </div>
             </div>
         );
@@ -85,16 +95,15 @@ export class Posts extends React.Component<PostsProps, State> {
     render() {
         if (!this.props.posts || this.props.posts.length === 0) {
             return (
-                <div style={{textAlign: "center", marginTop: "20px"}}>
+                <div style={{ textAlign: 'center', marginTop: '20px' }}>
                     <p>Brak postów.</p>
                 </div>
-            )
+            );
         }
         return (
             <div>
                 {this.props.posts.map((post, i) => this.renderPost(post, i))}
             </div>
-        )
+        );
     }
 }
-

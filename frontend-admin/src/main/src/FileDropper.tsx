@@ -6,7 +6,6 @@ interface FileDropperProps {
 }
 
 export default class FileDropper extends React.Component<FileDropperProps> {
-
     constructor(props) {
         super(props);
     }
@@ -17,17 +16,18 @@ export default class FileDropper extends React.Component<FileDropperProps> {
                 multiple={true}
                 accept="image/*"
                 onDrop={this.props.onFilesAdded}
-                noClick={true}
-            >
-                {({getRootProps, getInputProps}) => (
+                noClick={true}>
+                {({ getRootProps, getInputProps }) => (
                     <div className="section dropzone" {...getRootProps()}>
                         <div className="container fluid">
                             <input {...getInputProps()} />
-                            <h2 className="title is-4 dropzone-text">Upuść pliki tutaj</h2>
+                            <h2 className="title is-4 dropzone-text">
+                                Upuść pliki tutaj
+                            </h2>
                         </div>
                     </div>
                 )}
             </Dropzone>
-        )
+        );
     }
 }

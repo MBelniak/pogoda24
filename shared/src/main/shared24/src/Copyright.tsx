@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
 export class Copyright extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
     }
 
     render() {
@@ -12,6 +12,6 @@ export class Copyright extends React.Component {
                     <p>Copyright &copy; 2020 by Pogoda24/7</p>
                 </div>
             </footer>
-        )
+        );
     }
 }

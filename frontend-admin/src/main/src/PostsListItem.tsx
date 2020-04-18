@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface Post {
     id: number;
@@ -7,13 +7,8 @@ interface Post {
     imagesPublicIds: string[];
 }
 
-export default class PostsListItem extends React.Component<{post: Post}> {
-
+export default class PostsListItem extends React.Component<{ post: Post }> {
     render() {
-        return (
-            <div className="postsItem">
-
-            </div>
-        )
+        return <div className="postsItem">{this.props.post.description}</div>;
     }
 }

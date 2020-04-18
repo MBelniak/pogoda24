@@ -10,55 +10,62 @@ import { CloudinaryContext } from 'cloudinary-react';
 
 import './sass/main.scss';
 import 'shared24/src/sass/main.scss';
-import {TopBar} from "./TopBar";
-import {BarHolder} from "../../../../shared/src/main/shared24/src/BarHolder";
-import {Copyright} from "../../../../shared/src/main/shared24/src/Copyright";
+import { TopBar } from './TopBar';
+import { BarHolder } from '../../../../shared/src/main/shared24/src/BarHolder';
+import { Copyright } from '../../../../shared/src/main/shared24/src/Copyright';
 
 interface State {
     warningShort: string | null;
 }
 
 export default class App extends React.Component<{}, State> {
-
     state: State = {
         warningShort: null
     };
 
     componentDidMount() {
-        fetch("api/posts/warnings/topBarWarning")
+        fetch('api/posts/warnings/topBarWarning')
             .then(response => {
                 if (response && response.ok) {
                     response.text().then(text => {
-                        if (text !== null && text !== "") {
-                            this.setState({warningShort: text});
+                        if (text !== null && text !== '') {
+                            this.setState({ warningShort: text });
                         }
                     });
                 } else {
                     console.log(response);
                 }
-            }).catch(error => {
+            })
+            .catch(error => {
                 console.log(error);
-        });
+            });
     }
 
     render() {
         return (
             <Router>
-             <div className="main">
-                <BarHolder handleClick={() => {return;}}
-                           warningShort={this.state.warningShort ? this.state.warningShort : "Brak ostrzeżeń"}/>
-                <TopBar />
-                 <Switch>
-                     <Route exact path="/" component={MainPage}/>
-                     <Route path="/prognozy" component={Prognozy}/>
-                     <Route path="/ostrzezenia" component={Ostrzezenia}/>
-                     <Route path="/ciekawostki" component={Ciekawostki}/>
-                     <Route path="/about" component={ONas}/>
-                 </Switch>
-                 <Copyright/>
-             </div>
+                <div className="main">
+                    <BarHolder
+                        handleClick={() => {
+                            return;
+                        }}
+                        warningShort={
+                            this.state.warningShort
+                                ? this.state.warningShort
+                                : 'Brak ostrzeżeń'
+                        }
+                    />
+                    <TopBar />
+                    <Switch>
+                        <Route exact path="/" component={MainPage} />
+                        <Route path="/prognozy" component={Prognozy} />
+                        <Route path="/ostrzezenia" component={Ostrzezenia} />
+                        <Route path="/ciekawostki" component={Ciekawostki} />
+                        <Route path="/about" component={ONas} />
+                    </Switch>
+                    <Copyright />
+                </div>
             </Router>
         );
     }
-
 }

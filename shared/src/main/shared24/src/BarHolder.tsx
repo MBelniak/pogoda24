@@ -1,8 +1,11 @@
-import React from "react";
+import React from 'react';
 
-export class BarHolder extends React.Component<{handleClick: () => void, warningShort: string}> {
+export class BarHolder extends React.Component<{
+    handleClick: () => void;
+    warningShort: string;
+}> {
     constructor(props) {
-        super(props)
+        super(props);
     }
 
     render() {
@@ -10,6 +13,6 @@ export class BarHolder extends React.Component<{handleClick: () => void, warning
             <div className="barHolder" onClick={this.props.handleClick}>
                 <div className="barText">{this.props.warningShort}</div>
             </div>
-        )
+        );
     }
 }

@@ -17,12 +17,12 @@ ReactDOM.render(
     <Provider store={store}>
         <Router>
             <Switch>
-                <Route exact path="/write" component={MainPage}/>
-                <Route path="/writer" component={Writer}/>
+                <Route exact path="/write" component={MainPage} />
+                <Route path="/writer" component={Writer} />
                 <Route path="/elist" component={PostsList} />
                 <Route path="/traffic" component={Traffic} />
             </Switch>
         </Router>
-    </Provider>
-    , document.getElementById('root'));
-
+    </Provider>,
+    document.getElementById('root')
+);

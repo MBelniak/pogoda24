@@ -1,10 +1,9 @@
 import React from 'react';
 import img from './img/bg.jpg';
-import { Links } from "./Links";
+import { Links } from './Links';
 const Copyright = require('shared24').Copyright;
 
 export default class MainPage extends React.Component {
-
     constructor(props) {
         super(props);
     }
@@ -13,12 +12,11 @@ export default class MainPage extends React.Component {
         return (
             <div className="main">
                 <section className="container fluid">
-                    <img src={img} className="bgimg"/>
+                    <img src={img} className="bgimg" />
                     <Links />
                 </section>
                 <Copyright />
             </div>
-        )
+        );
     }
-
 }
