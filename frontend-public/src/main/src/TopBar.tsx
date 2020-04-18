@@ -23,7 +23,7 @@ export class TopBar extends React.Component {
 
     render() {
         return(
-            <nav className="topBar navbar" role="navigation" aria-label="main navigation">
+            <nav className="topBar is-fixed-top navbar" role="navigation" aria-label="main navigation">
                 <div className="navbar-brand">
                     <Link to="/" className="navbar-item" >
                         <img src="./img/logo-wHalo.png" className="logoImg"/>

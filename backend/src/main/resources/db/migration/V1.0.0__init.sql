@@ -1,24 +1,11 @@
-CREATE TABLE fact (
-  id                       BIGINT PRIMARY KEY AUTO_INCREMENT,
-  post_date                TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
-  description              nvarchar,
-  images_public_ids        nvarchar
-);
-
-CREATE TABLE forecast (
-  id                       BIGINT PRIMARY KEY AUTO_INCREMENT,
-  post_date                TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
-  description              nvarchar,
-  images_public_ids        nvarchar
-);
-
-CREATE TABLE warning (
+CREATE TABLE post (
   id                      BIGINT PRIMARY KEY AUTO_INCREMENT,
+  post_type               nvarchar DEFAULT 'FORECAST' not null,
   post_date               TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
   description             nvarchar,
   images_public_ids       nvarchar,
   is_added_to_top_bar     boolean,
-  due_date                TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
+  due_date                TIMESTAMP,
   short_description       nvarchar
 );
 

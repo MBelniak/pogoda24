@@ -5,8 +5,12 @@ import { ExternalApi } from './ExternalApi';
 interface Post {
     id: number;
     postDate: Date;
+    postType: string
     description: string;
-    imagesPublicIds: string[];
+    imagesPublicIdsJSON: string[];
+    addedToTopBar: boolean,
+    dueDate: string,
+    shortDescription: string
 }
 
 interface State {
@@ -24,7 +28,7 @@ export class MainPage extends React.Component<{}, State> {
     };
 
     componentDidMount() {
-        fetch("api/forecasts?page=0&count=" + this.forecastsPerPage)
+        fetch("api/posts?page=0&count=" + this.forecastsPerPage)
             .then(response => response.json().then(data => {
                 this.setState({ posts: data, loading: false });
             }));
@@ -38,7 +42,12 @@ export class MainPage extends React.Component<{}, State> {
                     {this.state.loading
                         ? <div className='column is-8' />
                         : <div className="column is-8 posts">
-                            <Posts posts={this.state.posts}/>
+                            {this.state.posts.length !== 0
+                                ? <Posts posts={this.state.posts}/>
+                                : <div style={{textAlign: "center", marginTop: "20px"}}>
+                                    <p className="noPosts">Brak postów.</p>
+                                </div>
+                            }
                         </div>
                     }
                     <ExternalApi/>

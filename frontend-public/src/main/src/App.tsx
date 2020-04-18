@@ -15,33 +15,29 @@ import {BarHolder} from "../../../../shared/src/main/shared24/src/BarHolder";
 import {Copyright} from "../../../../shared/src/main/shared24/src/Copyright";
 
 interface State {
-    warningShort: string;
+    warningShort: string | null;
 }
 
 export default class App extends React.Component<{}, State> {
 
     state: State = {
-        warningShort: ""
+        warningShort: null
     };
 
     componentDidMount() {
-        fetch("api/warnings/latestShort")
+        fetch("api/posts/warnings/topBarWarning")
             .then(response => {
                 if (response && response.ok) {
                     response.text().then(text => {
                         if (text !== null && text !== "") {
                             this.setState({warningShort: text});
-                        } else {
-                            this.setState({warningShort: "Brak ostrzeżeń."});
                         }
                     });
                 } else {
                     console.log(response);
-                    this.setState({warningShort: "Brak ostrzeżeń."});
                 }
             }).catch(error => {
                 console.log(error);
-                this.setState({warningShort: "Brak ostrzeżeń."});
         });
     }
 
@@ -49,7 +45,8 @@ export default class App extends React.Component<{}, State> {
         return (
             <Router>
              <div className="main">
-                <BarHolder handleClick={() => {return;}} warningShort={this.state.warningShort}/>
+                <BarHolder handleClick={() => {return;}}
+                           warningShort={this.state.warningShort ? this.state.warningShort : "Brak ostrzeżeń"}/>
                 <TopBar />
                  <Switch>
                      <Route exact path="/" component={MainPage}/>

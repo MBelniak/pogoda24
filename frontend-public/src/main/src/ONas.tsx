@@ -1,9 +1,6 @@
 import React from "react";
-import { TopBar } from './TopBar';
 import config from './config/config';
 import StaffItem from "./StaffItem";
-const BarHolder = require('shared24').BarHolder;
-const Copyright = require('shared24').Copyright;
 
 export class ONas extends React.Component {
     constructor(props) {
@@ -12,7 +9,7 @@ export class ONas extends React.Component {
 
     render() {
         return (
-            <section className="container fluid mainContentEkipa">
+            <section className="container fluid mainContent">
                 <div className="post ekipa">
                     <p style={{margin: "15px", wordWrap: "break-word"}}>Dziękujemy, że zajrzałeś na naszą stronę.<br/>
                         Zostawiając łapkę w górę na naszej stronie na <a

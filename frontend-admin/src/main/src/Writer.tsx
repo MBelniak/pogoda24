@@ -19,17 +19,23 @@ interface UploadedFile {
 
 interface State {
     postType: PostType,
-    addWarnToBar: boolean,
+    postTypeText: PostTypeText,
     warningDaysValid: number | undefined,
     postDescription: string,
     showModal: boolean,
     renderModal: JSX.Element | undefined
 }
 
-enum PostType {
+enum PostTypeText {
     Prognoza = "prognozy",
     Ostrzezenie = "ostrzeżenia",
     Ciekawostka = "ciekawostki"
+}
+
+enum PostType {
+    FORECAST = 'FORECAST',
+    WARNING = 'WARNING',
+    FACT = 'FACT'
 }
 
 const connector = connect((state: UploadedFile[]) => ({ files: state }),
@@ -43,8 +49,8 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 class Writer extends React.Component<PropsFromRedux, State> {
 
     state: State = {
-        postType: PostType.Prognoza,
-        addWarnToBar: false,
+        postType: PostType.FORECAST,
+        postTypeText: PostTypeText.Prognoza,
         warningDaysValid: undefined,
         postDescription: "",
         showModal: false,
@@ -102,8 +108,8 @@ class Writer extends React.Component<PropsFromRedux, State> {
 
     private handleSubmit(event) {
         event.preventDefault();
-        if (this.state.postType === PostType.Ostrzezenie) {
-            let formValid = this.validateField(this.daysValidInput.current);
+        if (this.state.postType === PostType.WARNING) {
+            let formValid = this.validateField(this.daysValidInput.current, () => parseInt(this.daysValidInput.current.value) > 0);
             formValid = this.validateField(this.warningShortInput.current) && formValid;
             if (!formValid)
                 return;
@@ -113,16 +119,40 @@ class Writer extends React.Component<PropsFromRedux, State> {
         this.afterPostRequestSend(responsePromise);
     }
 
-    private validateField(htmlInput) {
-        if (this.state.postType !== PostType.Ostrzezenie)
+    private validateField(htmlInput, additionalConstraint?: () => boolean) {
+        if (this.state.postType !== PostType.WARNING)
             return;
-        if (!htmlInput.value) {
+        if (!htmlInput.value || (additionalConstraint ? !additionalConstraint() : false)) {
             htmlInput.style.borderColor = "red";
             return false;
         } else {
             htmlInput.style.borderColor = "";
             return true;
         }
+    }
+
+    private sendPostToBackend(): Promise<Response> {
+        function calculateDueDate(days: number): number {
+            console.log(days);
+            return new Date(new Date().setHours(0, 0, 0, 0) + (days + 1) * 24 * 3600 * 1000).getTime();
+        }
+
+        const requestBodyPost = {
+            postDate: new Date().getTime(),
+            postType: this.state.postType.toString(),
+            description: this.postDescriptionTextArea.current.value,
+            addedToTopBar: this.state.postType === PostType.WARNING ? this.warningCheckBox.current.checked : null,
+            dueDate: this.state.postType === PostType.WARNING ? calculateDueDate(parseInt(this.daysValidInput.current.value)) : null,
+            shortDescription: this.state.postType === PostType.WARNING ? this.warningShortInput.current.value : null
+        }
+
+        return fetch('api/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBodyPost)
+        });
     }
 
     private afterPostRequestSend(responsePromise: Promise<Response>) {
@@ -164,35 +194,6 @@ class Writer extends React.Component<PropsFromRedux, State> {
         });
     }
 
-    private sendPostToBackend(): Promise<Response> {
-        let requestBodyPost;
-        console.log(new Date());
-        if (this.state.postType === PostType.Ostrzezenie) {
-            requestBodyPost = {
-                postDate: new Date().getTime(),
-                description: this.postDescriptionTextArea.current.value,
-                isAddedToTopBar: this.state.addWarnToBar,
-                daysValid: this.daysValidInput.current.value,
-                shortDescription: this.warningShortInput.current.value
-            };
-        } else {
-            requestBodyPost = {
-                postDate: new Date().getTime(),
-                description: this.postDescriptionTextArea.current.value
-            };
-        }
-        const url = this.state.postType === PostType.Prognoza ? "/api/forecasts"
-            : this.state.postType === PostType.Ostrzezenie ? "/api/warnings"
-                : "/api/facts";
-        return fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBodyPost)
-        });
-    }
-
     private uploadImages() {
         const url = `https://api.cloudinary.com/v1_1/${cloud_name}/upload`;
 
@@ -231,17 +232,21 @@ class Writer extends React.Component<PropsFromRedux, State> {
         const requestBodyUpdatedForecast = {
             id: data.id,
             postDate: data.postDate,
+            postType: data.postType,
             description: data.description,
-            imagesPublicIds: [] as string[]
+            imagesPublicIds: "",
+            addedToTopBar: data.addedToTopBar,
+            dueDate: data.dueDate,
+            shortDescription: data.shortDescription
         };
         const uploadedFiles = this.props.files;
         const uploadedFilesIdsOrdered: string[] = [];
         for (let i = 0; i < uploadedFiles.length; ++i) {
             uploadedFilesIdsOrdered.push(uploadedFiles[i].publicId);
         }
-        requestBodyUpdatedForecast['imagesPublicIds'] = uploadedFilesIdsOrdered;
+        requestBodyUpdatedForecast['imagesPublicIds'] = JSON.stringify(uploadedFilesIdsOrdered);
 
-        fetch('/api/forecasts', {
+        fetch('/api/posts', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -264,7 +269,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
     }
 
     private removePostFromBackend(postId: number) {
-        fetch("/api/forecasts/" + postId).then(response => {
+        fetch("/api/posts/" + postId).then(response => {
             if (response && response.ok) {
                 console.log("Removed post with id: " + postId);
             } else {
@@ -278,15 +283,15 @@ class Writer extends React.Component<PropsFromRedux, State> {
     private showSuccessMessage() {
         let postType;
         switch (this.state.postType) {
-            case (PostType.Prognoza): {
+            case (PostType.FORECAST): {
                 postType = "prognozę.";
                 break;
             }
-            case (PostType.Ostrzezenie): {
+            case (PostType.WARNING): {
                 postType = "ostrzeżenie.";
                 break;
             }
-            case (PostType.Ciekawostka): {
+            case (PostType.FACT): {
                 postType = "ciekawostkę.";
                 break;
             }
@@ -310,7 +315,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
 
     private clearEverything() {
         this.props.onClearFiles();
-        this.setState({postType: PostType.Prognoza, postDescription: ""});
+        this.setState({postTypeText: PostTypeText.Prognoza, postType: PostType.FORECAST, postDescription: ""});
         this.closeModal();
     }
 
@@ -320,7 +325,6 @@ class Writer extends React.Component<PropsFromRedux, State> {
                 <div className="column is-half">
                     <div style={{margin: "10px"}}>
                         <input id="addToBar" type="checkbox"
-                               onChange={() => this.setState({addWarnToBar: !this.state.addWarnToBar})}
                                ref={this.warningCheckBox}/>
                         <label htmlFor="addToBar"> Dodaj ostrzeżenie do paska u góry strony</label>
                     </div>
@@ -330,7 +334,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                         </div>
                         <div className="column">
                             <input id="warningDaysValidInput" type="number" required={true} ref={this.daysValidInput} min="0" max="7"
-                                    onBlur={e => this.validateField(e.target)}/>
+                                    onBlur={e => this.validateField(e.target, () => parseInt(e.target.value) > 0)}/>
                         </div>
                     </div>
                     <div className="columns">
@@ -364,7 +368,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                     <div className="container fluid writerForm">
                         <div className="columns">
                             <div className="column">
-                                <p>Dodaj opis do {this.state.postType.toString()}: </p>
+                                <p>Dodaj opis do {this.state.postTypeText.toString()}: </p>
                                 <textarea required={true} cols={100} rows={10} placeholder='Treść posta...'
                                           ref={this.postDescriptionTextArea} onChange={this.handleDescriptionTextAreaChange}
                                           value={this.state.postDescription}/>
@@ -372,21 +376,24 @@ class Writer extends React.Component<PropsFromRedux, State> {
                             <div className="column">
                                 <p>Typ postu: </p>
                                 <input type="radio" id="forecast" name="postType" value="Prognoza"
-                                       checked={this.state.postType === PostType.Prognoza}
+                                       checked={this.state.postType === PostType.FORECAST}
                                        onChange={() => this.setState({
-                                           postType: PostType.Prognoza,
-                                           addWarnToBar: false
+                                           postType: PostType.FORECAST,
+                                           postTypeText: PostTypeText.Prognoza
                                        })}/>
                                 <label htmlFor="forecast"> Prognoza</label><br/>
                                 <input type="radio" id="warning" name="postType" value="Ostrzeżenie"
-                                       checked={this.state.postType === PostType.Ostrzezenie}
-                                       onChange={() => this.setState({postType: PostType.Ostrzezenie})}/>
+                                       checked={this.state.postType === PostType.WARNING}
+                                       onChange={() => this.setState({
+                                           postType: PostType.WARNING,
+                                           postTypeText: PostTypeText.Ostrzezenie
+                                       })}/>
                                 <label htmlFor="warning"> Ostrzeżenie</label><br/>
                                 <input type="radio" id="ciekawostka" name="postType" value="Ciekawostka"
-                                       checked={this.state.postType === PostType.Ciekawostka}
+                                       checked={this.state.postType === PostType.FACT}
                                        onChange={() => this.setState({
-                                           postType: PostType.Ciekawostka,
-                                           addWarnToBar: false
+                                           postType: PostType.FACT,
+                                           postTypeText: PostTypeText.Ciekawostka
                                        })}/>
                                 <label htmlFor="ciekawostka"> Ciekawostka</label>
                             </div>
@@ -418,7 +425,7 @@ class Writer extends React.Component<PropsFromRedux, State> {
                             })}
                         </div>
                         <div className="is-divider"/>
-                        {this.state.postType === PostType.Ostrzezenie
+                        {this.state.postType === PostType.WARNING
                             ? this.renderForWarning()
                             : null}
                         <form onSubmit={this.handleSubmit}>

@@ -5,8 +5,12 @@ import { Posts } from './Posts';
 interface Post {
     id: number;
     postDate: Date;
+    postType: string
     description: string;
-    imagesPublicIds: string[];
+    imagesPublicIdsJSON: string[];
+    addedToTopBar: boolean,
+    dueDate: string,
+    shortDescription: string
 }
 
 interface State {
@@ -31,9 +35,9 @@ export class Prognozy extends React.Component<{}, State> {
     }
 
     componentDidMount() {
-        fetch("api/forecasts/count").then(response => response.json().then(data => {
+        fetch("api/posts/count?postType=FORECAST").then(response => response.json().then(data => {
             this.setState({ forecastsCount: data });
-            fetch("api/forecasts?page=0&count=" + this.forecastsPerPage)
+            fetch("api/posts?postType=FORECAST&page=0&count=" + this.forecastsPerPage)
                 .then(response => response.json().then(data => {
                     console.log(data);
                     this.setState({ posts: data, loading: false });
@@ -43,7 +47,7 @@ export class Prognozy extends React.Component<{}, State> {
 
     private handlePageClick(data) {
         const selected = data.selected;
-        fetch("api/forecasts?page=" + selected +  "&count=" + this.forecastsPerPage)
+        fetch("api/posts?postType=FORECASTS&page=" + selected +  "&count=" + this.forecastsPerPage)
             .then(response => response.json().then(data => {
                 this.setState({ posts: data });
             }));
@@ -57,9 +61,16 @@ export class Prognozy extends React.Component<{}, State> {
                     {this.state.loading
                         ? <div className='column is-10'/>
                         : <div className="column is-10 posts">
-                            <Posts posts={this.state.posts}/>
-                            <PagingBar pages={Math.ceil(this.state.forecastsCount / this.forecastsPerPage)}
-                                       handlePageClick={this.handlePageClick}/>
+                            {this.state.posts.length !== 0
+                                ? (<>
+                                    <Posts posts={this.state.posts}/>
+                                    <PagingBar pages={Math.ceil(this.state.forecastsCount / this.forecastsPerPage)}
+                                               handlePageClick={this.handlePageClick}/>
+                                </>)
+                                : <div style={{textAlign: "center", marginTop: "20px"}}>
+                                    <p className="noPosts">Brak postów.</p>
+                                </div>
+                            }
                         </div>
                     }
                     <div className="column is-1"/>

@@ -121,9 +121,13 @@ p, span, label {
   position: absolute;
   height: 100%;
   width: 100%;
+  margin: 0;
   top: 0;
   left: 0;
   z-index: 10;
+}
+.uploadedFilesItemOverlayWrapper * {
+  margin: 0;
 }
 .uploadedFilesItemOverlay {
   background-color: $secondary-color;

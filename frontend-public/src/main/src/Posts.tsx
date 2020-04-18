@@ -8,8 +8,12 @@ interface State {
 interface Post {
     id: number;
     postDate: Date;
+    postType: string
     description: string;
-    imagesPublicIds: string[];
+    imagesPublicIdsJSON: string[];
+    addedToTopBar: boolean,
+    dueDate: string,
+    shortDescription: string
 }
 
 interface PostsProps {
@@ -72,7 +76,7 @@ export class Posts extends React.Component<PostsProps, State> {
                 {this.processDescription(post)}
                 <div className="is-divider" style={{margin: "15px 0 10px 0"}}/>
                 <div style={{textAlign: "center"}}>
-                    <ForecastMapList imagesPublicIds={post.imagesPublicIds} />
+                    <ForecastMapList imagesPublicIds={post.imagesPublicIdsJSON} />
                 </div>
             </div>
         );
