@@ -1,19 +1,9 @@
 import React from 'react';
 import { ForecastMapList } from './ForecastMapList';
+import Post from './Post';
 
 interface State {
     expandedPosts: number[];
-}
-
-interface Post {
-    id: number;
-    postDate: Date;
-    postType: string;
-    description: string;
-    imagesPublicIdsJSON: string[];
-    addedToTopBar: boolean;
-    dueDate: string;
-    shortDescription: string;
 }
 
 interface PostsProps {
@@ -30,9 +20,8 @@ export class Posts extends React.Component<PostsProps, State> {
     }
 
     private processDate(postDate: Date) {
-        const date = postDate.toString().split('T')[0];
-        const time = postDate.toString().split('T')[1].substr(0, 5);
-        return date + ' o ' + time;
+        const date = postDate.toLocaleString('pl-PL');
+        return date.replace(', ', ' o ');
     }
 
     private expandPost(id: number) {
@@ -44,13 +33,18 @@ export class Posts extends React.Component<PostsProps, State> {
         let description = post.description;
         const expanded =
             this.state.expandedPosts.indexOf(post.id) > -1 ||
-            post.description.length < 170;
+            post.description.length < 150;
         if (!expanded) {
-            let length = 170;
-            while (post.description.substr(length, 1) != ' ') {
-                --length;
+            description = description.substr(0, 150);
+            const regex = /^.*\s/g;
+            const match = description.match(regex);
+            if (match) {
+                if (typeof match === 'string') {
+                    description = match + '...';
+                } else {
+                    description = match[0] + '...';
+                }
             }
-            description = post.description.substr(0, length) + ' ...';
         }
 
         description = description
@@ -63,7 +57,6 @@ export class Posts extends React.Component<PostsProps, State> {
                     <a
                         className="postLink"
                         onClick={() => this.expandPost(post.id)}>
-                        {' '}
                         więcej
                     </a>
                 )}

@@ -10,19 +10,22 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("api/posts")
 public class PostController {
 
     private PostService postService;
+    private Map<String, Post> hashToPostMap;
 
     @Autowired
     public PostController(PostService postService) {
         this.postService = postService;
+        this.hashToPostMap = new ConcurrentHashMap<>();
     }
 
     @GetMapping("/count")
@@ -59,6 +62,7 @@ public class PostController {
         return new ResponseEntity<>(postService.getPostsOrderedByDate(page, count).getContent(), HttpStatus.OK);
     }
 
+    @Transactional
     @PostMapping("")
     public ResponseEntity<Post> addPost(@RequestBody @Valid Post post, BindingResult bindingResult) throws BindException {
         if (!bindingResult.hasErrors()) {
@@ -72,15 +76,42 @@ public class PostController {
         throw new BindException(bindingResult);
     }
 
+    @Transactional
     @PutMapping("")
-    public void updatePost(@RequestBody @Valid Post post, BindingResult bindingResult) throws BindException {
+    public ResponseEntity updatePost(@RequestBody @Valid Post post, BindingResult bindingResult,
+                           @RequestParam(required = false) Boolean temporary) throws BindException {
         if (!bindingResult.hasErrors()) {
+            if (temporary != null && temporary) {
+                String pseudoHash = UUID.randomUUID().toString();
+                while (hashToPostMap.get(pseudoHash) != null) {
+                    pseudoHash = UUID.randomUUID().toString();
+                }
+                hashToPostMap.put(pseudoHash, post);
+                return new ResponseEntity<>(pseudoHash, HttpStatus.OK);
+            }
             postService.savePost(post);
+            return new ResponseEntity(HttpStatus.OK);
         } else {
             throw new BindException(bindingResult);
         }
     }
 
+    @Transactional
+    @GetMapping("/continuePostUpdate/{hash}")
+    public ResponseEntity continuePostUpdate(@PathVariable String hash, @RequestParam Boolean success) {
+        Post postToSave = hashToPostMap.get(hash);
+        if (postToSave == null) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+        if (success) {
+            postService.savePost(postToSave);
+            return new ResponseEntity(HttpStatus.OK);
+        }
+        hashToPostMap.remove(hash);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @Transactional
     @DeleteMapping("/{id}")
     public void deletePost(@PathVariable Long id) {
         if (id != null) {

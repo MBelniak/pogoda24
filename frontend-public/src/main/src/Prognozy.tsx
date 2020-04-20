@@ -1,17 +1,7 @@
 import React from 'react';
 import { PagingBar } from './PagingBar';
 import { Posts } from './Posts';
-
-interface Post {
-    id: number;
-    postDate: Date;
-    postType: string;
-    description: string;
-    imagesPublicIdsJSON: string[];
-    addedToTopBar: boolean;
-    dueDate: string;
-    shortDescription: string;
-}
+import Post, { postDTOsToPostsList } from './Post';
 
 interface State {
     forecastsCount: number;
@@ -46,7 +36,7 @@ export class Prognozy extends React.Component<{}, State> {
                             .then(response =>
                                 response.json().then(data => {
                                     this.setState({
-                                        posts: data,
+                                        posts: postDTOsToPostsList(data),
                                         loading: false
                                     });
                                 })
@@ -55,6 +45,8 @@ export class Prognozy extends React.Component<{}, State> {
                                 console.log(error);
                                 this.setState({ loading: false });
                             });
+                    } else {
+                        this.setState({ loading: false });
                     }
                 })
             )

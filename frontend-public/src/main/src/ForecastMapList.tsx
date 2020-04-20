@@ -1,8 +1,8 @@
 import React from 'react';
-import { Image, Video, Transformation } from 'cloudinary-react';
+import { Image, Transformation } from 'cloudinary-react';
 
 export class ForecastMapList extends React.Component<{
-    imagesPublicIds: string[];
+    imagesPublicIds?: string[];
 }> {
     constructor(props) {
         super(props);

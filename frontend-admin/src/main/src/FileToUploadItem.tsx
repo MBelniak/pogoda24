@@ -1,28 +1,25 @@
 import React from 'react';
-import { moveFileBack, moveFileForward, removeFile } from './redux/actions';
+import { closeModal, showModal } from './redux/actions';
 import { connect, ConnectedProps } from 'react-redux';
+import { Image, Transformation } from 'cloudinary-react';
+import { FileToUpload } from './Writer';
 
-interface UploadedFile {
-    id: number;
-    file: File;
-}
-
-const connector = connect(() => ({}), {
-    onDeleteFile: removeFile,
-    onMoveForward: moveFileForward,
-    onMoveBack: moveFileBack
+const connector = connect(null, {
+    showModal: showModal,
+    closeModal: closeModal
 });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 interface UploadedFilesItemProps {
-    file: UploadedFile;
+    file: FileToUpload;
     listId: number;
-    showModal: (toRender: JSX.Element) => void;
-    closeModal: () => void;
+    onRemoveFile: (id: number) => void;
+    onMoveForward: (id: number) => void;
+    onMoveBackward: (id: number) => void;
 }
 
-class UploadedFilesItem extends React.Component<
+class FileToUploadItem extends React.Component<
     UploadedFilesItemProps & PropsFromRedux
 > {
     private overlayDiv;
@@ -48,10 +45,21 @@ class UploadedFilesItem extends React.Component<
         this.props.showModal(
             <div style={{ width: '100%', height: '100%', textAlign: 'center' }}>
                 <p className="dialogMessage">Kliknij zdjęcie by zamknąć</p>
-                <img
-                    src={URL.createObjectURL(this.props.file.file)}
-                    onClick={() => this.props.closeModal()}
-                />
+                {this.props.file.file ? (
+                    <img
+                        src={URL.createObjectURL(this.props.file.file)}
+                        onClick={() => this.props.closeModal()}
+                    />
+                ) : (
+                    <div onClick={() => this.props.closeModal()}>
+                        <Image
+                            publicId={this.props.file.publicId}
+                            format="png"
+                            quality="auto">
+                            <Transformation crop="fill" gravity="faces" />
+                        </Image>
+                    </div>
+                )}
             </div>
         );
     }
@@ -63,16 +71,27 @@ class UploadedFilesItem extends React.Component<
                 onMouseOver={this.displayOverlay}
                 onMouseOut={this.hideOverlay}>
                 <div className="uploadedFilesItemContent">
-                    <img
-                        src={URL.createObjectURL(this.props.file.file)}
-                        height="100%"
-                        width="100%"
-                    />
+                    {this.props.file.file ? (
+                        <img
+                            src={URL.createObjectURL(this.props.file.file)}
+                            height="100%"
+                            width="100%"
+                        />
+                    ) : (
+                        <Image
+                            publicId={this.props.file.publicId}
+                            format="png"
+                            quality="auto">
+                            <Transformation crop="fill" gravity="faces" />
+                        </Image>
+                    )}
                     <p style={{ wordWrap: 'break-word' }}>
                         {this.props.listId +
                             1 +
                             '. ' +
-                            this.props.file.file.name}
+                            (this.props.file.file
+                                ? this.props.file.file.name
+                                : this.props.file.publicId)}
                     </p>
                 </div>
                 <div
@@ -85,7 +104,7 @@ class UploadedFilesItem extends React.Component<
                             className="arrowLeft"
                             onClick={e => {
                                 e.stopPropagation();
-                                this.props.onMoveBack(this.props.listId);
+                                this.props.onMoveBackward(this.props.listId);
                             }}>
                             <span style={{ fontSize: '40px', margin: '10px' }}>
                                 &lt;
@@ -97,7 +116,7 @@ class UploadedFilesItem extends React.Component<
                                 className="uploadedFilesItemDelete"
                                 onClick={e => {
                                     e.stopPropagation();
-                                    this.props.onDeleteFile(this.props.file.id);
+                                    this.props.onRemoveFile(this.props.file.id);
                                 }}
                             />
                         </div>
@@ -118,4 +137,4 @@ class UploadedFilesItem extends React.Component<
     }
 }
 
-export default connector(UploadedFilesItem);
+export default connector(FileToUploadItem);

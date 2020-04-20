@@ -31,7 +31,7 @@ export class TopBar extends React.Component {
     render() {
         return (
             <nav
-                className="topBar is-fixed-top navbar"
+                className="topBar navbar"
                 role="navigation"
                 aria-label="main navigation">
                 <div className="navbar-brand">

@@ -22,7 +22,7 @@ public class Post {
     private PostType postType;
 
     @NotNull(message = "Property 'postDate' cannot be null.")
-    @JsonFormat(timezone="GMT+02")
+    @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp postDate;
 
     @NotNull(message = "Property 'description' cannot be null.")
@@ -38,7 +38,7 @@ public class Post {
 
     private Boolean isAddedToTopBar;
 
-    @JsonFormat(timezone="GMT+02")
+    @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp dueDate;
 
     private String shortDescription;

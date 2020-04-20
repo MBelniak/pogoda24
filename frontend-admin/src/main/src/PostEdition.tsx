@@ -1,37 +1,28 @@
 import React from 'react';
-import config from './config/config';
-import * as fns from 'date-fns';
-import FileDropper from './FileDropper';
 import { connect, ConnectedProps } from 'react-redux';
+import Post, { PostType } from './Post';
 import { closeModal, showModal } from './redux/actions';
-import img from './img/bg.jpg';
-import FileToUploadItem from './FileToUploadItem';
-import { PostType } from './Post';
+import * as fns from 'date-fns';
+import config from './config/config';
 import { uploadImages } from './helpers/CloudinaryHelper';
-const Copyright = require('shared24').Copyright;
+import FileDropper from './FileDropper';
+import FileToUploadItem from './FileToUploadItem';
+import { FileToUpload } from './Writer';
+
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 const { MAX_IMAGES_PER_POST, BACKEND_DATE_FORMAT } = config;
 
-export interface FileToUpload {
-    id: number;
-    file: File | null;
-    publicId: string;
-    timestamp: string;
+interface PostEditionProps {
+    post: Post;
+    onFinishEditing: () => void;
 }
 
 interface State {
-    postType: PostType;
-    postTypeText: PostTypeText;
-    warningDaysValid: number | undefined;
     postDescription: string;
+    postType: PostType;
+    warningDaysValid: number | undefined;
     filesToUpload: FileToUpload[];
-}
-
-enum PostTypeText {
-    Prognoza = 'prognozy',
-    Ostrzezenie = 'ostrzeżenia',
-    Ciekawostka = 'ciekawostki'
 }
 
 const connector = connect(null, {
@@ -39,29 +30,37 @@ const connector = connect(null, {
     closeModal: closeModal
 });
 
-type WriterProps = ConnectedProps<typeof connector>;
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-class Writer extends React.Component<WriterProps, State> {
-    state: State = {
-        postType: PostType.FORECAST,
-        postTypeText: PostTypeText.Prognoza,
-        warningDaysValid: undefined,
-        postDescription: '',
-        filesToUpload: []
-    };
-
+class PostEdition extends React.Component<
+    PostEditionProps & PropsFromRedux,
+    State
+> {
     private fileId: number;
     private fileInput;
-    private warningCheckBox;
+    private addToTopBarCheckBox;
     private postDescriptionTextArea;
     private daysValidInput;
     private warningShortInput;
+
+    state: State = {
+        postDescription: this.props.post.description,
+        postType: this.props.post.postType,
+        warningDaysValid:
+            this.props.post.postType === PostType.WARNING
+                ? fns.differenceInCalendarDays(
+                      this.props.post.dueDate!!,
+                      this.props.post.postDate
+                  ) - 1
+                : 0,
+        filesToUpload: []
+    };
 
     constructor(props) {
         super(props);
         this.fileId = 0;
         this.fileInput = React.createRef();
-        this.warningCheckBox = React.createRef();
+        this.addToTopBarCheckBox = React.createRef();
         this.postDescriptionTextArea = React.createRef();
         this.daysValidInput = React.createRef();
         this.warningShortInput = React.createRef();
@@ -70,11 +69,46 @@ class Writer extends React.Component<WriterProps, State> {
         this.handleDescriptionTextAreaChange = this.handleDescriptionTextAreaChange.bind(
             this
         );
-        this.clearEverything = this.clearEverything.bind(this);
         this.validateField = this.validateField.bind(this);
         this.onRemoveFile = this.onRemoveFile.bind(this);
         this.onMoveForward = this.onMoveForward.bind(this);
         this.onMoveBackward = this.onMoveBackward.bind(this);
+    }
+
+    componentDidMount() {
+        //images coming from cloudinary let's add to state. They will be recognized by null file
+        this.addImagesToReduxStore();
+        if (this.props.post.postType === PostType.WARNING) {
+            this.addToTopBarCheckBox.current.checked = this.props.post.addedToTopBar;
+            if (this.props.post.dueDate) {
+                this.daysValidInput.current.value =
+                    fns.differenceInCalendarDays(
+                        this.props.post.dueDate,
+                        this.props.post.postDate
+                    ) - 1;
+            }
+            this.warningShortInput.current.value = this.props.post.shortDescription;
+        }
+    }
+
+    private addImagesToReduxStore() {
+        const filesToUpload: FileToUpload[] = [];
+        if (this.props.post.imagesPublicIdsJSON) {
+            for (
+                let i = 0;
+                i < this.props.post.imagesPublicIdsJSON.length;
+                ++i
+            ) {
+                //only publicId and file as null are used
+                filesToUpload.push({
+                    id: this.fileId++,
+                    publicId: this.props.post.imagesPublicIdsJSON[i],
+                    file: null,
+                    timestamp: ''
+                });
+            }
+        }
+        this.setState({ filesToUpload: filesToUpload });
     }
 
     private onFilesAdded(files: File[]) {
@@ -122,14 +156,14 @@ class Writer extends React.Component<WriterProps, State> {
     private prepareAndPushFile(file: File) {
         let timestamp = new Date().getTime().toString();
         timestamp = timestamp.substr(0, timestamp.length - 3);
-        const fileToUpload = {
+        const newFile = {
             id: this.fileId++,
             file: file,
             publicId: file.name + timestamp,
             timestamp: timestamp
         };
         this.setState({
-            filesToUpload: [...this.state.filesToUpload, fileToUpload]
+            filesToUpload: [...this.state.filesToUpload, newFile]
         });
     }
 
@@ -149,25 +183,11 @@ class Writer extends React.Component<WriterProps, State> {
         this.afterPostRequestSend(responsePromise);
     }
 
-    private validateField(htmlInput, additionalConstraint?: () => boolean) {
-        if (this.state.postType !== PostType.WARNING) return;
-        if (
-            !htmlInput.value ||
-            (additionalConstraint ? !additionalConstraint() : false)
-        ) {
-            htmlInput.style.borderColor = 'red';
-            return false;
-        } else {
-            htmlInput.style.borderColor = '';
-            return true;
-        }
-    }
-
     private sendPostToBackend(): Promise<Response> {
-        function calculateDueDate(days: number): string {
+        function calculateDueDate(postDate: Date, days: number): string {
             return fns.format(
                 new Date(
-                    new Date().setHours(0, 0, 0, 0) +
+                    postDate.setHours(0, 0, 0, 0) +
                         (days + 1) * 24 * 3600 * 1000
                 ),
                 BACKEND_DATE_FORMAT
@@ -175,17 +195,18 @@ class Writer extends React.Component<WriterProps, State> {
         }
 
         const requestBodyPost = {
-            postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
+            postDate: fns.format(this.props.post.postDate, BACKEND_DATE_FORMAT),
             postType: this.state.postType.toString(),
             description: this.postDescriptionTextArea.current.value,
             imagesPublicIds: '',
             addedToTopBar:
                 this.state.postType === PostType.WARNING
-                    ? this.warningCheckBox.current.checked
+                    ? this.addToTopBarCheckBox.current.checked
                     : null,
             dueDate:
                 this.state.postType === PostType.WARNING
                     ? calculateDueDate(
+                          this.props.post.postDate,
                           parseInt(this.daysValidInput.current.value)
                       )
                     : null,
@@ -197,15 +218,13 @@ class Writer extends React.Component<WriterProps, State> {
 
         const uploadedFilesIdsOrdered: string[] = [];
         for (let i = 0; i < this.state.filesToUpload.length; ++i) {
-            uploadedFilesIdsOrdered.push(
-                this.state.filesToUpload[i].publicId!!
-            );
+            uploadedFilesIdsOrdered.push(this.state.filesToUpload[i].publicId);
         }
         requestBodyPost['imagesPublicIds'] = JSON.stringify(
             uploadedFilesIdsOrdered
         );
 
-        return fetch('api/posts', {
+        return fetch('api/posts?temporary=true', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -218,12 +237,12 @@ class Writer extends React.Component<WriterProps, State> {
         responsePromise
             .then(response => {
                 if (response && response.ok) {
-                    response.json().then((data: any) => {
+                    response.json().then((data: string) => {
                         if (data !== null) {
-                            //post saved, send images to cloudinary
+                            //post saved temporarily, send images to cloudinary
                             const uploadPromises: Promise<
                                 Response
-                            >[] = uploadImages(this.state.filesToUpload);
+                            >[] = uploadImages(this.getImagesToUpload());
                             Promise.all(uploadPromises)
                                 .then(responses => {
                                     if (
@@ -232,7 +251,7 @@ class Writer extends React.Component<WriterProps, State> {
                                         )
                                     ) {
                                         //all images uploaded successfully
-                                        this.showSuccessMessage();
+                                        this.continueSavingPostToBackend(data);
                                     } else {
                                         responses = responses.filter(
                                             response =>
@@ -240,9 +259,9 @@ class Writer extends React.Component<WriterProps, State> {
                                         );
                                         console.log(responses.toString());
                                         this.showErrorMessage(
-                                            'Nie udało się wysłać wszystkich plików. Post nie został zapisany.'
+                                            'Nie udało się wysłać wszystkich plików. Post nie został zmieniony.'
                                         );
-                                        this.removePostFromBackend(data.id);
+                                        this.abortPostUpdate(data);
                                     }
                                 })
                                 .catch(error => {
@@ -250,7 +269,7 @@ class Writer extends React.Component<WriterProps, State> {
                                     this.showErrorMessage(
                                         'Wystąpił błąd przy wysyłaniu plików. Post nie został zapisany.'
                                     );
-                                    this.removePostFromBackend(data.id);
+                                    this.abortPostUpdate(data);
                                 });
                         } else {
                             this.showErrorMessage(
@@ -271,15 +290,39 @@ class Writer extends React.Component<WriterProps, State> {
             });
     }
 
-    private removePostFromBackend(postId: number) {
-        fetch('/api/posts/' + postId)
+    private getImagesToUpload(): FileToUpload[] {
+        return this.state.filesToUpload.filter(
+            file => typeof file.file !== null
+        );
+    }
+
+    private continueSavingPostToBackend(hash: string) {
+        fetch('/api/posts/continuePostUpdate/' + hash + '?success=true')
             .then(response => {
                 if (response && response.ok) {
-                    console.log('Removed post with id: ' + postId);
+                    this.showSuccessMessage();
+                } else {
+                    console.log(response.statusText + ', ' + response.body);
+                    this.showErrorMessage(
+                        'Wystąpił błąd przy zapisywaniu posta.'
+                    );
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                this.showErrorMessage('Nie udało się zapisać posta.');
+            });
+    }
+
+    private abortPostUpdate(hash: string) {
+        fetch('/api/posts/continuePostUpdate/' + hash + '?success=false')
+            .then(response => {
+                if (response && response.ok) {
+                    console.log('Post update aborted.');
                 } else {
                     console.log(
-                        'Cannot remove post with id: ' +
-                            postId +
+                        'Cannot abort. Hash: ' +
+                            hash +
                             '. Server response: ' +
                             response
                     );
@@ -287,9 +330,23 @@ class Writer extends React.Component<WriterProps, State> {
             })
             .catch(error => {
                 console.log(
-                    'Error while deleting post. Error message: ' + error
+                    'Error while aborting update. Error message: ' + error
                 );
             });
+    }
+
+    private validateField(htmlInput, additionalConstraint?: () => boolean) {
+        if (this.state.postType !== PostType.WARNING) return;
+        if (
+            !htmlInput.value ||
+            (additionalConstraint ? !additionalConstraint() : false)
+        ) {
+            htmlInput.style.borderColor = 'red';
+            return false;
+        } else {
+            htmlInput.style.borderColor = '';
+            return true;
+        }
     }
 
     private showSuccessMessage() {
@@ -314,7 +371,7 @@ class Writer extends React.Component<WriterProps, State> {
                 <button
                     className="button is-primary"
                     style={{ float: 'right' }}
-                    onClick={this.clearEverything}>
+                    onClick={this.props.onFinishEditing}>
                     Ok
                 </button>
             </div>
@@ -333,16 +390,6 @@ class Writer extends React.Component<WriterProps, State> {
                 </button>
             </div>
         );
-    }
-
-    private clearEverything() {
-        this.setState({
-            postTypeText: PostTypeText.Prognoza,
-            postType: PostType.FORECAST,
-            postDescription: '',
-            filesToUpload: []
-        });
-        this.props.closeModal();
     }
 
     private onRemoveFile(fileId: number) {
@@ -375,6 +422,10 @@ class Writer extends React.Component<WriterProps, State> {
         }
     }
 
+    private handleDescriptionTextAreaChange(event) {
+        this.setState({ postDescription: event.target.value });
+    }
+
     private renderForWarning() {
         return (
             <div className="columns">
@@ -383,7 +434,7 @@ class Writer extends React.Component<WriterProps, State> {
                         <input
                             id="addToBar"
                             type="checkbox"
-                            ref={this.warningCheckBox}
+                            ref={this.addToTopBarCheckBox}
                         />
                         <label htmlFor="addToBar">
                             {' '}
@@ -438,167 +489,135 @@ class Writer extends React.Component<WriterProps, State> {
         );
     }
 
-    private handleDescriptionTextAreaChange(event) {
-        this.setState({ postDescription: event.target.value });
-    }
-
     render() {
         return (
-            <div className="main">
-                <section className="container fluid">
-                    <img src={img} className="bgimg" />
-                    <h2 className="title">Witaj w edytorze wpisów.</h2>
-                    <h2 className="title is-5">
-                        Możesz tutaj tworzyć nowe posty do umieszczenia na
-                        stronie.
-                    </h2>
-                    <div className="container fluid writerForm">
-                        <div className="columns">
-                            <div className="column">
-                                <p>
-                                    Dodaj opis do{' '}
-                                    {this.state.postTypeText.toString()}:{' '}
-                                </p>
-                                <textarea
-                                    required={true}
-                                    cols={100}
-                                    rows={10}
-                                    placeholder="Treść posta..."
-                                    ref={this.postDescriptionTextArea}
-                                    onChange={
-                                        this.handleDescriptionTextAreaChange
-                                    }
-                                    value={this.state.postDescription}
-                                />
-                            </div>
-                            <div className="column">
-                                <p>Typ postu: </p>
-                                <input
-                                    type="radio"
-                                    id="forecast"
-                                    name="postType"
-                                    value="Prognoza"
-                                    checked={
-                                        this.state.postType ===
-                                        PostType.FORECAST
-                                    }
-                                    onChange={() =>
-                                        this.setState({
-                                            postType: PostType.FORECAST,
-                                            postTypeText: PostTypeText.Prognoza
-                                        })
-                                    }
-                                />
-                                <label htmlFor="forecast"> Prognoza</label>
-                                <br />
-                                <input
-                                    type="radio"
-                                    id="warning"
-                                    name="postType"
-                                    value="Ostrzeżenie"
-                                    checked={
-                                        this.state.postType === PostType.WARNING
-                                    }
-                                    onChange={() =>
-                                        this.setState({
-                                            postType: PostType.WARNING,
-                                            postTypeText:
-                                                PostTypeText.Ostrzezenie
-                                        })
-                                    }
-                                />
-                                <label htmlFor="warning"> Ostrzeżenie</label>
-                                <br />
-                                <input
-                                    type="radio"
-                                    id="ciekawostka"
-                                    name="postType"
-                                    value="Ciekawostka"
-                                    checked={
-                                        this.state.postType === PostType.FACT
-                                    }
-                                    onChange={() =>
-                                        this.setState({
-                                            postType: PostType.FACT,
-                                            postTypeText:
-                                                PostTypeText.Ciekawostka
-                                        })
-                                    }
-                                />
-                                <label htmlFor="ciekawostka">
-                                    {' '}
-                                    Ciekawostka
-                                </label>
-                            </div>
-                        </div>
-                        <p>
-                            Dodaj mapki z prognozą/ostrzeżeniem lub zdjęcia do
-                            ciekawostki. Możesz przeciągnąć swoje pliki z dysku
-                            na kreskowane pole:
-                        </p>
-                        <FileDropper onFilesAdded={this.onFilesAdded} />
-                        <p>
-                            ...lub skorzystać z klasycznego dodawania plików:{' '}
-                        </p>
-                        <input
-                            type="button"
-                            className="button"
-                            id="loadFile"
-                            value="Wybierz pliki"
-                            onClick={() =>
-                                document.getElementById('mapsFiles')?.click()
-                            }
-                        />
-                        <input
-                            type="file"
-                            id="mapsFiles"
-                            style={{ display: 'none' }}
-                            accept="image/*"
-                            multiple={true}
-                            ref={this.fileInput}
-                            onChange={() =>
-                                this.onFilesAdded(this.fileInput.files)
-                            }
-                        />
-                        <p>
-                            Pamiętaj, aby przed wysłaniem plików ustawić je w
-                            odpowiedniej kolejnośći!
-                        </p>
-                        <p>Obecnie dodane pliki:</p>
-                        <div className="columns is-multiline">
-                            {this.state.filesToUpload.map((file, key) => {
-                                return (
-                                    <div
-                                        key={key}
-                                        className="column is-one-quarter">
-                                        <FileToUploadItem
-                                            listId={key}
-                                            file={file}
-                                            onRemoveFile={this.onRemoveFile}
-                                            onMoveForward={this.onMoveForward}
-                                            onMoveBackward={this.onMoveBackward}
-                                        />
-                                    </div>
-                                );
-                            })}
-                        </div>
-                        <div className="is-divider" />
-                        {this.state.postType === PostType.WARNING
-                            ? this.renderForWarning()
-                            : null}
-                        <form onSubmit={this.handleSubmit}>
-                            <input
-                                type="submit"
-                                className="button"
-                                value="Wyślij"
+            <>
+                <h2 className="title">Edytuj post.</h2>
+                <div className="container fluid writerForm">
+                    <div className="columns">
+                        <div className="column">
+                            <p>Opis:</p>
+                            <textarea
+                                required={true}
+                                cols={100}
+                                rows={10}
+                                placeholder="Treść posta..."
+                                ref={this.postDescriptionTextArea}
+                                onChange={this.handleDescriptionTextAreaChange}
+                                value={this.state.postDescription}
                             />
-                        </form>
+                        </div>
+                        <div className="column">
+                            <p>Typ postu: </p>
+                            <input
+                                type="radio"
+                                id="forecast"
+                                name="postType"
+                                value="Prognoza"
+                                checked={
+                                    this.state.postType === PostType.FORECAST
+                                }
+                                onChange={() =>
+                                    this.setState({
+                                        postType: PostType.FORECAST
+                                    })
+                                }
+                            />
+                            <label htmlFor="forecast"> Prognoza</label>
+                            <br />
+                            <input
+                                type="radio"
+                                id="warning"
+                                name="postType"
+                                value="Ostrzeżenie"
+                                checked={
+                                    this.state.postType === PostType.WARNING
+                                }
+                                onChange={() =>
+                                    this.setState({
+                                        postType: PostType.WARNING
+                                    })
+                                }
+                            />
+                            <label htmlFor="warning"> Ostrzeżenie</label>
+                            <br />
+                            <input
+                                type="radio"
+                                id="ciekawostka"
+                                name="postType"
+                                value="Ciekawostka"
+                                checked={this.state.postType === PostType.FACT}
+                                onChange={() =>
+                                    this.setState({
+                                        postType: PostType.FACT
+                                    })
+                                }
+                            />
+                            <label htmlFor="ciekawostka"> Ciekawostka</label>
+                        </div>
                     </div>
-                </section>
-                <Copyright />
-            </div>
+                    <p>
+                        Dodaj mapki z prognozą/ostrzeżeniem lub zdjęcia do
+                        ciekawostki. Możesz przeciągnąć swoje pliki z dysku na
+                        kreskowane pole:
+                    </p>
+                    <FileDropper onFilesAdded={this.onFilesAdded} />
+                    <p>...lub skorzystać z klasycznego dodawania plików: </p>
+                    <input
+                        type="button"
+                        className="button"
+                        id="loadFile"
+                        value="Wybierz pliki"
+                        onClick={() =>
+                            document.getElementById('mapsFiles')?.click()
+                        }
+                    />
+                    <input
+                        type="file"
+                        id="mapsFiles"
+                        style={{ display: 'none' }}
+                        accept="image/*"
+                        multiple={true}
+                        ref={this.fileInput}
+                        onChange={() => this.onFilesAdded(this.fileInput.files)}
+                    />
+                    <p>
+                        Pamiętaj, aby przed wysłaniem plików ustawić je w
+                        odpowiedniej kolejnośći!
+                    </p>
+                    <p>Obecnie dodane pliki:</p>
+                    <div className="columns is-multiline">
+                        {this.state.filesToUpload.map((file, key) => {
+                            return (
+                                <div
+                                    key={key}
+                                    className="column is-one-quarter">
+                                    <FileToUploadItem
+                                        listId={key}
+                                        file={file}
+                                        onRemoveFile={this.onRemoveFile}
+                                        onMoveForward={this.onMoveForward}
+                                        onMoveBackward={this.onMoveBackward}
+                                    />
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="is-divider" />
+                    {this.state.postType === PostType.WARNING
+                        ? this.renderForWarning()
+                        : null}
+                    <form onSubmit={this.handleSubmit}>
+                        <input
+                            type="submit"
+                            className="button"
+                            value="Wyślij"
+                        />
+                    </form>
+                </div>
+            </>
         );
     }
 }
 
-export default connector(Writer);
+export default connector(PostEdition);

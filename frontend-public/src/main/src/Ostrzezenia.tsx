@@ -1,17 +1,7 @@
 import React from 'react';
 import { Posts } from './Posts';
 import { PagingBar } from './PagingBar';
-
-interface Post {
-    id: number;
-    postDate: Date;
-    postType: string;
-    description: string;
-    imagesPublicIdsJSON: string[];
-    addedToTopBar: boolean;
-    dueDate: string;
-    shortDescription: string;
-}
+import Post, { postDTOsToPostsList } from './Post';
 
 interface State {
     posts: Post[];
@@ -38,7 +28,10 @@ export class Ostrzezenia extends React.Component<{}, State> {
                         this.warningsPerPage
                 ).then(response =>
                     response.json().then(data => {
-                        this.setState({ posts: data, loading: false });
+                        this.setState({
+                            posts: postDTOsToPostsList(data),
+                            loading: false
+                        });
                     })
                 );
             })

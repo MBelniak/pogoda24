@@ -14,7 +14,7 @@ const customStyles = {
 
 export class ModalWindow extends React.Component<{
     isShown: boolean;
-    render: () => JSX.Element;
+    render: JSX.Element;
 }> {
     componentWillMount() {
         Modal.setAppElement('body');

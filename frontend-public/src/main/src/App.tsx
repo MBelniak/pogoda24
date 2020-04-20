@@ -7,12 +7,12 @@ import { Ostrzezenia } from './Ostrzezenia';
 import { Ciekawostki } from './Ciekawostki';
 import { ONas } from './ONas';
 import { CloudinaryContext } from 'cloudinary-react';
-
 import './sass/main.scss';
 import 'shared24/src/sass/main.scss';
 import { TopBar } from './TopBar';
-import { BarHolder } from '../../../../shared/src/main/shared24/src/BarHolder';
-import { Copyright } from '../../../../shared/src/main/shared24/src/Copyright';
+
+const BarHolder = require('shared24').BarHolder;
+const Copyright = require('shared24').Copyright;
 
 interface State {
     warningShort: string | null;

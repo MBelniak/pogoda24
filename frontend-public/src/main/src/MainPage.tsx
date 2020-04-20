@@ -1,17 +1,7 @@
 import React from 'react';
 import { Posts } from './Posts';
 import { ExternalApi } from './ExternalApi';
-
-interface Post {
-    id: number;
-    postDate: Date;
-    postType: string;
-    description: string;
-    imagesPublicIdsJSON: string[];
-    addedToTopBar: boolean;
-    dueDate: string;
-    shortDescription: string;
-}
+import Post, { postDTOsToPostsList } from './Post';
 
 interface State {
     posts: Post[];
@@ -27,12 +17,19 @@ export class MainPage extends React.Component<{}, State> {
     };
 
     componentDidMount() {
-        fetch('api/posts?page=0&count=' + this.forecastsPerPage).then(
-            response =>
+        fetch('api/posts?page=0&count=' + this.forecastsPerPage)
+            .then(response =>
                 response.json().then(data => {
-                    this.setState({ posts: data, loading: false });
+                    this.setState({
+                        posts: postDTOsToPostsList(data),
+                        loading: false
+                    });
                 })
-        );
+            )
+            .catch(error => {
+                console.log(error);
+                this.setState({ loading: false });
+            });
     }
 
     render() {

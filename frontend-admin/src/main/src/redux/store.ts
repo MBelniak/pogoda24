@@ -1,59 +1,29 @@
+import {
+    CLOSE_MODAL,
+    SHOW_MODAL
+} from './actions';
 import { createStore } from 'redux';
-import { ADD_FILE, CLEAR_FILES, REMOVE_FILE, MOVE_FILE_BACK, MOVE_FILE_FORWARD } from "./actions";
 
-interface UploadedFile {
-    id: number;
-    file: File;
-    publicId: string
+
+export interface ModalWindowState {
+    isShown: boolean;
+    render?: JSX.Element;
 }
 
-const uploadedFilesReducer = (uploadedFiles: UploadedFile[] = [], action) => {
+const ModalReducer = (
+    storeState: ModalWindowState = { isShown: false, render: undefined },
+    action
+) => {
     switch (action.type) {
-        case ADD_FILE:
-        {
-            let fileIndex = -1;
-            const updatedFiles = uploadedFiles.map((file, index) => {
-                if (file.id === action.payload.id) {
-                    fileIndex = index;
-                    return { ...file, ...action.payload };
-                }
-
-                return file;
-            });
-
-            return fileIndex !== -1
-                ? updatedFiles
-                : [...uploadedFiles, action.payload];
+        case SHOW_MODAL: {
+            return { isShown: true, render: action.payload };
         }
-        case REMOVE_FILE:
-        {
-            const id = action.payload.id;
-            return uploadedFiles.filter(uploadedFile => uploadedFile.id != id);
-        }
-        case MOVE_FILE_BACK:
-        {
-            const id = action.payload.id;
-            if (id > 0) {
-                uploadedFiles.splice(id - 1, 0, uploadedFiles.splice(id, 1)[0]);
-            }
-            return [...uploadedFiles];
-        }
-        case MOVE_FILE_FORWARD:
-        {
-            const id = action.payload.id;
-            if (id < uploadedFiles.length - 1) {
-                uploadedFiles.splice(id + 1, 0, uploadedFiles.splice(id, 1)[0]);
-            }
-            return [...uploadedFiles];
-        }
-        case CLEAR_FILES:
-        {
-            return [];
+        case CLOSE_MODAL: {
+            return { isShown: false, render: undefined };
         }
         default:
-            return uploadedFiles;
+            return storeState;
     }
 };
 
-export const store = createStore(uploadedFilesReducer);
-
+export const store = createStore(ModalReducer);
