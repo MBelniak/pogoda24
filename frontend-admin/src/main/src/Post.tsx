@@ -26,7 +26,6 @@ export interface PostDTO {
 
 export function postDTOsToPostsList(postDTOs: PostDTO[]): Post[] {
     return postDTOs.map(post => {
-        console.log(post.postDate);
         return {
             ...post,
             postDate: fns.parse(post.postDate, BACKEND_DATE_FORMAT, new Date()),

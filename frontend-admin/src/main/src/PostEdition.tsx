@@ -195,6 +195,7 @@ class PostEdition extends React.Component<
         }
 
         const requestBodyPost = {
+            id: this.props.post.id,
             postDate: fns.format(this.props.post.postDate, BACKEND_DATE_FORMAT),
             postType: this.state.postType.toString(),
             description: this.postDescriptionTextArea.current.value,
@@ -225,7 +226,7 @@ class PostEdition extends React.Component<
         );
 
         return fetch('api/posts?temporary=true', {
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -237,7 +238,7 @@ class PostEdition extends React.Component<
         responsePromise
             .then(response => {
                 if (response && response.ok) {
-                    response.json().then((data: string) => {
+                    response.text().then((data: string) => {
                         if (data !== null) {
                             //post saved temporarily, send images to cloudinary
                             const uploadPromises: Promise<

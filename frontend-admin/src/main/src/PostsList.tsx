@@ -45,10 +45,12 @@ class PostsList extends React.Component<PostsListProps, State> {
     }
 
     private onFinishEditing() {
+        this.props.closeModal();
         this.setState({ postEdition: false, postToEdit: undefined });
+        this.fetchPostsFromApi();
     }
 
-    componentDidMount() {
+    private fetchPostsFromApi() {
         this.props.showModal(<LoadingIndicator />);
         fetch('api/posts/count')
             .then(response =>
@@ -83,6 +85,10 @@ class PostsList extends React.Component<PostsListProps, State> {
                 this.setState({ loading: false });
                 this.props.closeModal();
             });
+    }
+
+    componentDidMount() {
+        this.fetchPostsFromApi();
     }
 
     render() {

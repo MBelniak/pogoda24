@@ -104,6 +104,7 @@ public class PostController {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
         if (success) {
+            System.out.println(postToSave.getDueDate());
             postService.savePost(postToSave);
             return new ResponseEntity(HttpStatus.OK);
         }
