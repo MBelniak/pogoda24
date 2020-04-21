@@ -41,6 +41,10 @@ const connector = connect(null, {
 
 type WriterProps = ConnectedProps<typeof connector>;
 
+const daysValidInputConstraint = (text: string): boolean => {
+    return parseInt(text) >= 0;
+};
+
 class Writer extends React.Component<WriterProps, State> {
     state: State = {
         postType: PostType.FORECAST,
@@ -138,7 +142,7 @@ class Writer extends React.Component<WriterProps, State> {
         if (this.state.postType === PostType.WARNING) {
             let formValid = this.validateField(
                 this.daysValidInput.current,
-                () => parseInt(this.daysValidInput.current.value) > 0
+                daysValidInputConstraint
             );
             formValid =
                 this.validateField(this.warningShortInput.current) && formValid;
@@ -149,11 +153,16 @@ class Writer extends React.Component<WriterProps, State> {
         this.afterPostRequestSend(responsePromise);
     }
 
-    private validateField(htmlInput, additionalConstraint?: () => boolean) {
+    private validateField(
+        htmlInput,
+        additionalConstraint?: (value) => boolean
+    ) {
         if (this.state.postType !== PostType.WARNING) return;
         if (
             !htmlInput.value ||
-            (additionalConstraint ? !additionalConstraint() : false)
+            (additionalConstraint
+                ? !additionalConstraint(htmlInput.value)
+                : false)
         ) {
             htmlInput.style.borderColor = 'red';
             return false;
@@ -408,7 +417,7 @@ class Writer extends React.Component<WriterProps, State> {
                                 onBlur={e =>
                                     this.validateField(
                                         e.target,
-                                        () => parseInt(e.target.value) > 0
+                                        daysValidInputConstraint
                                     )
                                 }
                             />

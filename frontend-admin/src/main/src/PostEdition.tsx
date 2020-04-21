@@ -32,6 +32,10 @@ const connector = connect(null, {
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
+const daysValidInputConstraint = (text: string): boolean => {
+    return parseInt(text) >= 0;
+};
+
 class PostEdition extends React.Component<
     PostEditionProps & PropsFromRedux,
     State
@@ -172,7 +176,7 @@ class PostEdition extends React.Component<
         if (this.state.postType === PostType.WARNING) {
             let formValid = this.validateField(
                 this.daysValidInput.current,
-                () => parseInt(this.daysValidInput.current.value) > 0
+                daysValidInputConstraint
             );
             formValid =
                 this.validateField(this.warningShortInput.current) && formValid;
@@ -181,6 +185,25 @@ class PostEdition extends React.Component<
         this.props.showModal(<LoadingIndicator />);
         const responsePromise = this.sendPostToBackend();
         this.afterPostRequestSend(responsePromise);
+    }
+
+    private validateField(
+        htmlInput,
+        additionalConstraint?: (value) => boolean
+    ) {
+        if (this.state.postType !== PostType.WARNING) return;
+        if (
+            !htmlInput.value ||
+            (additionalConstraint
+                ? !additionalConstraint(htmlInput.value)
+                : false)
+        ) {
+            htmlInput.style.borderColor = 'red';
+            return false;
+        } else {
+            htmlInput.style.borderColor = '';
+            return true;
+        }
     }
 
     private sendPostToBackend(): Promise<Response> {
@@ -293,7 +316,7 @@ class PostEdition extends React.Component<
 
     private getImagesToUpload(): FileToUpload[] {
         return this.state.filesToUpload.filter(
-            file => typeof file.file !== null
+            file => file.file !== null
         );
     }
 
@@ -314,7 +337,6 @@ class PostEdition extends React.Component<
                 this.showErrorMessage('Nie udało się zapisać posta.');
             });
     }
-
     private abortPostUpdate(hash: string) {
         fetch('/api/posts/continuePostUpdate/' + hash + '?success=false')
             .then(response => {
@@ -334,20 +356,6 @@ class PostEdition extends React.Component<
                     'Error while aborting update. Error message: ' + error
                 );
             });
-    }
-
-    private validateField(htmlInput, additionalConstraint?: () => boolean) {
-        if (this.state.postType !== PostType.WARNING) return;
-        if (
-            !htmlInput.value ||
-            (additionalConstraint ? !additionalConstraint() : false)
-        ) {
-            htmlInput.style.borderColor = 'red';
-            return false;
-        } else {
-            htmlInput.style.borderColor = '';
-            return true;
-        }
     }
 
     private showSuccessMessage() {
@@ -460,7 +468,7 @@ class PostEdition extends React.Component<
                                 onBlur={e =>
                                     this.validateField(
                                         e.target,
-                                        () => parseInt(e.target.value) > 0
+                                        daysValidInputConstraint
                                     )
                                 }
                             />
