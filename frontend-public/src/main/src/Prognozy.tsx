@@ -1,17 +1,7 @@
 import React from 'react';
 import { PagingBar } from './PagingBar';
 import { Posts } from './Posts';
-import { TopBar } from './TopBar';
-import {LoadingIndicator} from "../../../../shared/src/main/shared24/src/LoadingIndicator";
-const BarHolder = require('shared24').BarHolder;
-const Copyright = require('shared24').Copyright;
-
-interface Post {
-    id: number;
-    postDate: Date;
-    description: string;
-    imagesPublicIds: string[];
-}
+import Post, { postDTOsToPostsList } from './Post';
 
 interface State {
     forecastsCount: number;
@@ -20,7 +10,6 @@ interface State {
 }
 
 export class Prognozy extends React.Component<{}, State> {
-
     private readonly forecastsPerPage = 4;
 
     state: State = {
@@ -35,46 +24,86 @@ export class Prognozy extends React.Component<{}, State> {
     }
 
     componentDidMount() {
-        fetch("api/forecasts/count").then(response => response.json().then(data => {
-            this.setState({ forecastsCount: data });
-            fetch("api/forecasts?page=0&count=" + this.forecastsPerPage)
-                .then(response => response.json().then(data => {
-                    console.log(data);
-                    this.setState({ posts: data, loading: false });
-                }));
-        }));
+        fetch('api/posts/count?postType=FORECAST')
+            .then(response =>
+                response.json().then(data => {
+                    this.setState({ forecastsCount: data });
+                    if (this.state.forecastsCount !== 0) {
+                        fetch(
+                            'api/posts?postType=FORECAST&page=0&count=' +
+                                this.forecastsPerPage
+                        )
+                            .then(response =>
+                                response.json().then(data => {
+                                    this.setState({
+                                        posts: postDTOsToPostsList(data),
+                                        loading: false
+                                    });
+                                })
+                            )
+                            .catch(error => {
+                                console.log(error);
+                                this.setState({ loading: false });
+                            });
+                    } else {
+                        this.setState({ loading: false });
+                    }
+                })
+            )
+            .catch(error => {
+                console.log(error);
+                this.setState({ loading: false });
+            });
     }
 
     private handlePageClick(data) {
         const selected = data.selected;
-        fetch("api/forecasts?page=" + selected +  "&count=" + this.forecastsPerPage)
-            .then(response => response.json().then(data => {
+        fetch(
+            'api/posts?postType=FORECASTS&page=' +
+                selected +
+                '&count=' +
+                this.forecastsPerPage
+        ).then(response =>
+            response.json().then(data => {
                 this.setState({ posts: data });
-            }));
+            })
+        );
     }
 
     render() {
         return (
-            <div className="main">
-                <BarHolder />
-                <TopBar />
-                <section className="mainContent">
-                    <div className="columns">
-                        <div className="column is-1"/>
-                        {this.state.loading
-                            ? <div className='column is-10'/>
-                            : <div className="column is-10 posts">
-                                <Posts posts={this.state.posts}/>
-                                <PagingBar pages={Math.ceil(this.state.forecastsCount / this.forecastsPerPage)}
-                                            handlePageClick={this.handlePageClick}/>
-                            </div>
-                        }
-                        <div className="column is-1"/>
-                    </div>
-                </section>
-                <Copyright />
-            </div>
-        )
+            <section className="mainContent">
+                <div className="columns">
+                    <div className="column is-1" />
+                    {this.state.loading ? (
+                        <div className="column is-10" />
+                    ) : (
+                        <div className="column is-10 posts">
+                            {this.state.posts.length !== 0 ? (
+                                <>
+                                    <Posts posts={this.state.posts} />
+                                    <PagingBar
+                                        pages={Math.ceil(
+                                            this.state.forecastsCount /
+                                                this.forecastsPerPage
+                                        )}
+                                        handlePageClick={this.handlePageClick}
+                                    />
+                                </>
+                            ) : (
+                                <div
+                                    style={{
+                                        textAlign: 'center',
+                                        marginTop: '20px'
+                                    }}>
+                                    <p className="noPosts">Brak postów.</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    <div className="column is-1" />
+                </div>
+            </section>
+        );
     }
-
 }

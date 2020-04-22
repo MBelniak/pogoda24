@@ -1,24 +1,14 @@
 import React from 'react';
 import { Posts } from './Posts';
 import { ExternalApi } from './ExternalApi';
-import { TopBar } from './TopBar';
-const Copyright = require('shared24').Copyright;
-const BarHolder = require('shared24').BarHolder;
-
-interface Post {
-    id: number;
-    postDate: Date;
-    description: string;
-    imagesPublicIds: string[];
-}
+import Post, { postDTOsToPostsList } from './Post';
 
 interface State {
-    posts: Post[],
+    posts: Post[];
     loading: boolean;
 }
 
 export class MainPage extends React.Component<{}, State> {
-
     private readonly forecastsPerPage = 4;
 
     state: State = {
@@ -27,31 +17,46 @@ export class MainPage extends React.Component<{}, State> {
     };
 
     componentDidMount() {
-        fetch("api/forecasts?page=0&count=" + this.forecastsPerPage)
-            .then(response => response.json().then(data => {
-                this.setState({ posts: data, loading: false });
-            }));
+        fetch('api/posts?page=0&count=' + this.forecastsPerPage)
+            .then(response =>
+                response.json().then(data => {
+                    this.setState({
+                        posts: postDTOsToPostsList(data),
+                        loading: false
+                    });
+                })
+            )
+            .catch(error => {
+                console.log(error);
+                this.setState({ loading: false });
+            });
     }
 
     render() {
         return (
-            <div className="main">
-                <BarHolder />
-                <TopBar />
-                <section className="mainContent">
-                    <div className="columns">
-                        <div className="column is-2" />
-                        {this.state.loading
-                            ? <div className='column is-8' />
-                            : <div className="column is-8 posts">
-                                <Posts posts={this.state.posts}/>
-                            </div>
-                        }
-                        <ExternalApi/>
-                    </div>
-                </section>
-                <Copyright/>
-            </div>
+            <section className="mainContent">
+                <div className="columns">
+                    <div className="column is-2" />
+                    {this.state.loading ? (
+                        <div className="column is-8" />
+                    ) : (
+                        <div className="column is-8 posts">
+                            {this.state.posts.length !== 0 ? (
+                                <Posts posts={this.state.posts} />
+                            ) : (
+                                <div
+                                    style={{
+                                        textAlign: 'center',
+                                        marginTop: '20px'
+                                    }}>
+                                    <p className="noPosts">Brak postów.</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    <ExternalApi />
+                </div>
+            </section>
         );
     }
 }

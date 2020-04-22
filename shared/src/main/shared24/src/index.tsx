@@ -7,4 +7,11 @@ import { Navigation } from './Navigation';
 import { TopImage } from './TopImage';
 const styles = require('./sass/main.scss');
 
-export { BarHolder, Copyright, LoadingIndicator, ModalWindow, Navigation, TopImage };
+export {
+    BarHolder,
+    Copyright,
+    LoadingIndicator,
+    ModalWindow,
+    Navigation,
+    TopImage
+};

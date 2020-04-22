@@ -34,6 +34,7 @@
     "@babel/runtime": "7.1.2",
     "bulma": "^0.8.1",
     "bulma-extensions": "6.2.7",
+    "prettier": "2.0.4",
     "typescript": "^3.8.3"
   },
   "browserslist": [
@@ -41,5 +42,13 @@
     "not dead",
     "not ie < 11",
     "not op_mini all"
-  ]
+  ],
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 4,
+    "trailingComma": "none",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": true,
+    "arrowParens": "avoid"
+  }
 }

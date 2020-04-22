@@ -3,17 +3,16 @@ import ReactPaginate from 'react-paginate';
 
 interface PagingBarProps {
     pages: number;
-    handlePageClick: (data) => void
+    handlePageClick: (data) => void;
 }
 
 export class PagingBar extends React.Component<PagingBarProps> {
-
     constructor(props) {
         super(props);
     }
 
     render() {
-        return(
+        return (
             <div>
                 <ReactPaginate
                     previousLabel={'< Poprzednie'}
@@ -27,8 +26,9 @@ export class PagingBar extends React.Component<PagingBarProps> {
                     containerClassName={'pagingBar'}
                     subContainerClassName={'pagingBarSub'}
                     activeClassName={'active'}
-                    previousLinkClassName={'pagingBarPrevious'}/>
+                    previousLinkClassName={'pagingBarPrevious'}
+                />
             </div>
-        )
+        );
     }
 }
