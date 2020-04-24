@@ -34,3 +34,4 @@ node_modules
 package-lock.json
 backend/src/main/resources/public
 backend/src/main/resources/admin
+.env

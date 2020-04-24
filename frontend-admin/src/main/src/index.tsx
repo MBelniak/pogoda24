@@ -9,6 +9,7 @@ import './sass/main.scss';
 import 'shared24/src/sass/main.scss';
 
 const Navigation = require('shared24').Navigation;
+
 const { cloud_name, upload_preset, api_key, api_secret } = config;
 
 ReactDOM.render(

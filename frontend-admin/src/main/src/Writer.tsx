@@ -281,7 +281,9 @@ class Writer extends React.Component<WriterProps, State> {
     }
 
     private removePostFromBackend(postId: number) {
-        fetch('/api/posts/' + postId)
+        fetch('/api/posts/' + postId, {
+            method: 'DELETE'
+        })
             .then(response => {
                 if (response && response.ok) {
                     console.log('Removed post with id: ' + postId);
