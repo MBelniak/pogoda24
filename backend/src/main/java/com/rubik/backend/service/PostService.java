@@ -69,4 +69,10 @@ public class PostService {
     public List<Post> getCurrentWarnings(boolean isAddedToTopBar) {
         return postRepository.findAllValidWarnings(new Timestamp(new Date().getTime()), isAddedToTopBar);
     }
+
+    public void updateViewsForPost(Long postId, Long views) {
+        Post post = this.getPostById(postId);
+        post.setViews(post.getViews() + views);
+        this.savePost(post);
+    }
 }

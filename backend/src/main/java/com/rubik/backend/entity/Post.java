@@ -43,6 +43,8 @@ public class Post {
 
     private String shortDescription;
 
+    private Long views;
+
     public Post() {
     }
 
@@ -51,10 +53,11 @@ public class Post {
                    @JsonProperty(value = "postDate", required = true) Timestamp postDate,
                    @JsonProperty(value = "postType", required = true) String postType,
                    @JsonProperty(value = "description", required = true) String description,
-                   @JsonProperty(value = "addedToTopBar") boolean isAddedToTopBar,
+                   @JsonProperty("addedToTopBar") boolean isAddedToTopBar,
                    @JsonProperty("imagesPublicIds") String imagesPublicIds,
-                   @JsonProperty(value = "dueDate") Timestamp dueDate,
-                   @JsonProperty(value = "shortDescription") String shortDescription) {
+                   @JsonProperty("dueDate") Timestamp dueDate,
+                   @JsonProperty("shortDescription") String shortDescription,
+                   @JsonProperty("views") Long views) {
         this.id = id;
         this.postType = PostType.contains(postType) ? PostType.valueOf(postType) : null;
         this.postDate = postDate;
@@ -65,6 +68,9 @@ public class Post {
         }
         this.dueDate = this.postType == PostType.WARNING ? dueDate : null;
         this.shortDescription = this.postType == PostType.WARNING ? shortDescription : null;
+        if (views != null) {
+            this.views = views;
+        }
     }
 
     public Long getId() {
@@ -148,5 +154,13 @@ public class Post {
 
     public void setShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
+    }
+
+    public Long getViews() {
+        return views;
+    }
+
+    public void setViews(Long views) {
+        this.views = views;
     }
 }
