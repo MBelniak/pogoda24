@@ -14,6 +14,6 @@ create sequence hibernate_sequence;
 
 CREATE TABLE site_traffic (
   id      BIGINT PRIMARY KEY AUTO_INCREMENT,
-  date    TIMESTAMP DEFAULT CURRENT_TIMESTAMP not null,
+  date    DATE DEFAULT GETDATE() not null,
   views   BIGINT
 );

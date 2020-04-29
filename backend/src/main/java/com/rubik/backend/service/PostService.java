@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -70,7 +71,8 @@ public class PostService {
         return postRepository.findAllValidWarnings(new Timestamp(new Date().getTime()), isAddedToTopBar);
     }
 
-    public void updateViewsForPost(Long postId, Long views) {
+    @Transactional
+    public void addViewsForPost(Long postId, Long views) {
         Post post = this.getPostById(postId);
         post.setViews(post.getViews() + views);
         this.savePost(post);

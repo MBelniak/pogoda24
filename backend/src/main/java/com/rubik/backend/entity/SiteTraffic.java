@@ -2,12 +2,9 @@ package com.rubik.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 public class SiteTraffic {
@@ -18,7 +15,8 @@ public class SiteTraffic {
 
     @NotNull(message = "Property 'date' cannot be null.")
     @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Timestamp date;
+    @Temporal(TemporalType.DATE)
+    private Date date;
 
     private Long views;
 
@@ -30,11 +28,11 @@ public class SiteTraffic {
         this.id = id;
     }
 
-    public Timestamp getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 

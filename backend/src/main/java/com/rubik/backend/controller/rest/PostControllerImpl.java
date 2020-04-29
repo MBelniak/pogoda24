@@ -6,11 +6,12 @@ import com.rubik.backend.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,7 +29,6 @@ public class PostControllerImpl implements PostController {
         this.hashToPostMap = new ConcurrentHashMap<>();
     }
 
-    @GetMapping("/count")
     public ResponseEntity<Long> getPostCount(@RequestParam(required = false) String postType) {
         if (postType != null) {
             if (!PostType.contains(postType)) {
@@ -40,7 +40,6 @@ public class PostControllerImpl implements PostController {
         return new ResponseEntity<>(postService.getPostCount(), HttpStatus.OK);
     }
 
-    @GetMapping("")
     public ResponseEntity<List<Post>> getPosts(@RequestParam(required = false) String postType,
                                @RequestParam(required = false) Integer page,
                                @RequestParam(required = false) Integer count) {
@@ -62,13 +61,10 @@ public class PostControllerImpl implements PostController {
         return new ResponseEntity<>(postService.getPostsOrderedByDate(page, count).getContent(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public Post getPost(@PathVariable("id") Long postId) {
+    public Post getPost(@PathVariable("id") Long postId, HttpServletRequest request) {
         return postService.getPostById(postId);
     }
 
-    @Transactional
-    @PostMapping("")
     public ResponseEntity<Post> addPost(@RequestBody @Valid Post post, BindingResult bindingResult) throws BindException {
         if (!bindingResult.hasErrors()) {
             postService.savePost(post);
@@ -77,8 +73,6 @@ public class PostControllerImpl implements PostController {
         throw new BindException(bindingResult);
     }
 
-    @Transactional
-    @PutMapping("")
     public ResponseEntity updatePost(@RequestBody @Valid Post post, BindingResult bindingResult,
                            @RequestParam(required = false) Boolean temporary) throws BindException {
         if (!bindingResult.hasErrors()) {
@@ -97,8 +91,6 @@ public class PostControllerImpl implements PostController {
         }
     }
 
-    @Transactional
-    @GetMapping("/continuePostUpdate/{hash}")
     public ResponseEntity continuePostUpdate(@PathVariable String hash, @RequestParam Boolean success) {
         Post postToSave = hashToPostMap.get(hash);
         if (postToSave == null) {
@@ -112,15 +104,12 @@ public class PostControllerImpl implements PostController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @Transactional
-    @DeleteMapping("/{id}")
     public void deletePost(@PathVariable Long id) {
         if (id != null) {
             postService.deletePost(id);
         }
     }
 
-    @GetMapping(value = "/warnings/topBarWarning", produces = "text/plain")
     public String getLatestWarningDescription() {
         List<Post> warnings = postService.getCurrentWarnings(true);
         if (warnings.size() == 0) {
@@ -130,7 +119,6 @@ public class PostControllerImpl implements PostController {
         return warnings.get(warnings.size() - 1).getShortDescription();
     }
 
-    @GetMapping("/validWarnings")
     public List<Post> getValidWarnings(@RequestParam(required = false) Boolean isAddedToTopBar) {
         List<Post> warnings;
         if (isAddedToTopBar == null) {
