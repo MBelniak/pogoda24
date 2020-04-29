@@ -5,24 +5,11 @@ import Traffic from './Traffic';
 import MainPage from './MainPage';
 import PostsList from './PostsList';
 import Writer from './Writer';
-import { connect, ConnectedProps } from 'react-redux';
-import { ModalWindowState } from './redux/store';
-const ModalWindow = require('shared24').ModalWindow;
-const connector = connect((state: ModalWindowState) => ({
-    modalShown: state.isShown,
-    modalRender: state.render
-}));
 
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-class App extends React.Component<PropsFromRedux> {
+export default class App extends React.Component {
     render() {
         return (
             <Router>
-                <ModalWindow
-                    isShown={this.props.modalShown}
-                    render={this.props.modalRender}
-                />
                 <Switch>
                     <Route exact path="/write" component={MainPage} />
                     <Route path="/writer" component={Writer} />
@@ -33,5 +20,3 @@ class App extends React.Component<PropsFromRedux> {
         );
     }
 }
-
-export default connector(App);

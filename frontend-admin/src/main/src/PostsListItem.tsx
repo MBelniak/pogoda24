@@ -1,8 +1,8 @@
 import React from 'react';
-import { connect, ConnectedProps } from 'react-redux';
 import { Image, Transformation } from 'cloudinary-react';
 import Post from './Post';
-import { closeModal, showModal } from './redux/actions';
+const showModal = require('shared24').showModal;
+const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 interface PostListItemProps {
@@ -15,14 +15,7 @@ interface State {
     renderModal: JSX.Element | undefined;
 }
 
-const connector = connect(null, {
-    showModal: showModal,
-    closeModal: closeModal
-});
-
-type PostsListItemProps = ConnectedProps<typeof connector> & PostListItemProps;
-
-class PostsListItem extends React.Component<PostsListItemProps, State> {
+export default class PostsListItem extends React.Component<PostListItemProps, State> {
     state: State = {
         showModal: false,
         renderModal: undefined
@@ -34,7 +27,7 @@ class PostsListItem extends React.Component<PostsListItemProps, State> {
     }
 
     private handleDeletePost() {
-        this.props.showModal(<LoadingIndicator />);
+        showModal(<LoadingIndicator />);
         fetch('api/posts/' + this.props.post.id, {
             method: 'DELETE'
         })
@@ -43,7 +36,7 @@ class PostsListItem extends React.Component<PostsListItemProps, State> {
                     location.reload();
                 } else {
                     console.log(response);
-                    this.props.showModal(
+                    showModal(
                         <div>
                             <p className="dialogMessage">
                                 Wystąpił błąd podczas usuwania posta.
@@ -51,7 +44,7 @@ class PostsListItem extends React.Component<PostsListItemProps, State> {
                             <button
                                 className="button is-primary"
                                 style={{ float: 'right' }}
-                                onClick={this.props.closeModal}>
+                                onClick={closeModal}>
                                 Ok
                             </button>
                         </div>
@@ -60,7 +53,7 @@ class PostsListItem extends React.Component<PostsListItemProps, State> {
             })
             .catch(error => {
                 console.log(error);
-                this.props.showModal(
+                showModal(
                     <div>
                         <p className="dialogMessage">
                             Wystąpił błąd podczas usuwania posta.
@@ -68,7 +61,7 @@ class PostsListItem extends React.Component<PostsListItemProps, State> {
                         <button
                             className="button is-primary"
                             style={{ float: 'right' }}
-                            onClick={this.props.closeModal}>
+                            onClick={closeModal}>
                             Ok
                         </button>
                     </div>
@@ -170,5 +163,3 @@ class PostsListItem extends React.Component<PostsListItemProps, State> {
         );
     }
 }
-
-export default connector(PostsListItem);

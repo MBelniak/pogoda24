@@ -1,14 +1,13 @@
 import React from 'react';
-import { connect, ConnectedProps } from 'react-redux';
 import Post, { PostType } from './Post';
-import { closeModal, showModal } from './redux/actions';
 import * as fns from 'date-fns';
 import config from './config/config';
 import { uploadImages } from './helpers/CloudinaryHelper';
 import FileDropper from './FileDropper';
 import FileToUploadItem from './FileToUploadItem';
 import { FileToUpload } from './Writer';
-
+const showModal = require('shared24').showModal;
+const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 const { MAX_IMAGES_PER_POST, BACKEND_DATE_FORMAT } = config;
@@ -25,19 +24,12 @@ interface State {
     filesToUpload: FileToUpload[];
 }
 
-const connector = connect(null, {
-    showModal: showModal,
-    closeModal: closeModal
-});
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
 const daysValidInputConstraint = (text: string): boolean => {
     return parseInt(text) >= 0;
 };
 
-class PostEdition extends React.Component<
-    PostEditionProps & PropsFromRedux,
+export default class PostEdition extends React.Component<
+    PostEditionProps,
     State
 > {
     private fileId: number;
@@ -120,7 +112,7 @@ class PostEdition extends React.Component<
             this.state.filesToUpload.length + files.length >
             MAX_IMAGES_PER_POST
         ) {
-            this.props.showModal(
+            showModal(
                 <div>
                     <p className="dialogMessage">
                         Do jednego postu możesz dodać tylko 6 plików!
@@ -128,7 +120,7 @@ class PostEdition extends React.Component<
                     <button
                         className="button is-primary"
                         style={{ float: 'right' }}
-                        onClick={this.props.closeModal}>
+                        onClick={closeModal}>
                         Ok
                     </button>
                 </div>
@@ -137,13 +129,13 @@ class PostEdition extends React.Component<
             return;
         }
         if (!files.every(file => /\.(jpe?g|png|svg)$/g.test(file.name))) {
-            this.props.showModal(
+            showModal(
                 <div>
                     <p className="dialogMessage">Tylko pliki graficzne!</p>
                     <button
                         className="button is-primary"
                         style={{ float: 'right' }}
-                        onClick={this.props.closeModal}>
+                        onClick={closeModal}>
                         Ok
                     </button>
                 </div>
@@ -182,7 +174,7 @@ class PostEdition extends React.Component<
                 this.validateField(this.warningShortInput.current) && formValid;
             if (!formValid) return;
         }
-        this.props.showModal(<LoadingIndicator />);
+        showModal(<LoadingIndicator />);
         const responsePromise = this.sendPostToBackend();
         this.afterPostRequestSend(responsePromise);
     }
@@ -374,7 +366,7 @@ class PostEdition extends React.Component<
                 break;
             }
         }
-        this.props.showModal(
+        showModal(
             <div>
                 <p className="dialogMessage">Pomyślnie zapisano {postType}</p>
                 <button
@@ -388,13 +380,13 @@ class PostEdition extends React.Component<
     }
 
     private showErrorMessage(errorMessage: string) {
-        this.props.showModal(
+        showModal(
             <div>
                 <p className="dialogMessage">{errorMessage}</p>
                 <button
                     className="button is-primary"
                     style={{ float: 'right' }}
-                    onClick={this.props.closeModal}>
+                    onClick={closeModal}>
                     Ok
                 </button>
             </div>
@@ -628,5 +620,3 @@ class PostEdition extends React.Component<
         );
     }
 }
-
-export default connector(PostEdition);

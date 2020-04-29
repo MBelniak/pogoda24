@@ -1,11 +1,11 @@
 import React from 'react';
-import { connect, ConnectedProps } from 'react-redux';
 import img from './img/bg.jpg';
 import PostsListItem from './PostsListItem';
-const Copyright = require('shared24').Copyright;
 import Post, { PostDTO, postDTOsToPostsList } from './Post';
 import PostEdition from './PostEdition';
-import { closeModal, showModal } from './redux/actions';
+const Copyright = require('shared24').Copyright;
+const showModal = require('shared24').showModal;
+const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 interface State {
@@ -16,14 +16,7 @@ interface State {
     postToEdit?: Post;
 }
 
-const connector = connect(null, {
-    showModal: showModal,
-    closeModal: closeModal
-});
-
-type PostsListProps = ConnectedProps<typeof connector>;
-
-class PostsList extends React.Component<PostsListProps, State> {
+export default class PostsList extends React.Component<{}, State> {
     private postsPerPage = 10;
 
     state: State = {
@@ -45,13 +38,13 @@ class PostsList extends React.Component<PostsListProps, State> {
     }
 
     private onFinishEditing() {
-        this.props.closeModal();
+        closeModal();
         this.setState({ postEdition: false, postToEdit: undefined });
         this.fetchPostsFromApi();
     }
 
     private fetchPostsFromApi() {
-        this.props.showModal(<LoadingIndicator />);
+        showModal(<LoadingIndicator />);
         fetch('api/posts/count')
             .then(response =>
                 response
@@ -65,25 +58,25 @@ class PostsList extends React.Component<PostsListProps, State> {
                                         posts: postDTOsToPostsList(data),
                                         loading: false
                                     });
-                                    this.props.closeModal();
+                                    closeModal();
                                 })
                             )
                             .catch(error => {
                                 console.log(error);
                                 this.setState({ loading: false });
-                                this.props.closeModal();
+                                closeModal();
                             });
                     })
                     .catch(error => {
                         console.log(error);
                         this.setState({ loading: false });
-                        this.props.closeModal();
+                        closeModal();
                     })
             )
             .catch(error => {
                 console.log(error);
                 this.setState({ loading: false });
-                this.props.closeModal();
+                closeModal();
             });
     }
 
@@ -139,5 +132,3 @@ class PostsList extends React.Component<PostsListProps, State> {
         );
     }
 }
-
-export default connector(PostsList);

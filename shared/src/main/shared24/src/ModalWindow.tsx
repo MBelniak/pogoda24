@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Modal from 'react-modal';
 
 const customStyles = {
@@ -12,19 +13,23 @@ const customStyles = {
     }
 };
 
-export class ModalWindow extends React.Component<{
-    isShown: boolean;
-    render: JSX.Element;
-}> {
-    componentWillMount() {
-        Modal.setAppElement('body');
-    }
+Modal.setAppElement('body');
 
-    render() {
-        return (
-            <Modal isOpen={this.props.isShown} style={customStyles}>
-                {this.props.render}
-            </Modal>
-        );
+function destroyModal() {
+    const modal = document.getElementById('modal');
+    if (modal) {
+        ReactDOM.unmountComponentAtNode(modal);     //This is a no-no, but I want to have the modal logic like that sooo much :D
     }
 }
+export function showModal(render: JSX.Element) {
+    destroyModal();
+    ReactDOM.render(
+        <Modal isOpen={true} style={customStyles}>
+            {render}
+        </Modal>,
+        document.getElementById('modal'));
+}
+export function closeModal() {
+    destroyModal();
+}
+
