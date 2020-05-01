@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
 import Post from './Post';
+import { fetchApi } from './helpers/fetchHelper';
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
@@ -28,7 +29,7 @@ export default class PostsListItem extends React.Component<PostListItemProps, St
 
     private handleDeletePost() {
         showModal(<LoadingIndicator />);
-        fetch('api/posts/' + this.props.post.id, {
+        fetchApi('api/posts/' + this.props.post.id, {
             method: 'DELETE'
         })
             .then(response => {

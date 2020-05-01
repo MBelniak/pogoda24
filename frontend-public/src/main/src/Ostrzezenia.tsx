@@ -1,7 +1,8 @@
 import React from 'react';
 import { Posts } from './Posts';
 import { PagingBar } from './PagingBar';
-import Post, { postDTOsToPostsList } from './Post';
+import Post, { postDTOToPost } from './Post';
+import { fetchApi } from './helper/fetchHelper';
 
 interface State {
     posts: Post[];
@@ -11,6 +12,7 @@ interface State {
 
 export class Ostrzezenia extends React.Component<{}, State> {
     private readonly warningsPerPage = 4;
+    private abortController;
 
     state: State = {
         posts: [],
@@ -18,38 +20,69 @@ export class Ostrzezenia extends React.Component<{}, State> {
         warningsCount: 0
     };
 
-    componentDidMount() {
-        fetch('api/posts/count?postType=WARNING').then(response =>
-            response.json().then(data => {
-                this.setState({ warningsCount: data });
+    constructor(props) {
+        super(props);
+        this.abortController = new AbortController();
+    }
 
-                fetch(
-                    'api/posts?postType=WARNING&page=0&count=' +
-                        this.warningsPerPage
-                ).then(response =>
-                    response.json().then(data => {
-                        this.setState({
-                            posts: postDTOsToPostsList(data),
-                            loading: false
+    componentDidMount() {
+        fetchApi('api/posts/count?postType=WARNING')
+            .then(response =>
+                response.json().then(data => {
+                    this.setState({ warningsCount: data });
+
+                    fetchApi(
+                        'api/posts?postType=WARNING&page=0&count=' +
+                            this.warningsPerPage,
+                        { signal: this.abortController.signal }
+                    )
+                        .then(response =>
+                            response.json().then(posts => {
+                                this.setState({
+                                    posts: posts.map(post =>
+                                        postDTOToPost(post)
+                                    ),
+                                    loading: false
+                                });
+                            }).catch(error => {
+                                console.log(error);
+                            })
+                        )
+                        .catch(error => {
+                            console.log(error);
                         });
-                    })
-                );
-            })
-        );
+                }).catch(error => {
+                    console.log(error);
+                })
+            )
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     private handlePageClick(data) {
         const selected = data.selected;
-        fetch(
+        fetchApi(
             'api/posts?postType=WARNING&page=' +
                 selected +
                 '&count=' +
-                this.warningsPerPage
-        ).then(response =>
-            response.json().then(data => {
-                this.setState({ posts: data });
-            })
-        );
+                this.warningsPerPage,
+            { signal: this.abortController.signal }
+        )
+            .then(response =>
+                response.json().then(data => {
+                    this.setState({ posts: data, loading: false });
+                }).catch(error => {
+                    console.log(error);
+                })
+            )
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {

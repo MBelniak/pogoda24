@@ -1,9 +1,5 @@
 import React from 'react';
 
-function importAll(r) {
-    return r.keys().map(r);
-}
-
 interface Person {
     imageURL: string;
     description: string;

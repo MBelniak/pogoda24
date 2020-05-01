@@ -1,8 +1,9 @@
 import React from 'react';
 import img from './img/bg.jpg';
 import PostsListItem from './PostsListItem';
-import Post, { PostDTO, postDTOsToPostsList } from './Post';
+import Post, { PostDTO, postDTOToPost } from './Post';
 import PostEdition from './PostEdition';
+import { fetchApi } from './helpers/fetchHelper';
 const Copyright = require('shared24').Copyright;
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
@@ -18,6 +19,7 @@ interface State {
 
 export default class PostsList extends React.Component<{}, State> {
     private postsPerPage = 10;
+    private abortController;
 
     state: State = {
         loading: true,
@@ -31,6 +33,7 @@ export default class PostsList extends React.Component<{}, State> {
         super(props);
         this.initiatePostEdit = this.initiatePostEdit.bind(this);
         this.onFinishEditing = this.onFinishEditing.bind(this);
+        this.abortController = new AbortController();
     }
 
     private initiatePostEdit(post: Post) {
@@ -45,43 +48,45 @@ export default class PostsList extends React.Component<{}, State> {
 
     private fetchPostsFromApi() {
         showModal(<LoadingIndicator />);
-        fetch('api/posts/count')
+        fetchApi('api/posts/count', { signal: this.abortController.signal })
             .then(response =>
                 response
                     .json()
                     .then(data => {
                         this.setState({ postsCount: data });
-                        fetch('api/posts?&page=0&count=' + this.postsPerPage)
+                        fetchApi('api/posts?&page=0&count=' + this.postsPerPage, { signal: this.abortController.signal })
                             .then(response =>
-                                response.json().then((data: PostDTO[]) => {
+                                response.json().then((posts: PostDTO[]) => {
                                     this.setState({
-                                        posts: postDTOsToPostsList(data),
+                                        posts: posts.map(post => postDTOToPost(post)),
                                         loading: false
                                     });
                                     closeModal();
+                                }).catch(error => {
+                                    console.log(error);
                                 })
                             )
                             .catch(error => {
                                 console.log(error);
-                                this.setState({ loading: false });
-                                closeModal();
                             });
                     })
                     .catch(error => {
                         console.log(error);
-                        this.setState({ loading: false });
                         closeModal();
                     })
             )
             .catch(error => {
                 console.log(error);
-                this.setState({ loading: false });
                 closeModal();
             });
     }
 
     componentDidMount() {
         this.fetchPostsFromApi();
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {

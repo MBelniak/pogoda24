@@ -18,7 +18,7 @@ Modal.setAppElement('body');
 function destroyModal() {
     const modal = document.getElementById('modal');
     if (modal) {
-        ReactDOM.unmountComponentAtNode(modal);     //This is a no-no, but I want to have the modal logic like that sooo much :D
+        ReactDOM.unmountComponentAtNode(modal); //This is a no-no, but I want to have the modal logic like that sooo much :D
     }
 }
 export function showModal(render: JSX.Element) {
@@ -27,9 +27,9 @@ export function showModal(render: JSX.Element) {
         <Modal isOpen={true} style={customStyles}>
             {render}
         </Modal>,
-        document.getElementById('modal'));
+        document.getElementById('modal')
+    );
 }
 export function closeModal() {
     destroyModal();
 }
-

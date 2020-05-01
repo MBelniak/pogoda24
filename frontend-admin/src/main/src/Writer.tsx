@@ -6,6 +6,7 @@ import img from './img/bg.jpg';
 import FileToUploadItem from './FileToUploadItem';
 import { PostType } from './Post';
 import { uploadImages } from './helpers/CloudinaryHelper';
+import { fetchApi } from './helpers/fetchHelper';
 const Copyright = require('shared24').Copyright;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 const showModal = require('shared24').showModal;
@@ -206,9 +207,7 @@ export default class Writer extends React.Component<{}, State> {
             uploadedFilesIdsOrdered
         );
 
-        console.log(JSON.stringify(requestBodyPost));
-
-        return fetch('api/posts', {
+        return fetchApi('api/posts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -260,6 +259,8 @@ export default class Writer extends React.Component<{}, State> {
                                 'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
                             );
                         }
+                    }).catch(error => {
+                        console.log(error);
                     });
                 } else {
                     console.log(response.statusText + ', ' + response.body);
@@ -275,7 +276,7 @@ export default class Writer extends React.Component<{}, State> {
     }
 
     private removePostFromBackend(postId: number) {
-        fetch('/api/posts/' + postId, {
+        fetchApi('api/posts/' + postId, {
             method: 'DELETE'
         })
             .then(response => {

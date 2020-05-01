@@ -22,14 +22,12 @@ export interface PostDTO {
     shortDescription?: string;
 }
 
-export function postDTOsToPostsList(postDTOs: PostDTO[]): Post[] {
-    return postDTOs.map(post => {
-        return {
-            ...post,
-            postDate: fns.parseJSON(post.postDate),
-            dueDate: post.dueDate ? fns.parseJSON(post.dueDate) : undefined
-        };
-    });
+export function postDTOToPost(postDTO: PostDTO): Post {
+    return {
+        ...postDTO,
+        postDate: fns.parseJSON(postDTO.postDate),
+        dueDate: postDTO.dueDate ? fns.parseJSON(postDTO.dueDate) : undefined
+    };
 }
 
 export enum PostType {

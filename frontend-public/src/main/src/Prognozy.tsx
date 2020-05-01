@@ -1,7 +1,8 @@
 import React from 'react';
 import { PagingBar } from './PagingBar';
 import { Posts } from './Posts';
-import Post, { postDTOsToPostsList } from './Post';
+import Post, { postDTOToPost } from './Post';
+import { fetchApi } from './helper/fetchHelper';
 
 interface State {
     forecastsCount: number;
@@ -11,6 +12,7 @@ interface State {
 
 export class Prognozy extends React.Component<{}, State> {
     private readonly forecastsPerPage = 4;
+    private abortController;
 
     state: State = {
         forecastsCount: 0,
@@ -21,53 +23,66 @@ export class Prognozy extends React.Component<{}, State> {
     constructor(props) {
         super(props);
         this.handlePageClick = this.handlePageClick.bind(this);
+        this.abortController = new AbortController();
     }
 
     componentDidMount() {
-        fetch('api/posts/count?postType=FORECAST')
+        fetchApi('api/posts/count?postType=FORECAST', { signal: this.abortController.signal })
             .then(response =>
                 response.json().then(data => {
                     this.setState({ forecastsCount: data });
                     if (this.state.forecastsCount !== 0) {
-                        fetch(
+                        fetchApi(
                             'api/posts?postType=FORECAST&page=0&count=' +
                                 this.forecastsPerPage
                         )
                             .then(response =>
-                                response.json().then(data => {
+                                response.json().then(posts => {
                                     this.setState({
-                                        posts: postDTOsToPostsList(data),
+                                        posts: posts.map(post =>
+                                            postDTOToPost(post)
+                                        ),
                                         loading: false
                                     });
+                                }).catch(error => {
+                                    console.log(error);
                                 })
                             )
                             .catch(error => {
                                 console.log(error);
-                                this.setState({ loading: false });
                             });
                     } else {
                         this.setState({ loading: false });
                     }
+                }).catch(error => {
+                    console.log(error);
                 })
             )
             .catch(error => {
                 console.log(error);
-                this.setState({ loading: false });
             });
     }
 
     private handlePageClick(data) {
         const selected = data.selected;
-        fetch(
+        fetchApi(
             'api/posts?postType=FORECASTS&page=' +
                 selected +
                 '&count=' +
-                this.forecastsPerPage
+                this.forecastsPerPage, { signal: this.abortController.signal }
         ).then(response =>
             response.json().then(data => {
                 this.setState({ posts: data });
+            }).catch(error => {
+                console.log(error);
             })
-        );
+        ).catch(error => {
+              console.log(error);
+        });
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {

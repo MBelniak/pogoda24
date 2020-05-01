@@ -6,6 +6,7 @@ import { uploadImages } from './helpers/CloudinaryHelper';
 import FileDropper from './FileDropper';
 import FileToUploadItem from './FileToUploadItem';
 import { FileToUpload } from './Writer';
+import { fetchApi } from './helpers/fetchHelper';
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
@@ -38,6 +39,7 @@ export default class PostEdition extends React.Component<
     private postDescriptionTextArea;
     private daysValidInput;
     private warningShortInput;
+    private abortController;
 
     state: State = {
         postDescription: this.props.post.description,
@@ -69,6 +71,7 @@ export default class PostEdition extends React.Component<
         this.onRemoveFile = this.onRemoveFile.bind(this);
         this.onMoveForward = this.onMoveForward.bind(this);
         this.onMoveBackward = this.onMoveBackward.bind(this);
+        this.abortController = new AbortController();
     }
 
     componentDidMount() {
@@ -240,7 +243,7 @@ export default class PostEdition extends React.Component<
             uploadedFilesIdsOrdered
         );
 
-        return fetch('api/posts?temporary=true', {
+        return fetchApi('api/posts?temporary=true', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -307,13 +310,13 @@ export default class PostEdition extends React.Component<
     }
 
     private getImagesToUpload(): FileToUpload[] {
-        return this.state.filesToUpload.filter(
-            file => file.file !== null
-        );
+        return this.state.filesToUpload.filter(file => file.file !== null);
     }
 
     private continueSavingPostToBackend(hash: string) {
-        fetch('/api/posts/continuePostUpdate/' + hash + '?success=true')
+        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=true', {
+            signal: this.abortController.signal
+        })
             .then(response => {
                 if (response && response.ok) {
                     this.showSuccessMessage();
@@ -329,8 +332,9 @@ export default class PostEdition extends React.Component<
                 this.showErrorMessage('Nie udało się zapisać posta.');
             });
     }
+
     private abortPostUpdate(hash: string) {
-        fetch('/api/posts/continuePostUpdate/' + hash + '?success=false')
+        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=false')
             .then(response => {
                 if (response && response.ok) {
                     console.log('Post update aborted.');
@@ -488,6 +492,10 @@ export default class PostEdition extends React.Component<
                 <div className="column is-half" />
             </div>
         );
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {

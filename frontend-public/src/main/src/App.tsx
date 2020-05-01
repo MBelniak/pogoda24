@@ -10,6 +10,9 @@ import { CloudinaryContext } from 'cloudinary-react';
 import './sass/main.scss';
 import 'shared24/src/sass/main.scss';
 import { TopBar } from './TopBar';
+import PostView from './PostView';
+import ErrorPage from './ErrorPage';
+import { fetchApi } from './helper/fetchHelper';
 
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
@@ -19,12 +22,19 @@ interface State {
 }
 
 export default class App extends React.Component<{}, State> {
+    private abortController;
+
     state: State = {
         warningShort: null
     };
 
+    constructor(props) {
+        super(props);
+        this.abortController = new AbortController();
+    }
+
     componentDidMount() {
-        fetch('api/posts/warnings/topBarWarning')
+        fetchApi('api/posts/warnings/topBarWarning', { signal: this.abortController.signal })
             .then(response => {
                 if (response && response.ok) {
                     response.text().then(text => {
@@ -39,6 +49,10 @@ export default class App extends React.Component<{}, State> {
             .catch(error => {
                 console.log(error);
             });
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {
@@ -59,9 +73,11 @@ export default class App extends React.Component<{}, State> {
                     <Switch>
                         <Route exact path="/" component={MainPage} />
                         <Route path="/prognozy" component={Prognozy} />
+                        <Route path="/posts/(\d+)" component={PostView} />
                         <Route path="/ostrzezenia" component={Ostrzezenia} />
                         <Route path="/ciekawostki" component={Ciekawostki} />
                         <Route path="/about" component={ONas} />
+                        <Route component={ErrorPage} />
                     </Switch>
                     <Copyright />
                 </div>
