@@ -1,7 +1,8 @@
 import React from 'react';
 import { Posts } from './Posts';
 import { ExternalApi } from './ExternalApi';
-import Post, { postDTOsToPostsList } from './Post';
+import Post, { postDTOToPost } from './Post';
+import { fetchApi } from './helper/fetchHelper';
 
 interface State {
     posts: Post[];
@@ -10,26 +11,39 @@ interface State {
 
 export class MainPage extends React.Component<{}, State> {
     private readonly forecastsPerPage = 4;
+    private abortController;
 
     state: State = {
         posts: [],
         loading: true
     };
 
+    constructor(props) {
+        super(props);
+        this.abortController = new AbortController();
+    }
+
     componentDidMount() {
-        fetch('api/posts?page=0&count=' + this.forecastsPerPage)
+        fetchApi('api/posts?page=0&count=' + this.forecastsPerPage, {
+            signal: this.abortController.signal
+        })
             .then(response =>
-                response.json().then(data => {
+                response.json().then(posts => {
                     this.setState({
-                        posts: postDTOsToPostsList(data),
+                        posts: posts.map(post => postDTOToPost(post)),
                         loading: false
                     });
+                }).catch(error => {
+                    console.log(error);
                 })
             )
             .catch(error => {
                 console.log(error);
-                this.setState({ loading: false });
             });
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {

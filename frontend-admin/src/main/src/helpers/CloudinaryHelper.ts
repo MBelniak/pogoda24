@@ -2,7 +2,8 @@ import config from '../config/config';
 import { FileToUpload } from '../Writer';
 
 const { cloud_name, upload_preset, api_key, api_secret } = config;
-
+export const controller = new AbortController();
+const signal = controller.signal;
 const sha1 = require('js-sha1');
 
 export function uploadImages(uploadedFiles: FileToUpload[]) {
@@ -25,7 +26,8 @@ export function uploadImages(uploadedFiles: FileToUpload[]) {
 
         return fetch(url, {
             method: 'POST',
-            body: formData
+            body: formData,
+            signal: signal
         });
     });
 }

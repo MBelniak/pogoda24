@@ -1,6 +1,4 @@
 import * as fns from 'date-fns';
-import config from './config/config';
-const { BACKEND_DATE_FORMAT } = config;
 
 export default interface Post {
     id: number;
@@ -24,16 +22,12 @@ export interface PostDTO {
     shortDescription?: string;
 }
 
-export function postDTOsToPostsList(postDTOs: PostDTO[]): Post[] {
-    return postDTOs.map(post => {
-        return {
-            ...post,
-            postDate: fns.parse(post.postDate, BACKEND_DATE_FORMAT, new Date()),
-            dueDate: post.dueDate
-                ? fns.parse(post.dueDate, BACKEND_DATE_FORMAT, new Date())
-                : undefined
-        };
-    });
+export function postDTOToPost(postDTO: PostDTO): Post {
+    return {
+        ...postDTO,
+        postDate: fns.parseJSON(postDTO.postDate),
+        dueDate: postDTO.dueDate ? fns.parseJSON(postDTO.dueDate) : undefined
+    };
 }
 
 export enum PostType {

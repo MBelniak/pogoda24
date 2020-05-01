@@ -2,15 +2,15 @@ import React from 'react';
 import config from './config/config';
 import * as fns from 'date-fns';
 import FileDropper from './FileDropper';
-import { connect, ConnectedProps } from 'react-redux';
-import { closeModal, showModal } from './redux/actions';
 import img from './img/bg.jpg';
 import FileToUploadItem from './FileToUploadItem';
 import { PostType } from './Post';
 import { uploadImages } from './helpers/CloudinaryHelper';
+import { fetchApi } from './helpers/fetchHelper';
 const Copyright = require('shared24').Copyright;
 const LoadingIndicator = require('shared24').LoadingIndicator;
-
+const showModal = require('shared24').showModal;
+const closeModal = require('shared24').closeModal;
 const { MAX_IMAGES_PER_POST, BACKEND_DATE_FORMAT } = config;
 
 export interface FileToUpload {
@@ -34,18 +34,11 @@ enum PostTypeText {
     Ciekawostka = 'ciekawostki'
 }
 
-const connector = connect(null, {
-    showModal: showModal,
-    closeModal: closeModal
-});
-
-type WriterProps = ConnectedProps<typeof connector>;
-
 const daysValidInputConstraint = (text: string): boolean => {
     return parseInt(text) >= 0;
 };
 
-class Writer extends React.Component<WriterProps, State> {
+export default class Writer extends React.Component<{}, State> {
     state: State = {
         postType: PostType.FORECAST,
         postTypeText: PostTypeText.Prognoza,
@@ -86,7 +79,7 @@ class Writer extends React.Component<WriterProps, State> {
             this.state.filesToUpload.length + files.length >
             MAX_IMAGES_PER_POST
         ) {
-            this.props.showModal(
+            showModal(
                 <div>
                     <p className="dialogMessage">
                         Do jednego postu możesz dodać tylko 6 plików!
@@ -94,7 +87,7 @@ class Writer extends React.Component<WriterProps, State> {
                     <button
                         className="button is-primary"
                         style={{ float: 'right' }}
-                        onClick={this.props.closeModal}>
+                        onClick={closeModal}>
                         Ok
                     </button>
                 </div>
@@ -103,13 +96,13 @@ class Writer extends React.Component<WriterProps, State> {
             return;
         }
         if (!files.every(file => /\.(jpe?g|png|svg)$/g.test(file.name))) {
-            this.props.showModal(
+            showModal(
                 <div>
                     <p className="dialogMessage">Tylko pliki graficzne!</p>
                     <button
                         className="button is-primary"
                         style={{ float: 'right' }}
-                        onClick={this.props.closeModal}>
+                        onClick={closeModal}>
                         Ok
                     </button>
                 </div>
@@ -148,7 +141,7 @@ class Writer extends React.Component<WriterProps, State> {
                 this.validateField(this.warningShortInput.current) && formValid;
             if (!formValid) return;
         }
-        this.props.showModal(<LoadingIndicator />);
+        showModal(<LoadingIndicator />);
         const responsePromise = this.sendPostToBackend();
         this.afterPostRequestSend(responsePromise);
     }
@@ -214,7 +207,7 @@ class Writer extends React.Component<WriterProps, State> {
             uploadedFilesIdsOrdered
         );
 
-        return fetch('api/posts', {
+        return fetchApi('api/posts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -266,6 +259,8 @@ class Writer extends React.Component<WriterProps, State> {
                                 'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
                             );
                         }
+                    }).catch(error => {
+                        console.log(error);
                     });
                 } else {
                     console.log(response.statusText + ', ' + response.body);
@@ -281,7 +276,9 @@ class Writer extends React.Component<WriterProps, State> {
     }
 
     private removePostFromBackend(postId: number) {
-        fetch('/api/posts/' + postId)
+        fetchApi('api/posts/' + postId, {
+            method: 'DELETE'
+        })
             .then(response => {
                 if (response && response.ok) {
                     console.log('Removed post with id: ' + postId);
@@ -317,7 +314,7 @@ class Writer extends React.Component<WriterProps, State> {
                 break;
             }
         }
-        this.props.showModal(
+        showModal(
             <div>
                 <p className="dialogMessage">Pomyślnie zapisano {postType}</p>
                 <button
@@ -331,13 +328,13 @@ class Writer extends React.Component<WriterProps, State> {
     }
 
     private showErrorMessage(errorMessage: string) {
-        this.props.showModal(
+        showModal(
             <div>
                 <p className="dialogMessage">{errorMessage}</p>
                 <button
                     className="button is-primary"
                     style={{ float: 'right' }}
-                    onClick={this.props.closeModal}>
+                    onClick={closeModal}>
                     Ok
                 </button>
             </div>
@@ -351,7 +348,7 @@ class Writer extends React.Component<WriterProps, State> {
             postDescription: '',
             filesToUpload: []
         });
-        this.props.closeModal();
+        closeModal();
     }
 
     private onRemoveFile(fileId: number) {
@@ -609,5 +606,3 @@ class Writer extends React.Component<WriterProps, State> {
         );
     }
 }
-
-export default connector(Writer);

@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -43,7 +44,7 @@ public class PostService {
     }
 
     public Post getPostById(Long id) {
-        return postRepository.findAllById(id);
+        return postRepository.findFirstById(id);
     }
 
     public void savePost(Post post) {

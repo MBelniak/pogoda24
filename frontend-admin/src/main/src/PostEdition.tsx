@@ -1,14 +1,14 @@
 import React from 'react';
-import { connect, ConnectedProps } from 'react-redux';
 import Post, { PostType } from './Post';
-import { closeModal, showModal } from './redux/actions';
 import * as fns from 'date-fns';
 import config from './config/config';
 import { uploadImages } from './helpers/CloudinaryHelper';
 import FileDropper from './FileDropper';
 import FileToUploadItem from './FileToUploadItem';
 import { FileToUpload } from './Writer';
-
+import { fetchApi } from './helpers/fetchHelper';
+const showModal = require('shared24').showModal;
+const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 const { MAX_IMAGES_PER_POST, BACKEND_DATE_FORMAT } = config;
@@ -25,19 +25,12 @@ interface State {
     filesToUpload: FileToUpload[];
 }
 
-const connector = connect(null, {
-    showModal: showModal,
-    closeModal: closeModal
-});
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
 const daysValidInputConstraint = (text: string): boolean => {
     return parseInt(text) >= 0;
 };
 
-class PostEdition extends React.Component<
-    PostEditionProps & PropsFromRedux,
+export default class PostEdition extends React.Component<
+    PostEditionProps,
     State
 > {
     private fileId: number;
@@ -46,6 +39,7 @@ class PostEdition extends React.Component<
     private postDescriptionTextArea;
     private daysValidInput;
     private warningShortInput;
+    private abortController;
 
     state: State = {
         postDescription: this.props.post.description,
@@ -77,6 +71,7 @@ class PostEdition extends React.Component<
         this.onRemoveFile = this.onRemoveFile.bind(this);
         this.onMoveForward = this.onMoveForward.bind(this);
         this.onMoveBackward = this.onMoveBackward.bind(this);
+        this.abortController = new AbortController();
     }
 
     componentDidMount() {
@@ -120,7 +115,7 @@ class PostEdition extends React.Component<
             this.state.filesToUpload.length + files.length >
             MAX_IMAGES_PER_POST
         ) {
-            this.props.showModal(
+            showModal(
                 <div>
                     <p className="dialogMessage">
                         Do jednego postu możesz dodać tylko 6 plików!
@@ -128,7 +123,7 @@ class PostEdition extends React.Component<
                     <button
                         className="button is-primary"
                         style={{ float: 'right' }}
-                        onClick={this.props.closeModal}>
+                        onClick={closeModal}>
                         Ok
                     </button>
                 </div>
@@ -137,13 +132,13 @@ class PostEdition extends React.Component<
             return;
         }
         if (!files.every(file => /\.(jpe?g|png|svg)$/g.test(file.name))) {
-            this.props.showModal(
+            showModal(
                 <div>
                     <p className="dialogMessage">Tylko pliki graficzne!</p>
                     <button
                         className="button is-primary"
                         style={{ float: 'right' }}
-                        onClick={this.props.closeModal}>
+                        onClick={closeModal}>
                         Ok
                     </button>
                 </div>
@@ -182,7 +177,7 @@ class PostEdition extends React.Component<
                 this.validateField(this.warningShortInput.current) && formValid;
             if (!formValid) return;
         }
-        this.props.showModal(<LoadingIndicator />);
+        showModal(<LoadingIndicator />);
         const responsePromise = this.sendPostToBackend();
         this.afterPostRequestSend(responsePromise);
     }
@@ -248,7 +243,7 @@ class PostEdition extends React.Component<
             uploadedFilesIdsOrdered
         );
 
-        return fetch('api/posts?temporary=true', {
+        return fetchApi('api/posts?temporary=true', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -315,13 +310,13 @@ class PostEdition extends React.Component<
     }
 
     private getImagesToUpload(): FileToUpload[] {
-        return this.state.filesToUpload.filter(
-            file => file.file !== null
-        );
+        return this.state.filesToUpload.filter(file => file.file !== null);
     }
 
     private continueSavingPostToBackend(hash: string) {
-        fetch('/api/posts/continuePostUpdate/' + hash + '?success=true')
+        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=true', {
+            signal: this.abortController.signal
+        })
             .then(response => {
                 if (response && response.ok) {
                     this.showSuccessMessage();
@@ -337,8 +332,9 @@ class PostEdition extends React.Component<
                 this.showErrorMessage('Nie udało się zapisać posta.');
             });
     }
+
     private abortPostUpdate(hash: string) {
-        fetch('/api/posts/continuePostUpdate/' + hash + '?success=false')
+        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=false')
             .then(response => {
                 if (response && response.ok) {
                     console.log('Post update aborted.');
@@ -374,7 +370,7 @@ class PostEdition extends React.Component<
                 break;
             }
         }
-        this.props.showModal(
+        showModal(
             <div>
                 <p className="dialogMessage">Pomyślnie zapisano {postType}</p>
                 <button
@@ -388,13 +384,13 @@ class PostEdition extends React.Component<
     }
 
     private showErrorMessage(errorMessage: string) {
-        this.props.showModal(
+        showModal(
             <div>
                 <p className="dialogMessage">{errorMessage}</p>
                 <button
                     className="button is-primary"
                     style={{ float: 'right' }}
-                    onClick={this.props.closeModal}>
+                    onClick={closeModal}>
                     Ok
                 </button>
             </div>
@@ -496,6 +492,10 @@ class PostEdition extends React.Component<
                 <div className="column is-half" />
             </div>
         );
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {
@@ -628,5 +628,3 @@ class PostEdition extends React.Component<
         );
     }
 }
-
-export default connector(PostEdition);

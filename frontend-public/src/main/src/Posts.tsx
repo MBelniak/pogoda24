@@ -1,6 +1,7 @@
 import React from 'react';
 import { ForecastMapList } from './ForecastMapList';
 import Post from './Post';
+import { fetchApi } from './helper/fetchHelper';
 
 interface State {
     expandedPosts: number[];
@@ -15,6 +16,8 @@ export class Posts extends React.Component<PostsProps, State> {
         expandedPosts: []
     };
 
+    private postsViewed: number[] = [];
+
     constructor(props) {
         super(props);
     }
@@ -26,6 +29,7 @@ export class Posts extends React.Component<PostsProps, State> {
 
     private expandPost(id: number) {
         const expandedPosts = this.state.expandedPosts;
+        this.postsViewed.push(id);
         this.setState({ expandedPosts: [...expandedPosts, id] });
     }
 
@@ -33,9 +37,14 @@ export class Posts extends React.Component<PostsProps, State> {
         let description = post.description;
         const expanded =
             this.state.expandedPosts.indexOf(post.id) > -1 ||
-            post.description.length < 150;
+            post.description.length < 70 && description.split(/[(\r\n)(\n)]/g).length <= 2;
         if (!expanded) {
-            description = description.substr(0, 150);
+            if (post.description.length >= 70) {
+                description = description.substr(0, 70);
+            }
+            if (description.split('/(\r\n)|(\n)/g').length <= 2) {
+                description = description.split(/[(\r\n)(\n)]/g).slice(0, 2).join('\n');
+            }
             const regex = /^.*\s/g;
             const match = description.match(regex);
             if (match) {
@@ -45,11 +54,15 @@ export class Posts extends React.Component<PostsProps, State> {
                     description = match[0] + '...';
                 }
             }
+        } else {
+            //post is too short to enable its expanding - it will be registered as viewed by default, which a little incorrect :/
+            if (this.postsViewed.indexOf(post.id) < 0) {
+                this.postsViewed.push(post.id);
+            }
         }
-
         description = description
-            .replace('\r\n', '<br/><br/>')
-            .replace('\n', '<br/><br/>');
+            .replace(/\r\n/g, '<br/>')
+            .replace(/\n/g, '<br/>');
         return (
             <div className="postDescription">
                 <span dangerouslySetInnerHTML={{ __html: description }}></span>
@@ -83,6 +96,23 @@ export class Posts extends React.Component<PostsProps, State> {
                 </div>
             </div>
         );
+    }
+
+    //send info about viewed posts to backend
+    componentWillUnmount() {
+        const body = this.postsViewed.map(postId => {
+            return {
+                postId: postId,
+                views: 1
+            };
+        });
+        fetchApi('api/views/registerViews', {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
     }
 
     render() {

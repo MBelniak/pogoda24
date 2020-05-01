@@ -1,11 +1,12 @@
 import React from 'react';
-import { connect, ConnectedProps } from 'react-redux';
 import img from './img/bg.jpg';
 import PostsListItem from './PostsListItem';
-const Copyright = require('shared24').Copyright;
-import Post, { PostDTO, postDTOsToPostsList } from './Post';
+import Post, { PostDTO, postDTOToPost } from './Post';
 import PostEdition from './PostEdition';
-import { closeModal, showModal } from './redux/actions';
+import { fetchApi } from './helpers/fetchHelper';
+const Copyright = require('shared24').Copyright;
+const showModal = require('shared24').showModal;
+const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 interface State {
@@ -16,15 +17,9 @@ interface State {
     postToEdit?: Post;
 }
 
-const connector = connect(null, {
-    showModal: showModal,
-    closeModal: closeModal
-});
-
-type PostsListProps = ConnectedProps<typeof connector>;
-
-class PostsList extends React.Component<PostsListProps, State> {
+export default class PostsList extends React.Component<{}, State> {
     private postsPerPage = 10;
+    private abortController;
 
     state: State = {
         loading: true,
@@ -38,6 +33,7 @@ class PostsList extends React.Component<PostsListProps, State> {
         super(props);
         this.initiatePostEdit = this.initiatePostEdit.bind(this);
         this.onFinishEditing = this.onFinishEditing.bind(this);
+        this.abortController = new AbortController();
     }
 
     private initiatePostEdit(post: Post) {
@@ -45,50 +41,52 @@ class PostsList extends React.Component<PostsListProps, State> {
     }
 
     private onFinishEditing() {
-        this.props.closeModal();
+        closeModal();
         this.setState({ postEdition: false, postToEdit: undefined });
         this.fetchPostsFromApi();
     }
 
     private fetchPostsFromApi() {
-        this.props.showModal(<LoadingIndicator />);
-        fetch('api/posts/count')
+        showModal(<LoadingIndicator />);
+        fetchApi('api/posts/count', { signal: this.abortController.signal })
             .then(response =>
                 response
                     .json()
                     .then(data => {
                         this.setState({ postsCount: data });
-                        fetch('api/posts?&page=0&count=' + this.postsPerPage)
+                        fetchApi('api/posts?&page=0&count=' + this.postsPerPage, { signal: this.abortController.signal })
                             .then(response =>
-                                response.json().then((data: PostDTO[]) => {
+                                response.json().then((posts: PostDTO[]) => {
                                     this.setState({
-                                        posts: postDTOsToPostsList(data),
+                                        posts: posts.map(post => postDTOToPost(post)),
                                         loading: false
                                     });
-                                    this.props.closeModal();
+                                    closeModal();
+                                }).catch(error => {
+                                    console.log(error);
                                 })
                             )
                             .catch(error => {
                                 console.log(error);
-                                this.setState({ loading: false });
-                                this.props.closeModal();
                             });
                     })
                     .catch(error => {
                         console.log(error);
-                        this.setState({ loading: false });
-                        this.props.closeModal();
+                        closeModal();
                     })
             )
             .catch(error => {
                 console.log(error);
-                this.setState({ loading: false });
-                this.props.closeModal();
+                closeModal();
             });
     }
 
     componentDidMount() {
         this.fetchPostsFromApi();
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {
@@ -139,5 +137,3 @@ class PostsList extends React.Component<PostsListProps, State> {
         );
     }
 }
-
-export default connector(PostsList);

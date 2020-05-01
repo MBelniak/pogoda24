@@ -1,15 +1,8 @@
 import React from 'react';
-import { closeModal, showModal } from './redux/actions';
-import { connect, ConnectedProps } from 'react-redux';
 import { Image, Transformation } from 'cloudinary-react';
 import { FileToUpload } from './Writer';
-
-const connector = connect(null, {
-    showModal: showModal,
-    closeModal: closeModal
-});
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
+const showModal = require('shared24').showModal;
+const closeModal = require('shared24').closeModal;
 
 interface UploadedFilesItemProps {
     file: FileToUpload;
@@ -19,9 +12,7 @@ interface UploadedFilesItemProps {
     onMoveBackward: (id: number) => void;
 }
 
-class FileToUploadItem extends React.Component<
-    UploadedFilesItemProps & PropsFromRedux
-> {
+export default class FileToUploadItem extends React.Component<UploadedFilesItemProps> {
     private overlayDiv;
 
     constructor(props) {
@@ -42,16 +33,16 @@ class FileToUploadItem extends React.Component<
 
     private showPicture() {
         this.hideOverlay();
-        this.props.showModal(
+        showModal(
             <div style={{ width: '100%', height: '100%', textAlign: 'center' }}>
                 <p className="dialogMessage">Kliknij zdjęcie by zamknąć</p>
                 {this.props.file.file ? (
                     <img
                         src={URL.createObjectURL(this.props.file.file)}
-                        onClick={() => this.props.closeModal()}
+                        onClick={() => closeModal()}
                     />
                 ) : (
-                    <div onClick={() => this.props.closeModal()}>
+                    <div onClick={() => closeModal()}>
                         <Image
                             publicId={this.props.file.publicId}
                             format="png"
@@ -136,5 +127,3 @@ class FileToUploadItem extends React.Component<
         );
     }
 }
-
-export default connector(FileToUploadItem);
