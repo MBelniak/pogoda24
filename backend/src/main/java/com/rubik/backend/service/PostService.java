@@ -44,7 +44,7 @@ public class PostService {
     }
 
     public Post getPostById(Long id) {
-        return postRepository.findAllById(id);
+        return postRepository.findFirstById(id);
     }
 
     public void savePost(Post post) {
@@ -69,12 +69,5 @@ public class PostService {
 
     public List<Post> getCurrentWarnings(boolean isAddedToTopBar) {
         return postRepository.findAllValidWarnings(new Timestamp(new Date().getTime()), isAddedToTopBar);
-    }
-
-    @Transactional
-    public void addViewsForPost(Long postId, Long views) {
-        Post post = this.getPostById(postId);
-        post.setViews(post.getViews() + views);
-        this.savePost(post);
     }
 }

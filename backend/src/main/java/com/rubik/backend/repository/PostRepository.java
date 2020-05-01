@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    Post findAllById(Long id);
+    Post findFirstById(Long id);
 
     List<Post> findAllByPostType(PostType postType);
 
@@ -25,6 +25,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByPostType(PostType postType, Pageable pageable);
 
     Long countByPostType(PostType postType);
+
+    @Query(value = "SELECT views FROM post p WHERE p.id = ?1", nativeQuery = true)
+    Long getViewsByPostId(Long id);
 
     @Query(value = "SELECT * FROM post p WHERE p.post_type = 'WARNING' AND p.post_date < ?1 AND p.due_date >= ?1",
             nativeQuery = true)
