@@ -24,10 +24,29 @@ export default class PostsListItem extends React.Component<PostListItemProps, St
 
     constructor(props) {
         super(props);
-        this.handleDeletePost = this.handleDeletePost.bind(this);
+        this.handleDeleteClick = this.handleDeleteClick.bind(this);
+        this.deletePost = this.deletePost.bind(this);
     }
 
-    private handleDeletePost() {
+    private handleDeleteClick() {
+        showModal(<div>
+            <p className="dialogMessage">Czy na pewno chcesz usunąć ten post?</p>
+            <button
+                className="button is-secondary"
+                style={{ float: 'right' }}
+                onClick={closeModal}>
+                Nie
+            </button>
+            <button
+                className="button is-primary"
+                style={{ float: 'right' }}
+                onClick={this.deletePost}>
+                Tak
+            </button>
+        </div>)
+    }
+
+    private deletePost() {
         showModal(<LoadingIndicator />);
         fetchApi('api/posts/' + this.props.post.id, {
             method: 'DELETE'
@@ -138,7 +157,7 @@ export default class PostsListItem extends React.Component<PostListItemProps, St
                         type="button"
                         className="button"
                         value="Usuń"
-                        onClick={this.handleDeletePost}
+                        onClick={this.handleDeleteClick}
                     />
                 </div>
                 <div className="postIconList">
