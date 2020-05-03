@@ -26,5 +26,6 @@ export default {
             imageURL: "sampleProfile.png",
             description: "Imię nazwisko\nZajmuje się meteo od 5 lat. Jest pasjonatem ekstremalnych zjawisk pogodowych"
         },
-    ]
+    ],
+    nonExpandedPostLength: 120
 }

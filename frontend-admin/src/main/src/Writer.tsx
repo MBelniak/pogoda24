@@ -2,12 +2,12 @@ import React from 'react';
 import config from './config/config';
 import * as fns from 'date-fns';
 import FileDropper from './FileDropper';
-import img from './img/bg.jpg';
 import FileToUploadItem from './FileToUploadItem';
 import { PostType } from './Post';
 import { uploadImages } from './helpers/CloudinaryHelper';
 import { fetchApi } from './helpers/fetchHelper';
 const Copyright = require('shared24').Copyright;
+const TopImage = require('shared24').TopImage;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
@@ -24,6 +24,7 @@ interface State {
     postType: PostType;
     postTypeText: PostTypeText;
     warningDaysValid: number | undefined;
+    title: string;
     postDescription: string;
     filesToUpload: FileToUpload[];
 }
@@ -35,7 +36,7 @@ enum PostTypeText {
 }
 
 const daysValidInputConstraint = (text: string): boolean => {
-    return parseInt(text) >= 0;
+    return parseInt(text) >= 0 && parseInt(text) <= 14;
 };
 
 export default class Writer extends React.Component<{}, State> {
@@ -44,6 +45,7 @@ export default class Writer extends React.Component<{}, State> {
         postTypeText: PostTypeText.Prognoza,
         warningDaysValid: undefined,
         postDescription: '',
+        title: '',
         filesToUpload: []
     };
 
@@ -51,6 +53,7 @@ export default class Writer extends React.Component<{}, State> {
     private fileInput;
     private warningCheckBox;
     private postDescriptionTextArea;
+    private titleTextArea;
     private daysValidInput;
     private warningShortInput;
 
@@ -60,11 +63,15 @@ export default class Writer extends React.Component<{}, State> {
         this.fileInput = React.createRef();
         this.warningCheckBox = React.createRef();
         this.postDescriptionTextArea = React.createRef();
+        this.titleTextArea = React.createRef();
         this.daysValidInput = React.createRef();
         this.warningShortInput = React.createRef();
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFilesAdded = this.onFilesAdded.bind(this);
         this.handleDescriptionTextAreaChange = this.handleDescriptionTextAreaChange.bind(
+            this
+        );
+        this.handleTitleTextAreaChange = this.handleTitleTextAreaChange.bind(
             this
         );
         this.clearEverything = this.clearEverything.bind(this);
@@ -157,10 +164,10 @@ export default class Writer extends React.Component<{}, State> {
                 ? !additionalConstraint(htmlInput.value)
                 : false)
         ) {
-            htmlInput.style.borderColor = 'red';
+            htmlInput.classList.add('is-danger');
             return false;
         } else {
-            htmlInput.style.borderColor = '';
+            htmlInput.classList.remove('is-danger');
             return true;
         }
     }
@@ -179,6 +186,7 @@ export default class Writer extends React.Component<{}, State> {
         const requestBodyPost = {
             postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
             postType: this.state.postType.toString(),
+            title: this.titleTextArea.current.value,
             description: this.postDescriptionTextArea.current.value,
             imagesPublicIds: '',
             addedToTopBar:
@@ -220,48 +228,52 @@ export default class Writer extends React.Component<{}, State> {
         responsePromise
             .then(response => {
                 if (response && response.ok) {
-                    response.json().then((data: any) => {
-                        if (data !== null) {
-                            //post saved, send images to cloudinary
-                            const uploadPromises: Promise<
-                                Response
-                            >[] = uploadImages(this.state.filesToUpload);
-                            Promise.all(uploadPromises)
-                                .then(responses => {
-                                    if (
-                                        responses.every(
-                                            response => response && response.ok
-                                        )
-                                    ) {
-                                        //all images uploaded successfully
-                                        this.showSuccessMessage();
-                                    } else {
-                                        responses = responses.filter(
-                                            response =>
-                                                !response || !response.ok
-                                        );
-                                        console.log(responses.toString());
+                    response
+                        .json()
+                        .then((data: any) => {
+                            if (data !== null) {
+                                //post saved, send images to cloudinary
+                                const uploadPromises: Promise<
+                                    Response
+                                >[] = uploadImages(this.state.filesToUpload);
+                                Promise.all(uploadPromises)
+                                    .then(responses => {
+                                        if (
+                                            responses.every(
+                                                response =>
+                                                    response && response.ok
+                                            )
+                                        ) {
+                                            //all images uploaded successfully
+                                            this.showSuccessMessage();
+                                        } else {
+                                            responses = responses.filter(
+                                                response =>
+                                                    !response || !response.ok
+                                            );
+                                            console.log(responses.toString());
+                                            this.showErrorMessage(
+                                                'Nie udało się wysłać wszystkich plików. Post nie został zapisany.'
+                                            );
+                                            this.removePostFromBackend(data.id);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.log(error);
                                         this.showErrorMessage(
-                                            'Nie udało się wysłać wszystkich plików. Post nie został zapisany.'
+                                            'Wystąpił błąd przy wysyłaniu plików. Post nie został zapisany.'
                                         );
                                         this.removePostFromBackend(data.id);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.log(error);
-                                    this.showErrorMessage(
-                                        'Wystąpił błąd przy wysyłaniu plików. Post nie został zapisany.'
-                                    );
-                                    this.removePostFromBackend(data.id);
-                                });
-                        } else {
-                            this.showErrorMessage(
-                                'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
-                            );
-                        }
-                    }).catch(error => {
-                        console.log(error);
-                    });
+                                    });
+                            } else {
+                                this.showErrorMessage(
+                                    'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
                 } else {
                     console.log(response.statusText + ', ' + response.body);
                     this.showErrorMessage(
@@ -346,6 +358,7 @@ export default class Writer extends React.Component<{}, State> {
             postTypeText: PostTypeText.Prognoza,
             postType: PostType.FORECAST,
             postDescription: '',
+            title: '',
             filesToUpload: []
         });
         closeModal();
@@ -400,17 +413,24 @@ export default class Writer extends React.Component<{}, State> {
                         <div className="column">
                             <label htmlFor="warningDaysValidInput">
                                 Czas trwania ostrzeżenia (0 = do końca
-                                dzisiejszego dnia:{' '}
+                                dzisiejszego dnia, max 14):{' '}
                             </label>
                         </div>
                         <div className="column">
                             <input
                                 id="warningDaysValidInput"
+                                className="input"
                                 type="number"
                                 required={true}
                                 ref={this.daysValidInput}
                                 min="0"
-                                max="7"
+                                max="14"
+                                onKeyUp={e =>
+                                    this.validateField(
+                                        e.target,
+                                        daysValidInputConstraint
+                                    )
+                                }
                                 onBlur={e =>
                                     this.validateField(
                                         e.target,
@@ -431,9 +451,11 @@ export default class Writer extends React.Component<{}, State> {
                             <input
                                 id="warningShortInput"
                                 type="text"
+                                className="input"
                                 required={true}
                                 maxLength={80}
                                 ref={this.warningShortInput}
+                                onKeyUp={e => this.validateField(e.target)}
                                 onBlur={e => this.validateField(e.target)}
                             />
                         </div>
@@ -448,11 +470,15 @@ export default class Writer extends React.Component<{}, State> {
         this.setState({ postDescription: event.target.value });
     }
 
+    private handleTitleTextAreaChange(event) {
+        this.setState({ title: event.target.value });
+    }
+
     render() {
         return (
             <div className="main">
                 <section className="container fluid">
-                    <img src={img} className="bgimg" />
+                    <TopImage />
                     <h2 className="title">Witaj w edytorze wpisów.</h2>
                     <h2 className="title is-5">
                         Możesz tutaj tworzyć nowe posty do umieszczenia na
@@ -461,6 +487,19 @@ export default class Writer extends React.Component<{}, State> {
                     <div className="container fluid writerForm">
                         <div className="columns">
                             <div className="column">
+                                <p>
+                                    Dodaj tytuł do{' '}
+                                    {this.state.postTypeText.toString()}:{' '}
+                                </p>
+                                <input
+                                    required={true}
+                                    maxLength={100}
+                                    placeholder="Tytuł"
+                                    ref={this.titleTextArea}
+                                    onChange={this.handleTitleTextAreaChange}
+                                    value={this.state.title}
+                                    className="input"
+                                />
                                 <p>
                                     Dodaj opis do{' '}
                                     {this.state.postTypeText.toString()}:{' '}
@@ -475,6 +514,7 @@ export default class Writer extends React.Component<{}, State> {
                                         this.handleDescriptionTextAreaChange
                                     }
                                     value={this.state.postDescription}
+                                    className="textarea"
                                 />
                             </div>
                             <div className="column">

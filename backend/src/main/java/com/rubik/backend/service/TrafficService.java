@@ -52,7 +52,7 @@ public class TrafficService {
         return postRepository.getViewsByPostId(postId);
     }
 
-    public Map<Date, Long> getViewsForSite(Integer daysBack) {
+    public List<SiteTraffic> getViewsForSite(Integer daysBack) {
         Date today = Calendar.getInstance().getTime();
         Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR_OF_DAY, 0);
@@ -66,6 +66,10 @@ public class TrafficService {
             long right = rightSiteViews.getDate().getTime();
             return Long.compare(right, left);
         });
-        return siteViews.stream().collect(Collectors.toMap(SiteTraffic::getDate, SiteTraffic::getViews));
+        return siteViews;
+    }
+
+    public List<SiteTraffic> getAllSiteTraffic() {
+        return siteRepository.findAll();
     }
 }

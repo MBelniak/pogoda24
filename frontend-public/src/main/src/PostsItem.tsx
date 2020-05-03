@@ -1,6 +1,9 @@
 import React from 'react';
 import Post from './Post';
 import { ForecastMapList } from './ForecastMapList';
+import config from './config/config';
+
+const { nonExpandedPostLength } = config;
 
 interface PostsItemProps {
     post: Post;
@@ -11,8 +14,10 @@ interface PostsItemState {
     isExpanded: boolean;
 }
 
-export default class PostsItem extends React.Component<PostsItemProps, PostsItemState> {
-
+export default class PostsItem extends React.Component<
+    PostsItemProps,
+    PostsItemState
+> {
     constructor(props) {
         super(props);
         this.expandPost = this.expandPost.bind(this);
@@ -26,9 +31,10 @@ export default class PostsItem extends React.Component<PostsItemProps, PostsItem
     }
 
     private isExpandedByDefault() {
-        return (this.props.post.description.length < 70 &&
-            this.props.post.description.split(/[(\r\n)(\n)]/g)
-                .length <= 2)
+        return (
+            this.props.post.description.length <= nonExpandedPostLength &&
+            this.props.post.description.split(/[(\r\n)(\n)]/g).length <= 2
+        );
     }
 
     private processDate() {
@@ -38,15 +44,16 @@ export default class PostsItem extends React.Component<PostsItemProps, PostsItem
 
     private expandPost() {
         this.setState({ isExpanded: true });
+        this.props.registerView(this.props.post.id);
     }
 
     private processDescription() {
         let description = this.props.post.description;
         if (!this.state.isExpanded) {
-            if (this.props.post.description.length >= 70) {
-                description = description.substr(0, 70);
+            if (this.props.post.description.length > nonExpandedPostLength) {
+                description = description.substr(0, nonExpandedPostLength);
             }
-            if (description.split('/(\r\n)|(\n)/g').length <= 2) {
+            if (description.split(/[(\r\n)(\n)]/g).length <= 2) {
                 description = description
                     .split(/[(\r\n)(\n)]/g)
                     .slice(0, 2)
@@ -54,12 +61,15 @@ export default class PostsItem extends React.Component<PostsItemProps, PostsItem
             }
             const regex = /^.*\s/g;
             const match = description.match(regex);
-            if (match) {
+            if (match && match.length > 70) {
                 if (typeof match === 'string') {
                     description = match + '...';
                 } else {
                     description = match[0] + '...';
                 }
+            } else {
+                //let's not clip very long words (does a word over 50 characters long even exist? Probably.)
+                description = description + '...';
             }
         }
 
@@ -67,28 +77,33 @@ export default class PostsItem extends React.Component<PostsItemProps, PostsItem
             .replace(/\r\n/g, '<br/>')
             .replace(/\n/g, '<br/>');
 
-        return (
-            <div className="postDescription">
-                <span dangerouslySetInnerHTML={{ __html: description }}/>
-                {this.state.isExpanded ? null : (
-                    <a
-                        className="postLink"
-                        onClick={this.expandPost}>
-                        więcej
-                    </a>
-                )}
-            </div>
-        );
+        return description;
     }
 
     render() {
         return (
             <div className="post">
-                <div className="postdate">
-                    {this.processDate()}
-                </div>
+                <div className="postdate">{this.processDate()}</div>
                 <br />
-                {this.processDescription()}
+                <div className="postTitle">
+                    <span style={{ wordWrap: 'break-word' }}>
+                        {this.props.post.title}
+                    </span>
+                </div>
+                <div className="postDescription">
+                    <span
+                        dangerouslySetInnerHTML={{
+                            __html: this.processDescription()
+                        }}
+                        style={{ wordWrap: 'break-word' }}
+                    />
+                    {this.state.isExpanded ? null : (
+                        <a className="postLink" onClick={this.expandPost}>{' '}
+                            więcej
+                        </a>
+                    )}
+                </div>
+
                 <div
                     className="is-divider"
                     style={{ margin: '15px 0 10px 0' }}

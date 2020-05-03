@@ -1,9 +1,10 @@
-import * as fns from 'date-fns';
+import * as fnstz from 'date-fns-tz';
 
 export default interface Post {
     id: number;
     postDate: Date;
     postType: PostType;
+    title: string;
     description: string;
     imagesPublicIdsJSON?: string[];
     addedToTopBar?: boolean;
@@ -15,6 +16,7 @@ export interface PostDTO {
     id: number;
     postDate: string;
     postType: PostType;
+    title: string;
     description: string;
     imagesPublicIdsJSON?: string[];
     addedToTopBar?: boolean;
@@ -25,8 +27,8 @@ export interface PostDTO {
 export function postDTOToPost(postDTO: PostDTO): Post {
     return {
         ...postDTO,
-        postDate: fns.parseJSON(postDTO.postDate),
-        dueDate: postDTO.dueDate ? fns.parseJSON(postDTO.dueDate) : undefined
+        postDate: fnstz.zonedTimeToUtc(postDTO.postDate, 'Europe/Warsaw'),
+        dueDate: postDTO.dueDate ? fnstz.zonedTimeToUtc(postDTO.dueDate, 'Europe/Warsaw') : undefined
     };
 }
 

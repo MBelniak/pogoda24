@@ -136,8 +136,9 @@ export default class PostsListItem extends React.Component<PostListItemProps, St
                         Data dodania:{' '}
                         {this.processDate(this.props.post.postDate)}
                     </p>
+                    <p>Tytuł: {this.props.post.title}</p>
                     <p>Opis: {this.processDescription()}</p>
-                    <p>Liczba wyświetleń: </p>
+                    <p>Liczba wyświetleń: {this.props.post.views === null ? 0 : this.props.post.views}</p>
                     <p>Rodzaj postu: {this.processPostType()}</p>
                     {this.props.post.postType === 'WARNING' ? (
                         <p>

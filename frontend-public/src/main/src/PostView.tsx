@@ -28,12 +28,16 @@ export default class PostView extends React.Component<{}, State> {
             fetchApi('api/posts/' + postId, { signal: this.controller.signal })
                 .then(response => {
                     if (response && response.ok) {
-                        response.json().then(post => {
-                            this.post = postDTOToPost(post);
-                            this.setState({ loading: false });
-                        }).catch(error => {
-                            console.log(error);
-                        });
+                        response
+                            .json()
+                            .then(post => {
+                                this.post = postDTOToPost(post);
+                                this.setState({ loading: false });
+                            })
+                            .catch(error => {
+                                this.setState({ loading: false });
+                                console.log(error);
+                            });
                     } else {
                         this.setState({ loading: false });
                     }
@@ -51,15 +55,13 @@ export default class PostView extends React.Component<{}, State> {
         return date.replace(', ', ' o ');
     }
 
-    private processDescription(post: Post) {
-        let description = post.description
-            .replace(/\r\n/g, '<br/>')
-            .replace(/\n/g, '<br/>');
-        return (
-            <div className="postDescription">
-                <span dangerouslySetInnerHTML={{ __html: description }}></span>
-            </div>
-        );
+    private processDescription() {
+        if (this.post) {
+            return this.post.description
+                .replace(/\r\n/g, '<br/>')
+                .replace(/\n/g, '<br/>');
+        }
+        return '';
     }
 
     componentWillUnmount() {
@@ -81,14 +83,29 @@ export default class PostView extends React.Component<{}, State> {
                                         {this.processDate(this.post.postDate)}
                                     </div>
                                     <br />
-                                    {this.processDescription(this.post)}
+                                    <div className="postTitle">
+                                        <span
+                                            style={{ wordWrap: 'break-word' }}>
+                                            {this.post.title}
+                                        </span>
+                                    </div>
+                                    <div className="postDescription">
+                                        <span
+                                            dangerouslySetInnerHTML={{
+                                                __html: this.processDescription()
+                                            }}
+                                            style={{ wordWrap: 'break-word' }}
+                                        />
+                                    </div>
                                     <div
                                         className="is-divider"
                                         style={{ margin: '15px 0 10px 0' }}
                                     />
                                     <div style={{ textAlign: 'center' }}>
                                         <ForecastMapList
-                                            imagesPublicIds={this.post.imagesPublicIdsJSON}
+                                            imagesPublicIds={
+                                                this.post.imagesPublicIdsJSON
+                                            }
                                         />
                                     </div>
                                 </div>
