@@ -1,10 +1,9 @@
 package com.rubik.backend.controller.rest;
 
+import com.rubik.backend.entity.SiteTraffic;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @RequestMapping("api/views")
 public interface TrafficController {
@@ -16,5 +15,8 @@ public interface TrafficController {
     Long getViewsForPost(@PathVariable Long id);
 
     @GetMapping("/site")
-    Map<Date, Long> getViewsForSite(@RequestParam Integer daysBack);
+    List<SiteTraffic> getViewsForSite(@RequestParam Integer daysBack);
+
+    @GetMapping("/gathered")
+    GatheredData getGatheredData();
 }

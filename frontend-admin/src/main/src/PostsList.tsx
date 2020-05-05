@@ -1,10 +1,10 @@
 import React from 'react';
-import img from './img/bg.jpg';
 import PostsListItem from './PostsListItem';
 import Post, { PostDTO, postDTOToPost } from './Post';
 import PostEdition from './PostEdition';
 import { fetchApi } from './helpers/fetchHelper';
 const Copyright = require('shared24').Copyright;
+const TopImage = require('shared24').TopImage;
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
@@ -61,6 +61,7 @@ export default class PostsList extends React.Component<{}, State> {
                                         posts: posts.map(post => postDTOToPost(post)),
                                         loading: false
                                     });
+                                    console.log(this.state.posts);
                                     closeModal();
                                 }).catch(error => {
                                     console.log(error);
@@ -93,7 +94,7 @@ export default class PostsList extends React.Component<{}, State> {
         return (
             <div className="main">
                 <section className="container fluid">
-                    <img src={img} className="bgimg" />
+                    <TopImage />
                     {this.state.postEdition ? (
                         <PostEdition
                             post={this.state.postToEdit!!}

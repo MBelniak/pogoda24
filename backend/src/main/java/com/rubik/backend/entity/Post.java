@@ -7,6 +7,7 @@ import com.rubik.backend.validation.ValidPost;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 @Entity
@@ -24,6 +25,10 @@ public class Post {
     @NotNull(message = "Property 'postDate' cannot be null.")
     @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Timestamp postDate;
+
+    @NotNull(message = "Property 'title' cannot be null.")
+    @Size(max=100)
+    private String title;
 
     @NotNull(message = "Property 'description' cannot be null.")
     private String description;
@@ -46,12 +51,14 @@ public class Post {
     private Long views;
 
     public Post() {
+        this.views = 0L;
     }
 
     @JsonCreator
     public Post(@JsonProperty("id") Long id,
                    @JsonProperty(value = "postDate", required = true) Timestamp postDate,
                    @JsonProperty(value = "postType", required = true) String postType,
+                   @JsonProperty(value = "title", required = true) String title,
                    @JsonProperty(value = "description", required = true) String description,
                    @JsonProperty("addedToTopBar") boolean isAddedToTopBar,
                    @JsonProperty("imagesPublicIds") String imagesPublicIds,
@@ -61,6 +68,7 @@ public class Post {
         this.id = id;
         this.postType = PostType.contains(postType) ? PostType.valueOf(postType) : null;
         this.postDate = postDate;
+        this.title = title;
         this.description = description;
         this.isAddedToTopBar = this.postType == PostType.WARNING ? isAddedToTopBar : null;
         if (imagesPublicIds != null) {
@@ -95,6 +103,14 @@ public class Post {
 
     public void setPostDate(Timestamp postDate) {
         this.postDate = postDate;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -157,7 +173,7 @@ public class Post {
     }
 
     public Long getViews() {
-        return views;
+        return this.views == null ? 0L : this.views;
     }
 
     public void setViews(Long views) {

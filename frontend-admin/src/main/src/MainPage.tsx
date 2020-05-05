@@ -1,7 +1,7 @@
 import React from 'react';
-import img from './img/bg.jpg';
 import { Links } from './Links';
 const Copyright = require('shared24').Copyright;
+const TopImage = require('shared24').TopImage;
 
 export default class MainPage extends React.Component {
     constructor(props) {
@@ -12,7 +12,7 @@ export default class MainPage extends React.Component {
         return (
             <div className="main">
                 <section className="container fluid">
-                    <img src={img} className="bgimg" />
+                    <TopImage/>
                     <Links />
                 </section>
                 <Copyright />

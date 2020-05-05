@@ -103,10 +103,17 @@ label {
     font-size: 14px;
 }
 
-.postDescription {
-    font-size: 16px;
+.postTitle {
+    font-size: 18px;
     text-align: center;
     margin-top: 0.35rem;
+    margin-bottom: 1rem;
+}
+
+
+.postDescription {
+    font-size: 16px;
+    text-align: left;
 }
 
 .externalApi {

@@ -16,13 +16,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Post findFirstById(Long id);
 
-    List<Post> findAllByPostType(PostType postType);
-
-    List<Post> findAll();
-
     Page<Post> findAll(Pageable pageable);
 
     Page<Post> findAllByPostType(PostType postType, Pageable pageable);
+
+    @Query(value = "SELECT * FROM post p ORDER BY p.post_date DESC", nativeQuery = true)
+    List<Post> findAllOrderedByDate();
+
+    @Query(value = "SELECT * FROM post p WHERE p.post_type = ?1 ORDER BY p.post_date DESC", nativeQuery = true)
+    List<Post> findAllByPostTypeOrderedByDate(PostType postType);
 
     Long countByPostType(PostType postType);
 

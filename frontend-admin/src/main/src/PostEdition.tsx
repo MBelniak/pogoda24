@@ -20,6 +20,7 @@ interface PostEditionProps {
 
 interface State {
     postDescription: string;
+    title: string;
     postType: PostType;
     warningDaysValid: number | undefined;
     filesToUpload: FileToUpload[];
@@ -37,12 +38,13 @@ export default class PostEdition extends React.Component<
     private fileInput;
     private addToTopBarCheckBox;
     private postDescriptionTextArea;
+    private titleTextArea;
     private daysValidInput;
     private warningShortInput;
-    private abortController;
 
     state: State = {
         postDescription: this.props.post.description,
+        title: this.props.post.title,
         postType: this.props.post.postType,
         warningDaysValid:
             this.props.post.postType === PostType.WARNING
@@ -60,6 +62,7 @@ export default class PostEdition extends React.Component<
         this.fileInput = React.createRef();
         this.addToTopBarCheckBox = React.createRef();
         this.postDescriptionTextArea = React.createRef();
+        this.titleTextArea = React.createRef();
         this.daysValidInput = React.createRef();
         this.warningShortInput = React.createRef();
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -67,16 +70,18 @@ export default class PostEdition extends React.Component<
         this.handleDescriptionTextAreaChange = this.handleDescriptionTextAreaChange.bind(
             this
         );
+        this.handleTitleTextAreaChange = this.handleTitleTextAreaChange.bind(
+            this
+        );
         this.validateField = this.validateField.bind(this);
         this.onRemoveFile = this.onRemoveFile.bind(this);
         this.onMoveForward = this.onMoveForward.bind(this);
         this.onMoveBackward = this.onMoveBackward.bind(this);
-        this.abortController = new AbortController();
     }
 
     componentDidMount() {
         //images coming from cloudinary let's add to state. They will be recognized by null file
-        this.addImagesToReduxStore();
+        this.registerImagesPresentAtCloudinary();
         if (this.props.post.postType === PostType.WARNING) {
             this.addToTopBarCheckBox.current.checked = this.props.post.addedToTopBar;
             if (this.props.post.dueDate) {
@@ -90,7 +95,7 @@ export default class PostEdition extends React.Component<
         }
     }
 
-    private addImagesToReduxStore() {
+    private registerImagesPresentAtCloudinary() {
         const filesToUpload: FileToUpload[] = [];
         if (this.props.post.imagesPublicIdsJSON) {
             for (
@@ -216,6 +221,7 @@ export default class PostEdition extends React.Component<
             id: this.props.post.id,
             postDate: fns.format(this.props.post.postDate, BACKEND_DATE_FORMAT),
             postType: this.state.postType.toString(),
+            title: this.titleTextArea.current.value,
             description: this.postDescriptionTextArea.current.value,
             imagesPublicIds: '',
             addedToTopBar:
@@ -313,10 +319,9 @@ export default class PostEdition extends React.Component<
         return this.state.filesToUpload.filter(file => file.file !== null);
     }
 
+    //Save temporarily saved changes to the database
     private continueSavingPostToBackend(hash: string) {
-        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=true', {
-            signal: this.abortController.signal
-        })
+        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=true')
             .then(response => {
                 if (response && response.ok) {
                     this.showSuccessMessage();
@@ -333,6 +338,7 @@ export default class PostEdition extends React.Component<
             });
     }
 
+    //Remove post changes, that are temporarily saved in backend
     private abortPostUpdate(hash: string) {
         fetchApi('api/posts/continuePostUpdate/' + hash + '?success=false')
             .then(response => {
@@ -427,10 +433,6 @@ export default class PostEdition extends React.Component<
         }
     }
 
-    private handleDescriptionTextAreaChange(event) {
-        this.setState({ postDescription: event.target.value });
-    }
-
     private renderForWarning() {
         return (
             <div className="columns">
@@ -494,8 +496,12 @@ export default class PostEdition extends React.Component<
         );
     }
 
-    componentWillUnmount() {
-        this.abortController.abort();
+    private handleDescriptionTextAreaChange(event) {
+        this.setState({ postDescription: event.target.value });
+    }
+
+    private handleTitleTextAreaChange(event) {
+        this.setState({ title: event.target.value });
     }
 
     render() {
@@ -505,6 +511,18 @@ export default class PostEdition extends React.Component<
                 <div className="container fluid writerForm">
                     <div className="columns">
                         <div className="column">
+                            <p>Tytuł:</p>
+                            <textarea
+                                required={true}
+                                cols={100}
+                                rows={1}
+                                maxLength={100}
+                                placeholder="Tytuł"
+                                ref={this.titleTextArea}
+                                onChange={this.handleTitleTextAreaChange}
+                                value={this.state.title}
+                                className="textarea"
+                            />
                             <p>Opis:</p>
                             <textarea
                                 required={true}
@@ -514,6 +532,7 @@ export default class PostEdition extends React.Component<
                                 ref={this.postDescriptionTextArea}
                                 onChange={this.handleDescriptionTextAreaChange}
                                 value={this.state.postDescription}
+                                className="textarea"
                             />
                         </div>
                         <div className="column">

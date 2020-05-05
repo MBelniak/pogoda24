@@ -26,11 +26,11 @@ public class PostService {
     }
 
     public List<Post> getPostsOrderedByDate() {
-        return postRepository.findAll();
+        return postRepository.findAllOrderedByDate();
     }
 
     public List<Post> getPostsOrderedByDate(PostType postType) {
-        return postRepository.findAllByPostType(postType);
+        return postRepository.findAllByPostTypeOrderedByDate(postType);
     }
 
     public Page<Post> getPostsOrderedByDate(int page, int count) {
