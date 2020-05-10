@@ -2,30 +2,37 @@ import React from 'react';
 import { Switch, Route } from 'react-router';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { MainPage } from './MainPage';
-import { Prognozy } from './Prognozy';
-import { Ostrzezenia } from './Ostrzezenia';
-import { Ciekawostki } from './Ciekawostki';
 import { ONas } from './ONas';
 import { CloudinaryContext } from 'cloudinary-react';
 import './sass/main.scss';
 import 'shared24/src/sass/main.scss';
+import * as fnstz from 'date-fns-tz';
 import { TopBar } from './TopBar';
 import PostView from './PostView';
 import ErrorPage from './ErrorPage';
 import { fetchApi } from './helper/fetchHelper';
-
+import { Posts } from './Posts';
+import { PostType } from './Post';
+import { Simulate } from 'react-dom/test-utils';
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
 
+interface WarningInfo {
+    id: number;
+    dueDate: Date;
+    shortDescription?: string;
+    postId?: number
+}
+
 interface State {
-    warningShort: string | null;
+    warningInfo: WarningInfo | null;
 }
 
 export default class App extends React.Component<{}, State> {
     private abortController;
 
     state: State = {
-        warningShort: null
+        warningInfo: null
     };
 
     constructor(props) {
@@ -34,13 +41,17 @@ export default class App extends React.Component<{}, State> {
     }
 
     componentDidMount() {
-        fetchApi('api/posts/warnings/topBarWarning', { signal: this.abortController.signal })
+        fetchApi('api/warningInfo/topBarWarning', { signal: this.abortController.signal })
             .then(response => {
                 if (response && response.ok) {
-                    response.text().then(text => {
-                        if (text !== null && text !== '') {
-                            this.setState({ warningShort: text });
-                        }
+                    response.json().then(warningInfo => {
+                       this.setState({ warningInfo: {
+                               ...warningInfo,
+                               dueDate: warningInfo.dueDate ? fnstz.zonedTimeToUtc(warningInfo.dueDate, 'Europe/Warsaw') : undefined
+                           } });
+                    }).catch(error => {
+                        console.log(error);
+                        this.setState({ warningInfo: null });
                     });
                 } else {
                     console.log(response);
@@ -64,19 +75,25 @@ export default class App extends React.Component<{}, State> {
                             return;
                         }}
                         warningShort={
-                            this.state.warningShort
-                                ? this.state.warningShort
+                            this.state.warningInfo
+                                ? this.state.warningInfo.shortDescription
                                 : 'Brak ostrzeżeń'
                         }
                     />
                     <TopBar />
                     <Switch>
                         <Route exact path="/" component={MainPage} />
-                        <Route path="/prognozy" component={Prognozy} />
-                        <Route path="/posts/(\d+)" component={PostView} />
-                        <Route path="/ostrzezenia" component={Ostrzezenia} />
-                        <Route path="/ciekawostki" component={Ciekawostki} />
+                        <Route path="/prognozy">
+                            <Posts postType={PostType.FORECAST}/>
+                        </Route>
+                        <Route path="/ostrzezenia">
+                            <Posts postType={PostType.WARNING}/>
+                        </Route>
+                        <Route path="/ciekawostki">
+                            <Posts postType={PostType.FACT}/>
+                        </Route>
                         <Route path="/about" component={ONas} />
+                        <Route path="/posts/(\d+)" component={PostView} />
                         <Route component={ErrorPage} />
                     </Switch>
                     <Copyright />

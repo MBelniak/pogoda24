@@ -12,7 +12,9 @@ interface UploadedFilesItemProps {
     onMoveBackward: (id: number) => void;
 }
 
-export default class FileToUploadItem extends React.Component<UploadedFilesItemProps> {
+export default class FileToUploadItem extends React.Component<
+    UploadedFilesItemProps
+> {
     private overlayDiv;
 
     constructor(props) {
@@ -34,13 +36,15 @@ export default class FileToUploadItem extends React.Component<UploadedFilesItemP
     private showPicture() {
         this.hideOverlay();
         showModal(
-            <div style={{ width: '100%', height: '100%', textAlign: 'center' }}>
-                <p className="dialogMessage">Kliknij zdjęcie by zamknąć</p>
+            <div
+                style={{
+                    textAlign: 'center',
+                    maxWidth: '100%',
+                    maxHeight: '100%'
+                }}
+                onClick={() => closeModal()}>
                 {this.props.file.file ? (
-                    <img
-                        src={URL.createObjectURL(this.props.file.file)}
-                        onClick={() => closeModal()}
-                    />
+                    <img src={URL.createObjectURL(this.props.file.file)} />
                 ) : (
                     <div onClick={() => closeModal()}>
                         <Image
@@ -63,11 +67,7 @@ export default class FileToUploadItem extends React.Component<UploadedFilesItemP
                 onMouseOut={this.hideOverlay}>
                 <div className="uploadedFilesItemContent">
                     {this.props.file.file ? (
-                        <img
-                            src={URL.createObjectURL(this.props.file.file)}
-                            height="100%"
-                            width="100%"
-                        />
+                        <img src={URL.createObjectURL(this.props.file.file)} />
                     ) : (
                         <Image
                             publicId={this.props.file.publicId}

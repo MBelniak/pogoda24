@@ -10,7 +10,7 @@ export class ForecastMapList extends React.Component<{
 
     render() {
         return (
-            <div>
+            <div className="forecastMapList">
                 {this.props.imagesPublicIds
                     ? this.props.imagesPublicIds.map((imagePublicId, i) => (
                           <Image

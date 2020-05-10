@@ -95,6 +95,6 @@ module.exports = {
             }),
         new webpack.DefinePlugin ({
             "process.env": JSON.stringify(dotenv.parsed)
-        }),
+        })
     ]
 };

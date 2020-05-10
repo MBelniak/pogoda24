@@ -1,7 +1,8 @@
 import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
-import Post from './Post';
+import Post, { PostType } from './Post';
 import { fetchApi } from './helpers/fetchHelper';
+import * as fnstz from 'date-fns-tz';
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
@@ -12,38 +13,49 @@ interface PostListItemProps {
 }
 
 interface State {
-    showModal: boolean;
-    renderModal: JSX.Element | undefined;
+    loading: boolean;
 }
 
-export default class PostsListItem extends React.Component<PostListItemProps, State> {
+export default class PostsListItem extends React.Component<
+    PostListItemProps,
+    State
+> {
+
+    private warningInfoDueDate: Date | null;
+    private abortController: AbortController;
+
     state: State = {
-        showModal: false,
-        renderModal: undefined
+        loading: true
     };
 
     constructor(props) {
         super(props);
+        this.warningInfoDueDate = null;
+        this.abortController = new AbortController();
         this.handleDeleteClick = this.handleDeleteClick.bind(this);
         this.deletePost = this.deletePost.bind(this);
     }
 
     private handleDeleteClick() {
-        showModal(<div>
-            <p className="dialogMessage">Czy na pewno chcesz usunąć ten post?</p>
-            <button
-                className="button is-secondary"
-                style={{ float: 'right' }}
-                onClick={closeModal}>
-                Nie
-            </button>
-            <button
-                className="button is-primary"
-                style={{ float: 'right' }}
-                onClick={this.deletePost}>
-                Tak
-            </button>
-        </div>)
+        showModal(
+            <div>
+                <p className="dialogMessage">
+                    Czy na pewno chcesz usunąć ten post?
+                </p>
+                <button
+                    className="button is-secondary"
+                    style={{ float: 'right' }}
+                    onClick={closeModal}>
+                    Nie
+                </button>
+                <button
+                    className="button is-primary"
+                    style={{ float: 'right' }}
+                    onClick={this.deletePost}>
+                    Tak
+                </button>
+            </div>
+        );
     }
 
     private deletePost() {
@@ -128,58 +140,89 @@ export default class PostsListItem extends React.Component<PostListItemProps, St
         }
     }
 
+    componentDidMount() {
+        if (this.props.post.postType === PostType.WARNING) {
+            fetchApi('api/warningInfo/byPostId/' + this.props.post.id, {signal: this.abortController.signal}).then(response => {
+                if (response && response.ok) {
+                    response.json().then(warningInfo => {
+                        this.warningInfoDueDate = fnstz.zonedTimeToUtc(warningInfo.dueDate, 'Europe/Warsaw');
+                        this.setState({ loading: false });
+                    }).catch(error => {
+                        this.setState({ loading: false });
+                        console.log(error);
+                    })
+                }
+            }).catch(error => {
+                console.log(error);
+            });
+        } else {
+            this.setState({ loading: false });
+        }
+    }
+
     render() {
         return (
-            <div className="postsItem columns">
-                <div className="column is-half">
-                    <p>
-                        Data dodania:{' '}
-                        {this.processDate(this.props.post.postDate)}
-                    </p>
-                    <p>Tytuł: {this.props.post.title}</p>
-                    <p>Opis: {this.processDescription()}</p>
-                    <p>Liczba wyświetleń: {this.props.post.views === null ? 0 : this.props.post.views}</p>
-                    <p>Rodzaj postu: {this.processPostType()}</p>
-                    {this.props.post.postType === 'WARNING' ? (
-                        <p>
-                            Ważne do:{' '}
-                            {this.processDate(this.props.post.dueDate)}
-                        </p>
-                    ) : null}
-                    <input
-                        type="button"
-                        className="button"
-                        value="Edytuj"
-                        onClick={() =>
-                            this.props.initiatePostEdit(this.props.post)
-                        }
-                    />
-                    <input
-                        type="button"
-                        className="button"
-                        value="Usuń"
-                        onClick={this.handleDeleteClick}
-                    />
-                </div>
-                <div className="postIconList">
-                    {this.props.post.imagesPublicIdsJSON
-                        ? this.props.post.imagesPublicIdsJSON.map(
-                              (imagePublicId, i) => (
-                                  <div key={i} className="postIconListItem">
-                                      <Image
-                                          publicId={imagePublicId}
-                                          format="png"
-                                          quality="auto">
-                                          <Transformation
-                                              crop="fill"
-                                              gravity="faces"
-                                          />
-                                      </Image>
-                                  </div>
-                              )
-                          )
-                        : null}
-                </div>
+            <div className="postsListItem columns">
+                {this.state.loading ? null : (
+                    <>
+                        <div className="column is-half">
+                            <p>
+                                Data dodania:{' '}
+                                {this.processDate(this.props.post.postDate)}
+                            </p>
+                            <p>Tytuł: {this.props.post.title}</p>
+                            <p>Opis: {this.processDescription()}</p>
+                            <p>
+                                Liczba wyświetleń:{' '}
+                                {this.props.post.views === null
+                                    ? 0
+                                    : this.props.post.views}
+                            </p>
+                            <p>Rodzaj postu: {this.processPostType()}</p>
+                            {this.warningInfoDueDate ? (
+                                <p>
+                                    Ważne do:{' '}
+                                    {this.processDate(this.warningInfoDueDate)}
+                                </p>
+                            ) : null}
+                            <input
+                                type="button"
+                                className="button"
+                                value="Edytuj"
+                                onClick={() =>
+                                    this.props.initiatePostEdit(this.props.post)
+                                }
+                            />
+                            <input
+                                type="button"
+                                className="button"
+                                value="Usuń"
+                                onClick={this.handleDeleteClick}
+                            />
+                        </div>
+                        <div className="postIconList">
+                            {this.props.post.imagesPublicIdsJSON
+                                ? this.props.post.imagesPublicIdsJSON.map(
+                                      (imagePublicId, i) => (
+                                          <div
+                                              key={i}
+                                              className="postIconListItem">
+                                              <Image
+                                                  publicId={imagePublicId}
+                                                  format="png"
+                                                  quality="auto">
+                                                  <Transformation
+                                                      crop="fill"
+                                                      gravity="faces"
+                                                  />
+                                              </Image>
+                                          </div>
+                                      )
+                                  )
+                                : null}
+                        </div>
+                    </>
+                )}
             </div>
         );
     }

@@ -45,10 +45,4 @@ public interface PostController {
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     void deletePost(@PathVariable Long id);
-
-    @GetMapping(value = "/warnings/topBarWarning", produces = "text/plain")
-    String getLatestWarningDescription();
-
-    @GetMapping("/validWarnings")
-    List<Post> getValidWarnings(@RequestParam(required = false) Boolean isAddedToTopBar);
 }

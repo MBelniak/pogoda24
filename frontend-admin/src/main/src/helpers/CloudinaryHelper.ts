@@ -2,20 +2,36 @@ import config from '../config/config';
 import { FileToUpload } from '../Writer';
 
 const { cloud_name, upload_preset, api_key, api_secret } = config;
-export const controller = new AbortController();
-const signal = controller.signal;
+export const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloud_name}/upload`;
+export const cloudinaryDownloadUrl = `https://res.cloudinary.com/${cloud_name}/image/upload/`;
 const sha1 = require('js-sha1');
 
-export function uploadImages(uploadedFiles: FileToUpload[]) {
-    const url = `https://api.cloudinary.com/v1_1/${cloud_name}/upload`;
-
+export function uploadImages(uploadedFiles: FileToUpload[], signal: AbortSignal) {
     return uploadedFiles.map(uploadedFile => {
         if (uploadedFile.file === null) {
             return new Promise<Response>(resolve => {
                 resolve();
             });
         }
-        const signature = prepareSignature(uploadedFile.file.name, uploadedFile.timestamp);
+
+        const data = prepareDateForFileUpload(
+            prepareSignature(uploadedFile.file.name, uploadedFile.timestamp),
+            uploadedFile
+        );
+
+        return fetch(cloudinaryUrl, {
+            method: 'POST',
+            body: data,
+            signal: signal
+        });
+    });
+}
+
+export function prepareDateForFileUpload(
+    signature: string,
+    uploadedFile: FileToUpload
+): FormData {
+    if (uploadedFile.file !== null) {
         const formData = new FormData();
         formData.append('upload_preset', upload_preset);
         formData.append('timestamp', uploadedFile.timestamp);
@@ -24,18 +40,12 @@ export function uploadImages(uploadedFiles: FileToUpload[]) {
         formData.append('file', uploadedFile.file);
         formData.append('signature', signature);
 
-        return fetch(url, {
-            method: 'POST',
-            body: formData,
-            signal: signal
-        });
-    });
+        return formData;
+    }
+    return new FormData();
 }
 
-export function prepareSignature(
-    fileName: string,
-    timestamp: string
-): string {
+export function prepareSignature(fileName: string, timestamp: string): string {
     const publicId = fileName + timestamp;
     const hash = sha1.create();
     const stringToSign =

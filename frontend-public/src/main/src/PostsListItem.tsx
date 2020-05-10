@@ -14,7 +14,7 @@ interface PostsItemState {
     isExpanded: boolean;
 }
 
-export default class PostsItem extends React.Component<
+export default class PostsListItem extends React.Component<
     PostsItemProps,
     PostsItemState
 > {
@@ -86,9 +86,7 @@ export default class PostsItem extends React.Component<
                 <div className="postdate">{this.processDate()}</div>
                 <br />
                 <div className="postTitle">
-                    <span style={{ wordWrap: 'break-word' }}>
-                        {this.props.post.title}
-                    </span>
+                    <span>{this.props.post.title}</span>
                 </div>
                 <div className="postDescription">
                     <span
@@ -98,7 +96,8 @@ export default class PostsItem extends React.Component<
                         style={{ wordWrap: 'break-word' }}
                     />
                     {this.state.isExpanded ? null : (
-                        <a className="postLink" onClick={this.expandPost}>{' '}
+                        <a className="postLink" onClick={this.expandPost}>
+                            {' '}
                             więcej
                         </a>
                     )}

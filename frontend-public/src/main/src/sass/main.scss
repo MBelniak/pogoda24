@@ -104,16 +104,26 @@ label {
 }
 
 .postTitle {
-    font-size: 18px;
+    font-size: 20px;
     text-align: center;
     margin-top: 0.35rem;
     margin-bottom: 1rem;
+    word-wrap: break-word;
 }
-
 
 .postDescription {
     font-size: 16px;
     text-align: left;
+}
+
+.forecastMapList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.forecastMapList * {
+    margin: 10px 0 10px 0;
 }
 
 .externalApi {

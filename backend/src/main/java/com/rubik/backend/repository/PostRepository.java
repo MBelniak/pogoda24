@@ -8,13 +8,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     Post findFirstById(Long id);
+
+    List<Post> findAllByIdIn(List<Long> ids);
 
     Page<Post> findAll(Pageable pageable);
 
@@ -30,12 +31,4 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "SELECT views FROM post p WHERE p.id = ?1", nativeQuery = true)
     Long getViewsByPostId(Long id);
-
-    @Query(value = "SELECT * FROM post p WHERE p.post_type = 'WARNING' AND p.post_date < ?1 AND p.due_date >= ?1",
-            nativeQuery = true)
-    List<Post> findAllValidWarnings(Timestamp date);
-
-    @Query(value = "SELECT * FROM post p WHERE p.post_type = 'WARNING' AND p.post_date < ?1 AND p.due_date >= ?1 AND p.is_added_to_top_bar = ?2",
-            nativeQuery = true)
-    List<Post> findAllValidWarnings(Timestamp date, boolean isAddedToTopBar);
 }

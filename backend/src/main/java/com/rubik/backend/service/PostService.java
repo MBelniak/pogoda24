@@ -9,10 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -47,6 +44,10 @@ public class PostService {
         return postRepository.findFirstById(id);
     }
 
+    public List<Post> getPostByIdIn(List<Long> ids) {
+        return postRepository.findAllByIdIn(ids);
+    }
+
     public void savePost(Post post) {
         postRepository.saveAndFlush(post);
     }
@@ -61,13 +62,5 @@ public class PostService {
 
     public Long getPostCount(PostType postType) {
         return postRepository.countByPostType(postType);
-    }
-
-    public List<Post> getCurrentWarnings() {
-        return postRepository.findAllValidWarnings(new Timestamp(new Date().getTime()));
-    }
-
-    public List<Post> getCurrentWarnings(boolean isAddedToTopBar) {
-        return postRepository.findAllValidWarnings(new Timestamp(new Date().getTime()), isAddedToTopBar);
     }
 }

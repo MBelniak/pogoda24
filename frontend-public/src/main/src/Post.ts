@@ -7,9 +7,6 @@ export default interface Post {
     title: string;
     description: string;
     imagesPublicIdsJSON?: string[];
-    addedToTopBar?: boolean;
-    dueDate?: Date;
-    shortDescription?: string;
 }
 
 export interface PostDTO {
@@ -27,9 +24,8 @@ export interface PostDTO {
 export function postDTOToPost(postDTO: PostDTO): Post {
     return {
         ...postDTO,
-        postDate: fnstz.zonedTimeToUtc(postDTO.postDate, 'Europe/Warsaw'),
-        dueDate: postDTO.dueDate ? fnstz.zonedTimeToUtc(postDTO.dueDate, 'Europe/Warsaw') : undefined
-    };
+        postDate: fnstz.zonedTimeToUtc(postDTO.postDate, 'Europe/Warsaw')
+    }
 }
 
 export enum PostType {

@@ -46,9 +46,20 @@ $footer-padding: 3rem 1.5rem 3rem;
     background-color: $tertiary-color;
 }
 
-p,
-span,
-label {
+.writerForm {
+    color: white;
+}
+
+.writerForm * {
+    margin-top: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+
+.daysValidInput {
+    width: 4rem;
+}
+
+.charts {
     color: white;
 }
 
@@ -56,9 +67,9 @@ label {
     border: 2px $secondary-color solid;
     border-radius: 20px;
     background: repeating-linear-gradient(
-        45deg,
-        $primary-color 1px,
-        $secondary-color 5px
+    45deg,
+    $primary-color 1px,
+    $secondary-color 5px
     );
     cursor: default;
 }
@@ -95,10 +106,6 @@ label {
     margin-left: 0.7rem;
 }
 
-.writerForm * {
-    margin-top: 0.7rem;
-    margin-bottom: 0.7rem;
-}
 
 .bgimg {
     width: 100%;
@@ -182,10 +189,11 @@ label {
     color: $primary-color;
     margin-bottom: 0.7rem;
 }
-.postsItem {
+.postsListItem {
     border: 2px solid $secondary-color;
     border-radius: 10px;
     margin: 0.7rem;
+    color: white;
 }
 
 .postIconList {
@@ -207,5 +215,9 @@ label {
 .input, .textarea {
     border: 2px solid transparent;
     border-radius: 4px;
+}
+
+.image-list {
+    color: white;
 }
 
