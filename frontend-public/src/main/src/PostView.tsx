@@ -1,5 +1,5 @@
 import React from 'react';
-import Post, { postDTOToPost } from './Post';
+import Post, { postDTOToPost, PostType } from './Post';
 import { fetchApi } from './helper/fetchHelper';
 import { ForecastMapList } from './ForecastMapList';
 
@@ -64,19 +64,31 @@ export default class PostView extends React.Component<{}, State> {
         return '';
     }
 
+    private processDescriptionForFact(post: Post) {
+        return (
+            <div
+                dangerouslySetInnerHTML={{
+                    __html: post.description.replace(/\\"/g, '"')
+                }}
+                style={{
+                    wordWrap: 'break-word'
+                }}
+            />
+        );
+    }
+
     componentWillUnmount() {
         this.controller.abort();
     }
 
     render() {
         return (
-            <section className="mainContent">
-                <div className="columns">
-                    <div className="column is-1" />
+            <section className="mainContent container is-fluid">
+                <div>
                     {this.state.loading ? (
-                        <div className="column is-10" />
+                        null
                     ) : (
-                        <div className="column is-10 posts">
+                        <div className="posts">
                             {this.post ? (
                                 <div className="post">
                                     <div className="postdate">
@@ -90,12 +102,21 @@ export default class PostView extends React.Component<{}, State> {
                                         </span>
                                     </div>
                                     <div className="postDescription">
-                                        <span
-                                            dangerouslySetInnerHTML={{
-                                                __html: this.processDescription()
-                                            }}
-                                            style={{ wordWrap: 'break-word' }}
-                                        />
+                                        {this.post.postType ===
+                                        PostType.FACT ? (
+                                            this.processDescriptionForFact(
+                                                this.post
+                                            )
+                                        ) : (
+                                            <span
+                                                dangerouslySetInnerHTML={{
+                                                    __html: this.processDescription()
+                                                }}
+                                                style={{
+                                                    wordWrap: 'break-word'
+                                                }}
+                                            />
+                                        )}
                                     </div>
                                     <div
                                         className="is-divider"
@@ -122,7 +143,6 @@ export default class PostView extends React.Component<{}, State> {
                             )}
                         </div>
                     )}
-                    <div className="column is-1" />
                 </div>
             </section>
         );

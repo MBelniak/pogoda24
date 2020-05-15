@@ -17,11 +17,10 @@ $navbar-item-img-max-height: none;
 @import '../../node_modules/bulma/sass/elements/button.sass';
 @import '../../node_modules/bulma/sass/elements/container.sass';
 @import '../../node_modules/bulma/sass/elements/title.sass';
-@import '../../node_modules/bulma/sass/form/_all.sass';
 @import '../../node_modules/bulma/sass/components/navbar.sass';
-@import '../../node_modules/bulma/sass/layout/hero.sass';
 @import '../../node_modules/bulma/sass/layout/section.sass';
-@import '../../node_modules/bulma/sass/layout/all.sass';
+@import '../../node_modules/bulma/sass/layout/footer.sass';
+@import '../../node_modules/bulma/sass/grid/columns.sass';
 @import '../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass';
 
 body {
@@ -74,6 +73,7 @@ label {
 }
 
 .posts {
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -104,16 +104,26 @@ label {
 }
 
 .postTitle {
-    font-size: 18px;
+    font-size: 20px;
     text-align: center;
     margin-top: 0.35rem;
     margin-bottom: 1rem;
+    word-wrap: break-word;
 }
-
 
 .postDescription {
     font-size: 16px;
     text-align: left;
+}
+
+.forecastMapList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.forecastMapList * {
+    margin: 10px 0 10px 0;
 }
 
 .externalApi {
@@ -197,20 +207,36 @@ label {
     margin: 0.7rem;
 }
 
+.pagination {
+    text-align: center;
+}
+
 .pagingBar {
-    align-self: flex-end;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    margin: 2rem 0 0.7rem 0;
+    margin: 2rem auto 0.7rem auto;
     font-size: 18px;
     background-color: $secondary-color;
     box-shadow: 0 0 10px $secondary-color;
 }
-.pagingBar li {
+
+.pagingBar * {
+    margin: 0.6rem;
+}
+
+.pagingBar li a {
     margin: 0.5rem;
     color: white;
+    transition: 0.3s;
 }
-.pagingBarPrevious {
-    color: white;
+
+.pagingBarPrevious:hover, .pagingBarNext:hover, .pagingBar a:hover {
+    color: $primary-color;
+    transition: 0.3s;
+}
+
+.pagingBar .active a {
+    color: $primary-color;
+    cursor: default;
 }

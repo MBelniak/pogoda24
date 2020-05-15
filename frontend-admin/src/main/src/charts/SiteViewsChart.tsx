@@ -2,7 +2,6 @@ import React from 'react';
 import { Line } from 'react-chartjs-2';
 import { fetchApi } from '../helpers/fetchHelper';
 import * as fns from 'date-fns';
-import { PostType } from '../Post';
 
 interface TrafficDTO {
     id: number;

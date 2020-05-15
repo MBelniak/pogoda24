@@ -16,11 +16,12 @@ $footer-padding: 3rem 1.5rem 3rem;
 @import '../../node_modules/bulma/sass/elements/button.sass';
 @import '../../node_modules/bulma/sass/elements/container.sass';
 @import '../../node_modules/bulma/sass/elements/title.sass';
-@import '../../node_modules/bulma/sass/form/_all.sass';
+@import '../../node_modules/bulma/sass/form/shared.sass';
+@import '../../node_modules/bulma/sass/form/input-textarea.sass';
 @import '../../node_modules/bulma/sass/components/navbar.sass';
-@import '../../node_modules/bulma/sass/layout/hero.sass';
 @import '../../node_modules/bulma/sass/layout/section.sass';
-@import '../../node_modules/bulma/sass/layout/all.sass';
+@import '../../node_modules/bulma/sass/layout/footer.sass';
+@import '../../node_modules/bulma/sass/grid/columns.sass';
 @import '../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass';
 
 .main {
@@ -46,9 +47,20 @@ $footer-padding: 3rem 1.5rem 3rem;
     background-color: $tertiary-color;
 }
 
-p,
-span,
-label {
+.writerForm {
+    color: white;
+}
+
+.writerForm * {
+    margin-top: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+
+.daysValidInput {
+    width: 4rem;
+}
+
+.charts {
     color: white;
 }
 
@@ -56,9 +68,9 @@ label {
     border: 2px $secondary-color solid;
     border-radius: 20px;
     background: repeating-linear-gradient(
-        45deg,
-        $primary-color 1px,
-        $secondary-color 5px
+    45deg,
+    $primary-color 1px,
+    $secondary-color 5px
     );
     cursor: default;
 }
@@ -95,20 +107,10 @@ label {
     margin-left: 0.7rem;
 }
 
-.writerForm * {
-    margin-top: 0.7rem;
-    margin-bottom: 0.7rem;
-}
 
 .bgimg {
     width: 100%;
     height: 25rem;
-}
-
-.zrzutka {
-    position: relative;
-    width: 100%;
-    margin-top: 0.7rem;
 }
 
 .uploadedFilesItem {
@@ -182,10 +184,11 @@ label {
     color: $primary-color;
     margin-bottom: 0.7rem;
 }
-.postsItem {
+.postsListItem {
     border: 2px solid $secondary-color;
     border-radius: 10px;
     margin: 0.7rem;
+    color: white;
 }
 
 .postIconList {
@@ -207,5 +210,9 @@ label {
 .input, .textarea {
     border: 2px solid transparent;
     border-radius: 4px;
+}
+
+.image-list {
+    color: white;
 }
 

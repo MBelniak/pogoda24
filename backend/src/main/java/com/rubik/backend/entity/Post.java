@@ -3,7 +3,6 @@ package com.rubik.backend.entity;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rubik.backend.validation.ValidPost;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,7 +11,6 @@ import java.sql.Timestamp;
 
 @Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ValidPost
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,13 +39,6 @@ public class Post {
     @Transient
     private JsonNode imagesPublicIdsJSON;
 
-    private Boolean isAddedToTopBar;
-
-    @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Timestamp dueDate;
-
-    private String shortDescription;
-
     private Long views;
 
     public Post() {
@@ -60,22 +51,16 @@ public class Post {
                    @JsonProperty(value = "postType", required = true) String postType,
                    @JsonProperty(value = "title", required = true) String title,
                    @JsonProperty(value = "description", required = true) String description,
-                   @JsonProperty("addedToTopBar") boolean isAddedToTopBar,
                    @JsonProperty("imagesPublicIds") String imagesPublicIds,
-                   @JsonProperty("dueDate") Timestamp dueDate,
-                   @JsonProperty("shortDescription") String shortDescription,
                    @JsonProperty("views") Long views) {
         this.id = id;
         this.postType = PostType.contains(postType) ? PostType.valueOf(postType) : null;
         this.postDate = postDate;
         this.title = title;
         this.description = description;
-        this.isAddedToTopBar = this.postType == PostType.WARNING ? isAddedToTopBar : null;
         if (imagesPublicIds != null) {
             this.setImagesPublicIds(imagesPublicIds);
         }
-        this.dueDate = this.postType == PostType.WARNING ? dueDate : null;
-        this.shortDescription = this.postType == PostType.WARNING ? shortDescription : null;
         if (views != null) {
             this.views = views;
         }
@@ -146,30 +131,6 @@ public class Post {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public Boolean getAddedToTopBar() {
-        return isAddedToTopBar;
-    }
-
-    public void setAddedToTopBar(Boolean addedToTopBar) {
-        isAddedToTopBar = addedToTopBar;
-    }
-
-    public Timestamp getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(Timestamp dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public String getShortDescription() {
-        return shortDescription;
-    }
-
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
     }
 
     public Long getViews() {

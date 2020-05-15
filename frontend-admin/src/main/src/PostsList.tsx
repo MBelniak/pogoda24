@@ -10,7 +10,6 @@ const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 interface State {
-    loading: boolean;
     postsCount: number;
     posts: Post[];
     postEdition: boolean;
@@ -22,7 +21,6 @@ export default class PostsList extends React.Component<{}, State> {
     private abortController;
 
     state: State = {
-        loading: true,
         postsCount: 0,
         posts: [],
         postEdition: false,
@@ -54,18 +52,24 @@ export default class PostsList extends React.Component<{}, State> {
                     .json()
                     .then(data => {
                         this.setState({ postsCount: data });
-                        fetchApi('api/posts?&page=0&count=' + this.postsPerPage, { signal: this.abortController.signal })
+                        fetchApi(
+                            'api/posts?&page=0&count=' + this.postsPerPage,
+                            { signal: this.abortController.signal }
+                        )
                             .then(response =>
-                                response.json().then((posts: PostDTO[]) => {
-                                    this.setState({
-                                        posts: posts.map(post => postDTOToPost(post)),
-                                        loading: false
-                                    });
-                                    console.log(this.state.posts);
-                                    closeModal();
-                                }).catch(error => {
-                                    console.log(error);
-                                })
+                                response
+                                    .json()
+                                    .then((posts: PostDTO[]) => {
+                                        this.setState({
+                                            posts: posts.map(post =>
+                                                postDTOToPost(post)
+                                            )
+                                        });
+                                        closeModal();
+                                    })
+                                    .catch(error => {
+                                        console.log(error);
+                                    })
                             )
                             .catch(error => {
                                 console.log(error);
@@ -100,8 +104,6 @@ export default class PostsList extends React.Component<{}, State> {
                             post={this.state.postToEdit!!}
                             onFinishEditing={this.onFinishEditing}
                         />
-                    ) : this.state.loading ? (
-                        <div />
                     ) : (
                         <>
                             <h2 className="title">Lista postów: </h2>

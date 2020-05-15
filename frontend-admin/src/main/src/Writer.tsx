@@ -31,8 +31,7 @@ interface State {
 
 enum PostTypeText {
     Prognoza = 'prognozy',
-    Ostrzezenie = 'ostrzeżenia',
-    Ciekawostka = 'ciekawostki'
+    Ostrzezenie = 'ostrzeżenia'
 }
 
 const daysValidInputConstraint = (text: string): boolean => {
@@ -51,21 +50,23 @@ export default class Writer extends React.Component<{}, State> {
 
     private fileId: number;
     private fileInput;
-    private warningCheckBox;
+    private addToTopBarCheckBox;
     private postDescriptionTextArea;
     private titleTextArea;
     private daysValidInput;
     private warningShortInput;
+    private abortController;
 
     constructor(props) {
         super(props);
         this.fileId = 0;
         this.fileInput = React.createRef();
-        this.warningCheckBox = React.createRef();
+        this.addToTopBarCheckBox = React.createRef();
         this.postDescriptionTextArea = React.createRef();
         this.titleTextArea = React.createRef();
         this.daysValidInput = React.createRef();
         this.warningShortInput = React.createRef();
+        this.abortController = new AbortController();
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFilesAdded = this.onFilesAdded.bind(this);
         this.handleDescriptionTextAreaChange = this.handleDescriptionTextAreaChange.bind(
@@ -102,21 +103,7 @@ export default class Writer extends React.Component<{}, State> {
             this.fileInput.current.value = null;
             return;
         }
-        if (!files.every(file => /\.(jpe?g|png|svg)$/g.test(file.name))) {
-            showModal(
-                <div>
-                    <p className="dialogMessage">Tylko pliki graficzne!</p>
-                    <button
-                        className="button is-primary"
-                        style={{ float: 'right' }}
-                        onClick={closeModal}>
-                        Ok
-                    </button>
-                </div>
-            );
-            this.fileInput.current.value = null;
-            return;
-        }
+
         for (let file of files) {
             this.prepareAndPushFile(file);
         }
@@ -135,22 +122,6 @@ export default class Writer extends React.Component<{}, State> {
         this.setState({
             filesToUpload: [...this.state.filesToUpload, fileToUpload]
         });
-    }
-
-    private handleSubmit(event) {
-        event.preventDefault();
-        if (this.state.postType === PostType.WARNING) {
-            let formValid = this.validateField(
-                this.daysValidInput.current,
-                daysValidInputConstraint
-            );
-            formValid =
-                this.validateField(this.warningShortInput.current) && formValid;
-            if (!formValid) return;
-        }
-        showModal(<LoadingIndicator />);
-        const responsePromise = this.sendPostToBackend();
-        this.afterPostRequestSend(responsePromise);
     }
 
     private validateField(
@@ -172,98 +143,51 @@ export default class Writer extends React.Component<{}, State> {
         }
     }
 
-    private sendPostToBackend(): Promise<Response> {
-        function calculateDueDate(days: number): string {
-            return fns.format(
-                new Date(
-                    new Date().setHours(0, 0, 0, 0) +
-                        (days + 1) * 24 * 3600 * 1000
-                ),
-                BACKEND_DATE_FORMAT
+    private handleSubmit(event) {
+        event.preventDefault();
+        if (this.state.postType === PostType.WARNING) {
+            let formValid = this.validateField(
+                this.daysValidInput.current,
+                daysValidInputConstraint
             );
+            formValid =
+                this.validateField(this.warningShortInput.current) && formValid;
+            if (!formValid) return;
         }
+        showModal(<LoadingIndicator />);
 
-        const requestBodyPost = {
-            postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
-            postType: this.state.postType.toString(),
-            title: this.titleTextArea.current.value,
-            description: this.postDescriptionTextArea.current.value,
-            imagesPublicIds: '',
-            addedToTopBar:
-                this.state.postType === PostType.WARNING
-                    ? this.warningCheckBox.current.checked
-                    : null,
-            dueDate:
-                this.state.postType === PostType.WARNING
-                    ? calculateDueDate(
-                          parseInt(this.daysValidInput.current.value)
-                      )
-                    : null,
-            shortDescription:
-                this.state.postType === PostType.WARNING
-                    ? this.warningShortInput.current.value
-                    : null
-        };
-
-        const uploadedFilesIdsOrdered: string[] = [];
-        for (let i = 0; i < this.state.filesToUpload.length; ++i) {
-            uploadedFilesIdsOrdered.push(
-                this.state.filesToUpload[i].publicId!!
-            );
-        }
-        requestBodyPost['imagesPublicIds'] = JSON.stringify(
-            uploadedFilesIdsOrdered
-        );
-
-        return fetchApi('api/posts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBodyPost)
-        });
-    }
-
-    private afterPostRequestSend(responsePromise: Promise<Response>) {
-        responsePromise
+        this.sendPostToBackend()
             .then(response => {
                 if (response && response.ok) {
                     response
                         .json()
                         .then((data: any) => {
                             if (data !== null) {
+                                let warningInfoPromise;
+                                if (
+                                    this.state.postType === PostType.WARNING &&
+                                    this.addToTopBarCheckBox.current.checked
+                                ) {
+                                    warningInfoPromise = this.saveWarningInfo(
+                                        data.id
+                                    );
+                                } else {
+                                    warningInfoPromise = Promise.resolve().then(
+                                        () => null
+                                    );
+                                }
                                 //post saved, send images to cloudinary
-                                const uploadPromises: Promise<
-                                    Response
-                                >[] = uploadImages(this.state.filesToUpload);
-                                Promise.all(uploadPromises)
-                                    .then(responses => {
-                                        if (
-                                            responses.every(
-                                                response =>
-                                                    response && response.ok
-                                            )
-                                        ) {
-                                            //all images uploaded successfully
-                                            this.showSuccessMessage();
-                                        } else {
-                                            responses = responses.filter(
-                                                response =>
-                                                    !response || !response.ok
-                                            );
-                                            console.log(responses.toString());
-                                            this.showErrorMessage(
-                                                'Nie udało się wysłać wszystkich plików. Post nie został zapisany.'
-                                            );
-                                            this.removePostFromBackend(data.id);
-                                        }
+                                warningInfoPromise
+                                    .then(response => {
+                                        this.saveImagesToCloudinary(
+                                            data.id,
+                                            response && response.ok
+                                                ? response.id
+                                                : undefined
+                                        );
                                     })
                                     .catch(error => {
                                         console.log(error);
-                                        this.showErrorMessage(
-                                            'Wystąpił błąd przy wysyłaniu plików. Post nie został zapisany.'
-                                        );
-                                        this.removePostFromBackend(data.id);
                                     });
                             } else {
                                 this.showErrorMessage(
@@ -283,7 +207,98 @@ export default class Writer extends React.Component<{}, State> {
             })
             .catch(error => {
                 console.log(error);
-                this.showErrorMessage('Niestety, nie udało się zapisać postu.');
+            });
+    }
+
+    private sendPostToBackend(): Promise<Response> {
+        const requestBody = {
+            postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
+            postType: this.state.postType.toString(),
+            title: this.titleTextArea.current.value,
+            description: this.postDescriptionTextArea.current.value,
+            imagesPublicIds: ''
+        };
+
+        const uploadedFilesIdsOrdered: string[] = [];
+        for (let i = 0; i < this.state.filesToUpload.length; ++i) {
+            uploadedFilesIdsOrdered.push(
+                this.state.filesToUpload[i].publicId!!
+            );
+        }
+        requestBody['imagesPublicIds'] = JSON.stringify(
+            uploadedFilesIdsOrdered
+        );
+
+        return fetchApi('api/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+    }
+
+    private saveWarningInfo(id: number) {
+        function calculateDueDate(days: number): string {
+            return fns.format(
+                new Date(
+                    new Date().setHours(0, 0, 0, 0) +
+                        (days + 1) * 24 * 3600 * 1000
+                ),
+                BACKEND_DATE_FORMAT
+            );
+        }
+
+        const requestBody = {
+            dueDate:
+                this.state.postType === PostType.WARNING
+                    ? calculateDueDate(
+                          parseInt(this.daysValidInput.current.value)
+                      )
+                    : null,
+            shortDescription:
+                this.state.postType === PostType.WARNING
+                    ? this.warningShortInput.current.value
+                    : null,
+            postId: id
+        };
+
+        return fetchApi('api/warningInfo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+    }
+
+    private saveImagesToCloudinary(postId: number, warningInfoId?: number) {
+        const uploadPromises: Promise<Response>[] = uploadImages(
+            this.state.filesToUpload,
+            this.abortController.signal
+        );
+        Promise.all(uploadPromises)
+            .then(responses => {
+                if (responses.every(response => response && response.ok)) {
+                    //all images uploaded successfully
+                    this.showSuccessMessage();
+                } else {
+                    responses = responses.filter(
+                        response => !response || !response.ok
+                    );
+                    console.log(responses.toString());
+                    this.showErrorMessage(
+                        'Nie udało się wysłać wszystkich plików. Post nie został zapisany.'
+                    );
+                    this.removePostFromBackend(postId);
+                    if (warningInfoId) {
+                        this.removeWarningInfoFromBackend(warningInfoId);
+                    }
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                this.removePostFromBackend(postId);
             });
     }
 
@@ -310,6 +325,31 @@ export default class Writer extends React.Component<{}, State> {
             });
     }
 
+    private removeWarningInfoFromBackend(warningInfoId: number) {
+        fetchApi('api/warningInfo/' + warningInfoId, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response && response.ok) {
+                    console.log(
+                        'Removed warningInfo with id: ' + warningInfoId
+                    );
+                } else {
+                    console.log(
+                        'Cannot remove warningInfo with id: ' +
+                            warningInfoId +
+                            '. Server response: ' +
+                            response
+                    );
+                }
+            })
+            .catch(error => {
+                console.log(
+                    'Error while deleting warningInfo. Error message: ' + error
+                );
+            });
+    }
+
     private showSuccessMessage() {
         let postType;
         switch (this.state.postType) {
@@ -319,10 +359,6 @@ export default class Writer extends React.Component<{}, State> {
             }
             case PostType.WARNING: {
                 postType = 'ostrzeżenie.';
-                break;
-            }
-            case PostType.FACT: {
-                postType = 'ciekawostkę.';
                 break;
             }
         }
@@ -396,72 +432,51 @@ export default class Writer extends React.Component<{}, State> {
 
     private renderForWarning() {
         return (
-            <div className="columns">
-                <div className="column is-half">
-                    <div style={{ margin: '10px' }}>
-                        <input
-                            id="addToBar"
-                            type="checkbox"
-                            ref={this.warningCheckBox}
-                        />
-                        <label htmlFor="addToBar">
-                            {' '}
-                            Dodaj ostrzeżenie do paska u góry strony
-                        </label>
-                    </div>
-                    <div className="columns">
-                        <div className="column">
-                            <label htmlFor="warningDaysValidInput">
-                                Czas trwania ostrzeżenia (0 = do końca
-                                dzisiejszego dnia, max 14):{' '}
-                            </label>
-                        </div>
-                        <div className="column">
-                            <input
-                                id="warningDaysValidInput"
-                                className="input"
-                                type="number"
-                                required={true}
-                                ref={this.daysValidInput}
-                                min="0"
-                                max="14"
-                                onKeyUp={e =>
-                                    this.validateField(
-                                        e.target,
-                                        daysValidInputConstraint
-                                    )
-                                }
-                                onBlur={e =>
-                                    this.validateField(
-                                        e.target,
-                                        daysValidInputConstraint
-                                    )
-                                }
-                            />
-                        </div>
-                    </div>
-                    <div className="columns">
-                        <div className="column">
-                            <label htmlFor="warningShortInput">
-                                Krótki opis (zostanie wyświetlony na pasku u
-                                góry strony):{' '}
-                            </label>
-                        </div>
-                        <div className="column">
-                            <input
-                                id="warningShortInput"
-                                type="text"
-                                className="input"
-                                required={true}
-                                maxLength={80}
-                                ref={this.warningShortInput}
-                                onKeyUp={e => this.validateField(e.target)}
-                                onBlur={e => this.validateField(e.target)}
-                            />
-                        </div>
-                    </div>
+            <div>
+                <div style={{ margin: '10px' }}>
+                    <input
+                        id="addToBar"
+                        type="checkbox"
+                        ref={this.addToTopBarCheckBox}
+                    />
+                    <label htmlFor="addToBar">
+                        {' '}
+                        Dodaj ostrzeżenie do paska u góry strony
+                    </label>
                 </div>
-                <div className="column is-half" />
+                <label htmlFor="warningDaysValidInput">
+                    Czas trwania ostrzeżenia (0 = do końca dzisiejszego dnia,
+                    max 14):{' '}
+                </label>
+                <input
+                    id="warningDaysValidInput"
+                    className="input daysValidInput"
+                    type="number"
+                    required={true}
+                    ref={this.daysValidInput}
+                    min="0"
+                    max="14"
+                    onKeyUp={e =>
+                        this.validateField(e.target, daysValidInputConstraint)
+                    }
+                    onBlur={e =>
+                        this.validateField(e.target, daysValidInputConstraint)
+                    }
+                />
+                <br />
+                <label htmlFor="warningShortInput">
+                    Krótki opis (zostanie wyświetlony na pasku u góry strony):{' '}
+                </label>
+                <input
+                    id="warningShortInput"
+                    type="text"
+                    className="input"
+                    required={true}
+                    maxLength={80}
+                    ref={this.warningShortInput}
+                    onKeyUp={e => this.validateField(e.target)}
+                    onBlur={e => this.validateField(e.target)}
+                />
             </div>
         );
     }
@@ -472,6 +487,10 @@ export default class Writer extends React.Component<{}, State> {
 
     private handleTitleTextAreaChange(event) {
         this.setState({ title: event.target.value });
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
     }
 
     render() {
@@ -554,33 +573,11 @@ export default class Writer extends React.Component<{}, State> {
                                     }
                                 />
                                 <label htmlFor="warning"> Ostrzeżenie</label>
-                                <br />
-                                <input
-                                    type="radio"
-                                    id="ciekawostka"
-                                    name="postType"
-                                    value="Ciekawostka"
-                                    checked={
-                                        this.state.postType === PostType.FACT
-                                    }
-                                    onChange={() =>
-                                        this.setState({
-                                            postType: PostType.FACT,
-                                            postTypeText:
-                                                PostTypeText.Ciekawostka
-                                        })
-                                    }
-                                />
-                                <label htmlFor="ciekawostka">
-                                    {' '}
-                                    Ciekawostka
-                                </label>
                             </div>
                         </div>
                         <p>
-                            Dodaj mapki z prognozą/ostrzeżeniem lub zdjęcia do
-                            ciekawostki. Możesz przeciągnąć swoje pliki z dysku
-                            na kreskowane pole:
+                            Dodaj mapki z prognozą lub ostrzeżeniem. Możesz
+                            przeciągnąć swoje pliki z dysku na kreskowane pole:
                         </p>
                         <FileDropper onFilesAdded={this.onFilesAdded} />
                         <p>

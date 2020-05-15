@@ -1,12 +1,13 @@
 import React from 'react';
-import { Posts } from './Posts';
+import { PostsList } from './PostsList';
 import { ExternalApi } from './ExternalApi';
 import Post, { postDTOToPost } from './Post';
 import { fetchApi } from './helper/fetchHelper';
+import CustomLinearProgress from './LinearProgress';
+
 
 interface State {
-    posts: Post[];
-    loading: boolean;
+    posts: Post[] | undefined;
 }
 
 export class MainPage extends React.Component<{}, State> {
@@ -14,8 +15,7 @@ export class MainPage extends React.Component<{}, State> {
     private abortController;
 
     state: State = {
-        posts: [],
-        loading: true
+        posts: undefined
     };
 
     constructor(props) {
@@ -28,14 +28,17 @@ export class MainPage extends React.Component<{}, State> {
             signal: this.abortController.signal
         })
             .then(response =>
-                response.json().then(posts => {
-                    this.setState({
-                        posts: posts.map(post => postDTOToPost(post)),
-                        loading: false
-                    });
-                }).catch(error => {
-                    console.log(error);
-                })
+                response
+                    .json()
+                    .then(posts => {
+                        this.setState({
+                            posts: posts.map(post => postDTOToPost(post))
+                        });
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        this.setState({posts: []});
+                    })
             )
             .catch(error => {
                 console.log(error);
@@ -51,23 +54,20 @@ export class MainPage extends React.Component<{}, State> {
             <section className="mainContent">
                 <div className="columns">
                     <div className="column is-2" />
-                    {this.state.loading ? (
-                        <div className="column is-8" />
-                    ) : (
-                        <div className="column is-8 posts">
-                            {this.state.posts.length !== 0 ? (
-                                <Posts posts={this.state.posts} />
-                            ) : (
-                                <div
-                                    style={{
-                                        textAlign: 'center',
-                                        marginTop: '20px'
-                                    }}>
-                                    <p className="noPosts">Brak postów.</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    <div className="column is-8 posts">
+                        {this.state.posts ? this.state.posts.length !== 0 ? (
+                            <PostsList posts={this.state.posts} />
+                        ) : (
+                            <div
+                                style={{
+                                    textAlign: 'center',
+                                    marginTop: '20px'
+                                }}>
+                                <p className="noPosts">Brak postów.</p>
+                            </div>
+                        ) : <CustomLinearProgress />}
+                    </div>
+
                     <ExternalApi />
                 </div>
             </section>

@@ -102,7 +102,6 @@ public class PostControllerImpl implements PostController {
         }
         if (success) {
             postService.savePost(postToSave);
-            return new ResponseEntity(HttpStatus.OK);
         }
         hashToPostMap.remove(hash);
         return new ResponseEntity(HttpStatus.OK);
@@ -113,26 +112,5 @@ public class PostControllerImpl implements PostController {
         if (id != null) {
             postService.deletePost(id);
         }
-    }
-
-    @Override
-    public String getLatestWarningDescription() {
-        List<Post> warnings = postService.getCurrentWarnings(true);
-        if (warnings.size() == 0) {
-            return null;
-        }
-        warnings.sort(Comparator.comparing(Post::getPostDate));
-        return warnings.get(warnings.size() - 1).getShortDescription();
-    }
-
-    @Override
-    public List<Post> getValidWarnings(@RequestParam(required = false) Boolean isAddedToTopBar) {
-        List<Post> warnings;
-        if (isAddedToTopBar == null) {
-            warnings = postService.getCurrentWarnings();
-        } else {
-            warnings = postService.getCurrentWarnings(isAddedToTopBar);
-        }
-        return warnings;
     }
 }

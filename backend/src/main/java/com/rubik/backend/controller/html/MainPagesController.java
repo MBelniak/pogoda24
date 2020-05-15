@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class MainPagesController {
 
-    @RequestMapping(value = {"/write", "/writer", "/elist", "/traffic"})
+    @RequestMapping(value = {"/write", "/writer", "/elist", "/traffic", "/factwriter"})
     public String getWritePage() {
         return "admin/index";
     }
