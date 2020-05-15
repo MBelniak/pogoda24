@@ -3,9 +3,8 @@ import { PostsList } from './PostsList';
 import { ExternalApi } from './ExternalApi';
 import Post, { postDTOToPost } from './Post';
 import { fetchApi } from './helper/fetchHelper';
-const LoadingIndicator = require('shared24').LoadingIndicator;
-const showModal = require('shared24').showModal;
-const closeModal = require('shared24').closeModal;
+import CustomLinearProgress from './LinearProgress';
+
 
 interface State {
     posts: Post[] | undefined;
@@ -25,7 +24,6 @@ export class MainPage extends React.Component<{}, State> {
     }
 
     componentDidMount() {
-        showModal(<LoadingIndicator />);
         fetchApi('api/posts?page=0&count=' + this.forecastsPerPage, {
             signal: this.abortController.signal
         })
@@ -36,16 +34,13 @@ export class MainPage extends React.Component<{}, State> {
                         this.setState({
                             posts: posts.map(post => postDTOToPost(post))
                         });
-                        closeModal();
                     })
                     .catch(error => {
                         console.log(error);
                         this.setState({posts: []});
-                        closeModal();
                     })
             )
             .catch(error => {
-                closeModal();
                 console.log(error);
             });
     }
@@ -70,7 +65,7 @@ export class MainPage extends React.Component<{}, State> {
                                 }}>
                                 <p className="noPosts">Brak postów.</p>
                             </div>
-                        ) : null}
+                        ) : <CustomLinearProgress />}
                     </div>
 
                     <ExternalApi />

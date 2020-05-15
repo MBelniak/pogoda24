@@ -51,6 +51,7 @@ function findIndex(array: Image[], index) {
 interface Image {
     htmlElement?: HTMLImageElement;
     fileToUpload: FileToUpload;
+    fileExtension: string;
 }
 
 export default class FactWriter extends React.Component<{}> {
@@ -82,7 +83,10 @@ export default class FactWriter extends React.Component<{}> {
                     file: file,
                     publicId: file.name + timestamp,
                     timestamp: timestamp
-                }
+                },
+                fileExtension: file.name
+                    .slice(file.name.lastIndexOf('.'), file.name.length)
+                    .toLowerCase()
             });
         }
 
@@ -115,18 +119,43 @@ export default class FactWriter extends React.Component<{}> {
         showModal(<LoadingIndicator />);
         this.editor.hide();
         this.imagesSrcStack = [];
-        for (let i = 0; i < this.imagesList.length; ++i) {
-            if (this.imagesList[i].htmlElement) {
-                this.imagesSrcStack.push(this.imagesList[i].htmlElement!!.src);
-                this.imagesList[i].htmlElement!!.src =
-                    cloudinaryDownloadUrl +
-                    this.imagesList[i].fileToUpload.publicId +
-                    '.png'; //have to add .png for proper file name
-            }
-        }
-        //First send post to backend, as if it is not up (idk why) then let's not collect trash in cloudinary
-        const responsePromise = this.sendPostToBackend();
-        this.afterPostRequestSend(responsePromise);
+
+        //In this case, we first send images to cloudinary, because we're gonna need the direct URL to the image
+        Promise.all(
+            uploadImages(
+                this.imagesList.map(image => image.fileToUpload),
+                this.abortController.signal
+            )
+        )
+            .then(responses => {
+                if (responses.every(response => response && response.ok)) {
+                    const jsonPromises: Promise<void>[] = [];
+                    // Save url from cloudinary to images info
+                    for (let i = 0; i < this.imagesList.length; ++i) {
+                        if (this.imagesList[i].htmlElement) {
+                            this.imagesSrcStack.push(
+                                this.imagesList[i].htmlElement!!.src
+                            );
+                            jsonPromises.push(responses[i].json().then(response => {
+                                this.imagesList[i].htmlElement!!.src =
+                                    response.url;
+                            }));
+                        }
+                    }
+                    Promise.all(jsonPromises).then(() => this.sendPostToBackend());
+                } else {
+                    responses = responses.filter(
+                        response => !response || !response.ok
+                    );
+                    console.log(responses.toString());
+                    this.showErrorMessage(
+                        'Nie udało się wysłać wszystkich plików. Ciekawostka nie została zapisana.'
+                    );
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     private validateTitle() {
@@ -139,17 +168,19 @@ export default class FactWriter extends React.Component<{}> {
         }
     }
 
-    private sendPostToBackend(): Promise<Response> {
+    private sendPostToBackend() {
+        let description = JSON.stringify(
+            //editor.getContents() returns 716 000 characters  ¯\_(ツ)_/¯
+            document.getElementsByClassName(
+                'se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable'
+            )[0].innerHTML
+        );
+        description = description.substr(1, description.length - 2);
         const requestBodyPost = {
             postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
             postType: PostType.FACT,
             title: this.titleInput.current.value,
-            description: JSON.stringify(
-                //editor.getContents() returns 716 000 characters  ¯\_(ツ)_/¯
-                document.getElementsByClassName(
-                    'se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable'
-                )[0].innerHTML
-            )
+            description: description
         };
 
         return fetchApi('api/posts', {
@@ -158,51 +189,15 @@ export default class FactWriter extends React.Component<{}> {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(requestBodyPost)
-        });
-    }
-
-    private afterPostRequestSend(responsePromise: Promise<Response>) {
-        responsePromise
+        })
             .then(response => {
                 if (response && response.ok) {
                     response
                         .json()
                         .then((data: any) => {
                             if (data !== null) {
-                                //post saved, send images to cloudinary
-                                Promise.all(
-                                    uploadImages(
-                                        this.imagesList.map(
-                                            image => image.fileToUpload
-                                        ),
-                                        this.abortController.signal
-                                    )
-                                )
-                                    .then(responses => {
-                                        if (
-                                            responses.every(
-                                                response =>
-                                                    response && response.ok
-                                            )
-                                        ) {
-                                            //all images uploaded successfully
-                                            this.showSuccessMessage();
-                                        } else {
-                                            responses = responses.filter(
-                                                response =>
-                                                    !response || !response.ok
-                                            );
-                                            console.log(responses.toString());
-                                            this.removePostFromBackend(data.id);
-                                            this.showErrorMessage(
-                                                'Nie udało się wysłać wszystkich plików. Ciekawostka nie została zapisana.'
-                                            );
-                                        }
-                                    })
-                                    .catch(error => {
-                                        console.log(error);
-                                        this.removePostFromBackend(data.id);
-                                    });
+                                //post saved
+                                this.showSuccessMessage();
                             } else {
                                 this.showErrorMessage(
                                     'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
@@ -221,29 +216,6 @@ export default class FactWriter extends React.Component<{}> {
             })
             .catch(error => {
                 console.log(error);
-            });
-    }
-
-    private removePostFromBackend(postId: number) {
-        fetchApi('api/posts/' + postId, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (response && response.ok) {
-                    console.log('Removed post with id: ' + postId);
-                } else {
-                    console.log(
-                        'Cannot remove post with id: ' +
-                            postId +
-                            '. Server response: ' +
-                            response
-                    );
-                }
-            })
-            .catch(error => {
-                console.log(
-                    'Error while deleting post. Error message: ' + error
-                );
             });
     }
 
@@ -322,11 +294,20 @@ export default class FactWriter extends React.Component<{}> {
     render() {
         return (
             <div className="main">
-                <section className="container fluid">
+                <section className="container">
                     <TopImage />
-                    <div style={{color: 'white', margin: "10px 0 10px 0"}}>
-                        <label htmlFor='titleInput'>Dodaj tytuł do ciekawostki: </label>
-                        <input style={{marginTop: "10px"}} id='titleInput' className="input" placeholder="Tytuł" maxLength={100} ref={this.titleInput}/>
+                    <div style={{ color: 'white', margin: '10px 0 10px 0' }}>
+                        <label htmlFor="titleInput">
+                            Dodaj tytuł do ciekawostki:{' '}
+                        </label>
+                        <input
+                            style={{ marginTop: '10px' }}
+                            id="titleInput"
+                            className="input"
+                            placeholder="Tytuł"
+                            maxLength={100}
+                            ref={this.titleInput}
+                        />
                     </div>
                     <textarea id="suneditor" />
                     <button className="button" onClick={this.handleSubmit}>

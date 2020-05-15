@@ -13,7 +13,6 @@ import ErrorPage from './ErrorPage';
 import { fetchApi } from './helper/fetchHelper';
 import { Posts } from './Posts';
 import { PostType } from './Post';
-import { Simulate } from 'react-dom/test-utils';
 const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
 

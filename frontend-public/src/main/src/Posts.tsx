@@ -3,12 +3,11 @@ import { PagingBar } from './PagingBar';
 import { PostsList } from './PostsList';
 import Post, { postDTOToPost, PostType } from './Post';
 import { fetchApi } from './helper/fetchHelper';
-const LoadingIndicator = require('shared24').LoadingIndicator;
-const showModal = require('shared24').showModal;
-const closeModal = require('shared24').closeModal;
+import CustomLinearProgress from './LinearProgress';
 
 interface State {
     posts: Post[] | undefined;
+    currentPage: number;
 }
 
 export class Posts extends React.Component<{ postType: PostType }, State> {
@@ -17,7 +16,8 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
     private abortController;
 
     state: State = {
-        posts: undefined
+        posts: undefined,
+        currentPage: 0
     };
 
     constructor(props) {
@@ -29,7 +29,6 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
 
     private fetchPosts() {
         this.setState({ posts: undefined });
-        showModal(<LoadingIndicator />);
         fetchApi('api/posts/count?postType=' + this.props.postType.toString(), {
             signal: this.abortController.signal
         })
@@ -55,42 +54,34 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                                                         postDTOToPost(post)
                                                     )
                                                 });
-                                                closeModal();
                                             })
                                             .catch(error => {
-                                                closeModal();
                                                 console.log(error);
                                             })
                                     )
                                     .catch(error => {
-                                        closeModal();
                                         console.log(error);
                                     });
                             } else {
-                                closeModal();
                                 this.setState({posts: []})
                             }
                         })
                         .catch(error => {
-                            closeModal();
                             console.log(error);
                         });
                 } else {
-                    closeModal();
                 }
             })
             .catch(error => {
-                closeModal();
                 console.log(error);
             });
     }
 
     private handlePageClick(data) {
         const selected = data.selected;
-        this.setState({ posts: [] });
-        showModal(<LoadingIndicator />);
+        this.setState({ posts: undefined, currentPage: selected });
         fetchApi(
-            'api/posts?postType=FORECASTS&page=' +
+            'api/posts?postType=FORECAST&page=' +
                 selected +
                 '&count=' +
                 this.postsPerPage,
@@ -100,21 +91,18 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                 if (response && response.ok) {
                     response
                         .json()
-                        .then(data => {
-                            this.setState({ posts: data });
-                            closeModal();
+                        .then(posts => {
+                            this.setState({ posts: posts });
                         })
                         .catch(error => {
-                            closeModal();
                             console.log(error);
                         });
                 } else {
-                    closeModal();
+                    this.setState({posts: []});
                 }
             })
             .catch(error => {
                 console.log(error);
-                closeModal();
             });
     }
 
@@ -154,6 +142,7 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                                         this.postsCount / this.postsPerPage
                                     )}
                                     handlePageClick={this.handlePageClick}
+                                    currentPage={this.state.currentPage}
                                 />
                             </>
                         ) : (
@@ -162,11 +151,11 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                                     textAlign: 'center',
                                     marginTop: '20px'
                                 }}>
-                                <p className="noPosts">
+                                <p className="noPosts" >
                                     Brak {this.postTypeToText()}.
                                 </p>
                             </div>
-                        ) : null}
+                        ) : <CustomLinearProgress />}
                     </div>
                     <div className="column is-1" />
                 </div>

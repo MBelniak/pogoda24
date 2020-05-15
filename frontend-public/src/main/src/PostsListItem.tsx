@@ -1,5 +1,6 @@
 import React from 'react';
-import Post from './Post';
+import Post, { PostType } from './Post';
+import { Link } from 'react-router-dom';
 import { ForecastMapList } from './ForecastMapList';
 import config from './config/config';
 
@@ -47,8 +48,33 @@ export default class PostsListItem extends React.Component<
         this.props.registerView(this.props.post.id);
     }
 
-    private processDescription() {
-        let description = this.props.post.description;
+    private createDescription() {
+        const description =
+            this.props.post.postType === PostType.FACT
+                ? this.processDescriptionForFact()
+                : this.processDescription(this.props.post.description);
+        return (
+            <>
+                <span
+                    dangerouslySetInnerHTML={{
+                        __html: description
+                    }}
+                    style={{ wordWrap: 'break-word' }}
+                />
+                {this.state.isExpanded ? null :
+                    this.props.post.postType === PostType.FACT ? <Link to={"/posts/" + this.props.post.id} className="postLink">
+                        {' '} więcej
+                    </Link>: (
+                    <a className="postLink" onClick={this.expandPost}>
+                        {' '}
+                        więcej
+                    </a>
+                )}
+            </>
+        );
+    }
+
+    private processDescription(description: string): string {
         if (!this.state.isExpanded) {
             if (this.props.post.description.length > nonExpandedPostLength) {
                 description = description.substr(0, nonExpandedPostLength);
@@ -80,6 +106,13 @@ export default class PostsListItem extends React.Component<
         return description;
     }
 
+    private processDescriptionForFact(): string {
+        const dummyDomEl = document.createElement('html');
+        dummyDomEl.innerHTML = this.props.post.description.replace(/\\"/g, '"');
+        const description: string = dummyDomEl.textContent ? dummyDomEl.textContent : '';
+        return this.processDescription(description);
+    }
+
     render() {
         return (
             <div className="post">
@@ -89,20 +122,8 @@ export default class PostsListItem extends React.Component<
                     <span>{this.props.post.title}</span>
                 </div>
                 <div className="postDescription">
-                    <span
-                        dangerouslySetInnerHTML={{
-                            __html: this.processDescription()
-                        }}
-                        style={{ wordWrap: 'break-word' }}
-                    />
-                    {this.state.isExpanded ? null : (
-                        <a className="postLink" onClick={this.expandPost}>
-                            {' '}
-                            więcej
-                        </a>
-                    )}
+                    {this.createDescription()}
                 </div>
-
                 <div
                     className="is-divider"
                     style={{ margin: '15px 0 10px 0' }}
