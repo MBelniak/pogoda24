@@ -17,6 +17,8 @@ public class WebMvcConfigurerImpl implements WebMvcConfigurer {
         registry.addResourceHandler("/static/admin/**").addResourceLocations("classpath:admin/");
         registry.addResourceHandler("/static/generator/**").addResourceLocations("classpath:generator/");
         registry.addResourceHandler("/generator/**").addResourceLocations("classpath:generator/");
+        registry.addResourceHandler("/login/**").addResourceLocations("classpath:login/");
+        registry.addResourceHandler("/static/login/**").addResourceLocations("classpath:login/");
         registry.addResourceHandler("/admin/**").addResourceLocations("classpath:admin/");
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:public/");
         registry.addResourceHandler("/**").addResourceLocations("classpath:public/");

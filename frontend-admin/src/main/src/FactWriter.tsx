@@ -2,7 +2,6 @@ import React from 'react';
 const Copyright = require('shared24').Copyright;
 const TopImage = require('shared24').TopImage;
 import * as fns from 'date-fns';
-import 'suneditor/dist/css/suneditor.min.css';
 import suneditor from 'suneditor';
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;

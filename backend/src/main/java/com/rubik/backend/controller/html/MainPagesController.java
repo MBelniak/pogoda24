@@ -15,4 +15,9 @@ public class MainPagesController {
     public String getIndexPage() {
         return "index";
     }
+
+    @RequestMapping(value = "/login")
+    public String getLoginPage() {
+        return "login/loginPage";
+    }
 }
