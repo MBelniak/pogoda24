@@ -18,6 +18,6 @@ public class MainPagesController {
 
     @RequestMapping(value = "/login")
     public String getLoginPage() {
-        return "login/loginPage";
+        return "templates/login/loginPage";
     }
 }
