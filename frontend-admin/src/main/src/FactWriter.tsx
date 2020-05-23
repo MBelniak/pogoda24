@@ -2,7 +2,6 @@ import React from 'react';
 const Copyright = require('shared24').Copyright;
 const TopImage = require('shared24').TopImage;
 import * as fns from 'date-fns';
-import 'suneditor/dist/css/suneditor.min.css';
 import suneditor from 'suneditor';
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
@@ -57,7 +56,7 @@ interface Image {
 export default class FactWriter extends React.Component<{}> {
     private editor;
     private imagesList: Image[] = [];
-    private imagesSrcStack: string[] = [];
+    private imagesSrcQueue: string[] = [];
     private nextImageId = 0;
     private abortController;
     private titleInput;
@@ -118,7 +117,7 @@ export default class FactWriter extends React.Component<{}> {
         }
         showModal(<LoadingIndicator />);
         this.editor.hide();
-        this.imagesSrcStack = [];
+        this.imagesSrcQueue = [];
 
         //In this case, we first send images to cloudinary, because we're gonna need the direct URL to the image
         Promise.all(
@@ -133,7 +132,7 @@ export default class FactWriter extends React.Component<{}> {
                     // Save url from cloudinary to images info
                     for (let i = 0; i < this.imagesList.length; ++i) {
                         if (this.imagesList[i].htmlElement) {
-                            this.imagesSrcStack.push(
+                            this.imagesSrcQueue.push(   //save local images urls in case upload is not successful
                                 this.imagesList[i].htmlElement!!.src
                             );
                             jsonPromises.push(responses[i].json().then(response => {
@@ -155,6 +154,9 @@ export default class FactWriter extends React.Component<{}> {
             })
             .catch(error => {
                 console.log(error);
+                this.showErrorMessage(
+                    'Nie udało się wysłać wszystkich plików. Ciekawostka nie została zapisana.'
+                );
             });
     }
 
@@ -169,11 +171,14 @@ export default class FactWriter extends React.Component<{}> {
     }
 
     private sendPostToBackend() {
+        let target = document.getElementsByClassName(
+            'se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable'
+        )[0].cloneNode(true) as HTMLElement;
+        const wrapper = document.createElement('div');
+        wrapper.appendChild(target);
         let description = JSON.stringify(
             //editor.getContents() returns 716 000 characters  ¯\_(ツ)_/¯
-            document.getElementsByClassName(
-                'se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable'
-            )[0].innerHTML
+            wrapper.innerHTML
         );
         description = description.substr(1, description.length - 2);
         const requestBodyPost = {
@@ -199,6 +204,7 @@ export default class FactWriter extends React.Component<{}> {
                                 //post saved
                                 this.showSuccessMessage();
                             } else {
+                                this.revertImageSrcChange();
                                 this.showErrorMessage(
                                     'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
                                 );
@@ -209,6 +215,7 @@ export default class FactWriter extends React.Component<{}> {
                         });
                 } else {
                     console.log(response.statusText + ', ' + response.body);
+                    this.revertImageSrcChange();
                     this.showErrorMessage(
                         'Wystąpił błąd serwera. Nie udało się zapisać postu.'
                     );
@@ -253,18 +260,22 @@ export default class FactWriter extends React.Component<{}> {
 
     private closeModalAndShowEditor() {
         closeModal();
+        this.editor.show();
+    }
+
+    private revertImageSrcChange() {
         for (let i = 0; i < this.imagesList.length; ++i) {
             if (this.imagesList[i].htmlElement) {
-                this.imagesList[i].htmlElement!!.src = this.imagesSrcStack[i];
+                this.imagesList[i].htmlElement!!.src = this.imagesSrcQueue[i];
             }
         }
-        this.editor.show();
     }
 
     componentDidMount() {
         this.editor = suneditor.create('suneditor', {
             width: '100%',
-            height: '500px',
+            minHeight: '500px',
+            height: '100%',
             plugins: [
                 font,
                 image,

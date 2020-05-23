@@ -8,7 +8,7 @@ const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 interface PostListItemProps {
-    post: Post;
+    post: any;
     initiatePostEdit: (post: Post) => void;
 }
 

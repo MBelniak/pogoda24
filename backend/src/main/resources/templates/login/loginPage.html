@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"/>
+    <link rel="stylesheet" href="templates/login/loginPage.css"/>
+    <title>Pogoda24/7 - Login Page</title>
+</head>
+<body>
+<section class="section">
+    <div class="container centered main">
+        <span class="logoTitle">Pogoda 24/7</span>
+        <div style="max-width: 400px; align-content: center;" class="form">
+            <form action="/login" method="post">
+                <label class="label">Login: </label>
+                <input class="input" id="username" name="username" type="text" placeholder="Login"
+                       autofocus="autofocus"/><br/>
+                <label class="label">Hasło:</label>
+                <input class="input" name="password" id="password" type="password" placeholder="Hasło"/><br/>
+                <input class="button is-primary" style="margin-top: 10px" type="submit" name="submit" value="Zaloguj"/>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

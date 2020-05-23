@@ -1,6 +1,7 @@
 package com.rubik.backend.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,7 +11,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -38,23 +41,31 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), new AntPathRequestMatcher("/api/**"))
                 .and()
                 .authorizeRequests()
-                .antMatchers("/write/login")
+                .antMatchers("/login")
                 .not().authenticated()
-                .antMatchers("/write", "/elist", "/writer", "/traffic", "/generator", "/write/**", "/console", "/console/**")
+                .antMatchers("/write", "/elist", "/writer", "/traffic", "/generator", "/console", "/factwriter")
                 .authenticated()
-                .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/about", "/login")
+                .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/about", "/posts/**")
                 .permitAll()
                 .and()
-                .formLogin();
-//                .loginPage("/write/login")
-//                .failureUrl("/write/login?error=true")
-//                .defaultSuccessUrl("/write?login=success")
-//                .and()
-//                .logout()
-//                .invalidateHttpSession(true)
-//                .clearAuthentication(true)
-//                .logoutRequestMatcher(new AntPathRequestMatcher("/write/logout"))
-//                .logoutSuccessUrl("/write/login?logout=success");
+                .formLogin()
+                .loginPage("/login")
+                .successHandler(successHandler())
+                .failureUrl("/login?error=true")
+                .defaultSuccessUrl("/write?login=success")
+                .and()
+                .logout()
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/login?logout=success");
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler successHandler() {
+        SimpleUrlAuthenticationSuccessHandler handler = new SimpleUrlAuthenticationSuccessHandler();
+        handler.setUseReferer(true);
+        return handler;
     }
 
     @Override

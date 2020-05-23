@@ -107,7 +107,6 @@ export class SiteViewsChart extends React.Component<{}, SiteViewsChartState> {
                 chartData[1].push(0);
             }
         }
-        console.log(chartData);
         return chartData;
     }
 

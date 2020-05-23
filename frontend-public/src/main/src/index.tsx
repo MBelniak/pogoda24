@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { CloudinaryContext } from 'cloudinary-react';
 import config from './config/config';
+import 'suneditor/dist/css/suneditor.min.css';
 import './sass/main.scss';
 import 'shared24/src/sass/main.scss';
 import App from './App';

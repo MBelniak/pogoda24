@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { CloudinaryContext } from 'cloudinary-react';
 import config from './config/config';
 import App from './App';
+const suneditorStyle = require('suneditor/dist/css/suneditor.min.css');
 import './sass/main.scss';
 import 'shared24/src/sass/main.scss';
 
