@@ -1,18 +1,17 @@
-package com.rubik.backend.controller.rest;
+package com.rubik.backend.controller.rest.dto;
 
 public class PostViewsDTO {
-    private Long postId;
+    private String postId;
 
     private Long views;
 
-    public PostViewsDTO() {
-    }
+    public PostViewsDTO() {}
 
-    public Long getPostId() {
+    public String getPostId() {
         return postId;
     }
 
-    public void setPostId(Long postId) {
+    public void setPostId(String postId) {
         this.postId = postId;
     }
 

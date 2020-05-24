@@ -3,7 +3,6 @@ import { FileToUpload } from '../Writer';
 
 const { cloud_name, upload_preset, api_key, api_secret } = config;
 export const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloud_name}/upload`;
-export const cloudinaryDownloadUrl = `https://res.cloudinary.com/${cloud_name}/image/upload/`;
 const sha1 = require('js-sha1');
 
 export function uploadImages(uploadedFiles: FileToUpload[], signal: AbortSignal) {

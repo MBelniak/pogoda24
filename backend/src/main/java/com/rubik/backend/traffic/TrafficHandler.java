@@ -1,6 +1,5 @@
 package com.rubik.backend.traffic;
 
-import com.rubik.backend.service.PostService;
 import com.rubik.backend.service.TrafficService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,20 +15,17 @@ import java.util.regex.Pattern;
 @SessionScope
 public class TrafficHandler {
 
-    private PostService postService;
-
     private TrafficService trafficService;
 
-    private Map<Long, Long> postViewsMap;   //could probably just use spring boot actuator, but let's keep it simple for now
+    private Map<String , Long> postViewsMap;   //could probably just use spring boot actuator, but let's keep it simple for now
 
     @Autowired
-    public TrafficHandler(PostService postService, TrafficService trafficService) {
-        this.postService = postService;
+    public TrafficHandler(TrafficService trafficService) {
         this.trafficService = trafficService;
         postViewsMap = new HashMap<>();
     }
 
-    public void registerPost(Long postId) {
+    public void registerPost(String postId) {
         Long views = postViewsMap.get(postId);
         if (views == null) {
             postViewsMap.put(postId, 1L);
@@ -38,7 +34,7 @@ public class TrafficHandler {
         }
     }
 
-    public void registerPostViewIfNotAdminPage(Long postId, String referer) {
+    public void registerPostViewIfNotAdminPage(String postId, String referer) {
         Pattern p = Pattern.compile("posts");
         Matcher m = p.matcher(referer);
         if (m.find()) {

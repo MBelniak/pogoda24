@@ -1,5 +1,7 @@
 package com.rubik.backend.controller.rest;
 
+import com.rubik.backend.controller.rest.dto.GatheredDataDTO;
+import com.rubik.backend.controller.rest.dto.PostViewsDTO;
 import com.rubik.backend.entity.Post;
 import com.rubik.backend.entity.SiteTraffic;
 import com.rubik.backend.service.PostService;
@@ -29,7 +31,7 @@ public class TrafficControllerImpl implements TrafficController {
     }
 
     @Override
-    public Long getViewsForPost(Long id) {
+    public Long getViewsForPost(String id) {
         return trafficService.getViewsForPost(id);
     }
 
@@ -39,7 +41,7 @@ public class TrafficControllerImpl implements TrafficController {
     }
 
     @Override
-    public GatheredData getGatheredData() {
+    public GatheredDataDTO getGatheredData() {
         List<Post> allPosts = postService.getPostsOrderedByDate();
         List<SiteTraffic> allSiteTraffic = trafficService.getAllSiteTraffic();
 
@@ -48,6 +50,6 @@ public class TrafficControllerImpl implements TrafficController {
         Integer postsCount = allPosts.size();
         Double averageViewsPerPost = allPostsViews.doubleValue() / postsCount.doubleValue();
 
-        return new GatheredData(allPostsViews, allSiteViews, postsCount, averageViewsPerPost);
+        return new GatheredDataDTO(allPostsViews, allSiteViews, postsCount, averageViewsPerPost);
     }
 }

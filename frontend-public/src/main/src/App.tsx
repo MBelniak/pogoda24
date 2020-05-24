@@ -17,10 +17,9 @@ const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
 
 interface WarningInfo {
-    id: number;
+    postId: string;
     dueDate: Date;
     shortDescription?: string;
-    postId?: number
 }
 
 interface State {
@@ -40,7 +39,7 @@ export default class App extends React.Component<{}, State> {
     }
 
     componentDidMount() {
-        fetchApi('api/warningInfo/topBarWarning', { signal: this.abortController.signal })
+        fetchApi('api/posts/topBarWarning', { signal: this.abortController.signal })
             .then(response => {
                 if (response && response.ok) {
                     response.json().then(warningInfo => {

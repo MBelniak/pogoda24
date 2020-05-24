@@ -16,7 +16,7 @@ public class TrafficAspect {
 
     @AfterReturning("execution(com.rubik.backend.entity.Post com.rubik.backend.controller.rest.PostController.getPost(..))")
     private void postView(JoinPoint joinPoint) {
-        Long postId = (Long) joinPoint.getArgs()[0];
+        String postId = (String) joinPoint.getArgs()[0];
         HttpServletRequest request = (HttpServletRequest) joinPoint.getArgs()[1];
         trafficHandler.registerPostViewIfNotAdminPage(postId, request.getHeader("referer"));
     }

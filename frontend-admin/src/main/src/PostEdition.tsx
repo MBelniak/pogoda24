@@ -20,8 +20,6 @@ interface PostEditionProps {
 }
 
 interface State {
-    postDescription: string;
-    title: string;
     postType: PostType;
     filesToUpload: FileToUpload[];
 }
@@ -36,17 +34,13 @@ export default class PostEdition extends React.Component<
 > {
     private fileId: number;
     private fileInput;
-    private addToTopBarCheckBox;
     private postDescriptionTextArea;
     private titleTextArea;
     private daysValidInput;
     private warningShortInput;
     private abortController;
-    private warningInfo;
 
     state: State = {
-        postDescription: this.props.post.description,
-        title: this.props.post.title,
         postType: this.props.post.postType,
         filesToUpload: []
     };
@@ -55,7 +49,6 @@ export default class PostEdition extends React.Component<
         super(props);
         this.fileId = 0;
         this.fileInput = React.createRef();
-        this.addToTopBarCheckBox = React.createRef();
         this.postDescriptionTextArea = React.createRef();
         this.titleTextArea = React.createRef();
         this.daysValidInput = React.createRef();
@@ -63,75 +56,20 @@ export default class PostEdition extends React.Component<
         this.abortController = new AbortController();
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFilesAdded = this.onFilesAdded.bind(this);
-        this.handleDescriptionTextAreaChange = this.handleDescriptionTextAreaChange.bind(
-            this
-        );
-        this.handleTitleTextAreaChange = this.handleTitleTextAreaChange.bind(
-            this
-        );
         this.validateField = this.validateField.bind(this);
         this.onRemoveFile = this.onRemoveFile.bind(this);
         this.onMoveForward = this.onMoveForward.bind(this);
         this.onMoveBackward = this.onMoveBackward.bind(this);
     }
 
-    private fetchWarningInfo() {
-        if (this.props.post.postType === PostType.WARNING) {
-            showModal(<LoadingIndicator />);
-            fetchApi('api/warningInfo/byPostId/' + this.props.post.id, {
-                signal: this.abortController.signal
-            })
-                .then(response => {
-                    if (response && response.ok) {
-                        response
-                            .json()
-                            .then(warningInfo => {
-                                this.warningInfo = warningInfo;
-                                this.addToTopBarCheckBox.current.checked = true;
-                                this.daysValidInput.current.value =
-                                    fns.differenceInCalendarDays(
-                                        fnstz.zonedTimeToUtc(
-                                            warningInfo.dueDate,
-                                            'Europe/Warsaw'
-                                        ),
-                                        this.props.post.postDate
-                                    ) - 1;
-                                this.warningShortInput.current.value =
-                                    warningInfo.shortDescription;
-                                closeModal();
-                            })
-                            .catch(error => {
-                                this.addToTopBarCheckBox.current.checked = false;
-                                this.daysValidInput.current.value = null;
-                                this.warningShortInput.current.value = null;
-                                closeModal();
-                                console.log(error);
-                            });
-                    } else {
-                        this.addToTopBarCheckBox.current.checked = false;
-                        this.daysValidInput.current.value = null;
-                        this.warningShortInput.current.value = null;
-                        closeModal();
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-        }
-    }
-
     private registerImagesPresentAtCloudinary() {
         const filesToUpload: FileToUpload[] = [];
-        if (this.props.post.imagesPublicIdsJSON) {
-            for (
-                let i = 0;
-                i < this.props.post.imagesPublicIdsJSON.length;
-                ++i
-            ) {
+        if (this.props.post.imagesPublicIds) {
+            for (let i = 0; i < this.props.post.imagesPublicIds.length; ++i) {
                 //only publicId and file as null are used
                 filesToUpload.push({
                     id: this.fileId++,
-                    publicId: this.props.post.imagesPublicIdsJSON[i],
+                    publicId: this.props.post.imagesPublicIds[i],
                     file: null,
                     timestamp: ''
                 });
@@ -228,53 +166,8 @@ export default class PostEdition extends React.Component<
                 if (response && response.ok) {
                     response.text().then((postHash: string) => {
                         if (postHash !== null) {
-                            let warningInfoPromise;
-                            if (
-                                this.state.postType === PostType.WARNING &&
-                                this.addToTopBarCheckBox.current.checked
-                            ) {
-                                warningInfoPromise = this.saveWarningInfo(
-                                    this.props.post.id
-                                );
-                            } else if (
-                                this.state.postType === PostType.WARNING &&
-                                !this.addToTopBarCheckBox.current.checked &&
-                                this.warningInfo
-                            ) {
-                                this.deleteWarningInfo();
-                                warningInfoPromise = Promise.resolve().then(
-                                    () => null
-                                );
-                            } else {
-                                if (this.warningInfo) {
-                                    this.deleteWarningInfo();
-                                }
-                                warningInfoPromise = Promise.resolve().then(
-                                    () => null
-                                );
-                            }
                             //post saved, send images to cloudinary
-                            warningInfoPromise
-                                .then(response => {
-                                    if (response && response.ok) {
-                                        response
-                                            .text()
-                                            .then(warningInfoHash => {
-                                                this.saveImagesToCloudinary(
-                                                    postHash,
-                                                    warningInfoHash
-                                                );
-                                            });
-                                    } else if (!response) {
-                                        this.saveImagesToCloudinary(
-                                            postHash,
-                                            undefined
-                                        );
-                                    }
-                                })
-                                .catch(error => {
-                                    console.log(error);
-                                });
+                            this.saveImagesToCloudinary(postHash);
                         } else {
                             this.showErrorMessage(
                                 'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
@@ -294,13 +187,33 @@ export default class PostEdition extends React.Component<
     }
 
     private sendPostToBackend(): Promise<Response> {
+        function calculateDueDate(days: number): string {
+            return fns.format(
+                new Date(
+                    new Date().setHours(0, 0, 0, 0) +
+                    (days + 1) * 24 * 3600 * 1000
+                ),
+                BACKEND_DATE_FORMAT
+            );
+        }
+
         const requestBodyPost = {
             id: this.props.post.id,
             postDate: fns.format(this.props.post.postDate, BACKEND_DATE_FORMAT),
             postType: this.state.postType.toString(),
             title: this.titleTextArea.current.value,
             description: this.postDescriptionTextArea.current.value,
-            imagesPublicIds: ''
+            imagesPublicIds: '',
+            dueDate:
+                this.state.postType === PostType.WARNING
+                    ? calculateDueDate(
+                    parseInt(this.daysValidInput.current.value)
+                    )
+                    : null,
+            shortDescription:
+                this.state.postType === PostType.WARNING
+                    ? this.warningShortInput.current.value
+                    : null,
         };
 
         const uploadedFilesIdsOrdered: string[] = [];
@@ -344,71 +257,16 @@ export default class PostEdition extends React.Component<
                         'Nie udało się wysłać wszystkich plików. Post nie został zmieniony.'
                     );
                     this.abortPostUpdate(postHash);
-                    if (warningInfoHash) {
-                        this.abortWarningInfoUpdate(warningInfoHash);
-                    }
                 }
             })
             .catch(error => {
                 console.log(error);
                 this.abortPostUpdate(postHash);
-                if (warningInfoHash) {
-                    this.abortWarningInfoUpdate(warningInfoHash);
-                }
             });
     }
 
     private getImagesToUpload(): FileToUpload[] {
         return this.state.filesToUpload.filter(file => file.file !== null);
-    }
-
-    private saveWarningInfo(postId: number) {
-        function calculateDueDate(days: number): string {
-            return fns.format(
-                new Date(
-                    new Date().setHours(0, 0, 0, 0) +
-                        (days + 1) * 24 * 3600 * 1000
-                ),
-                BACKEND_DATE_FORMAT
-            );
-        }
-
-        const requestBody = {
-            id: this.warningInfo ? this.warningInfo.id : null,
-            dueDate:
-                this.state.postType === PostType.WARNING
-                    ? calculateDueDate(
-                          parseInt(this.daysValidInput.current.value)
-                      )
-                    : null,
-            shortDescription:
-                this.state.postType === PostType.WARNING
-                    ? this.warningShortInput.current.value
-                    : null,
-            postId: postId
-        };
-
-        return fetchApi('api/warningInfo', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-    }
-
-    private deleteWarningInfo() {
-        fetchApi('api/warningInfo/' + this.warningInfo.id, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (!response || !response.ok) {
-                    console.log(response);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
     }
 
     //Save temporarily saved changes to the database
@@ -450,30 +308,6 @@ export default class PostEdition extends React.Component<
             .then(response => {
                 if (response && response.ok) {
                     console.log('Post update aborted.');
-                } else {
-                    console.log(
-                        'Cannot abort. Hash: ' +
-                            hash +
-                            '. Server response: ' +
-                            response
-                    );
-                }
-            })
-            .catch(error => {
-                console.log(
-                    'Error while aborting update. Error message: ' + error
-                );
-            });
-    }
-
-    //Remove warningInfo changes, that are temporarily saved in backend
-    private abortWarningInfoUpdate(hash: string) {
-        fetchApi(
-            'api/warningInfo/continuePostUpdate/' + hash + '?success=false'
-        )
-            .then(response => {
-                if (response && response.ok) {
-                    console.log('warningInfo update aborted.');
                 } else {
                     console.log(
                         'Cannot abort. Hash: ' +
@@ -563,17 +397,6 @@ export default class PostEdition extends React.Component<
         return (
             <div className="columns">
                 <div className="column is-half">
-                    <div style={{ margin: '10px' }}>
-                        <input
-                            id="addToBar"
-                            type="checkbox"
-                            ref={this.addToTopBarCheckBox}
-                        />
-                        <label htmlFor="addToBar">
-                            {' '}
-                            Dodaj ostrzeżenie do paska u góry strony
-                        </label>
-                    </div>
                     <div className="columns">
                         <div className="column">
                             <label htmlFor="warningDaysValidInput">
@@ -589,6 +412,15 @@ export default class PostEdition extends React.Component<
                                 ref={this.daysValidInput}
                                 min="0"
                                 max="7"
+                                defaultValue={
+                                    fns.differenceInCalendarDays(
+                                        fnstz.zonedTimeToUtc(
+                                            this.props.post.dueDate,
+                                            'Europe/Warsaw'
+                                        ),
+                                        this.props.post.postDate
+                                    ) - 1
+                                }
                                 onBlur={e =>
                                     this.validateField(
                                         e.target,
@@ -612,6 +444,7 @@ export default class PostEdition extends React.Component<
                                 required={true}
                                 maxLength={80}
                                 ref={this.warningShortInput}
+                                defaultValue={this.props.post.shortDescription}
                                 onBlur={e => this.validateField(e.target)}
                             />
                         </div>
@@ -622,18 +455,9 @@ export default class PostEdition extends React.Component<
         );
     }
 
-    private handleDescriptionTextAreaChange(event) {
-        this.setState({ postDescription: event.target.value });
-    }
-
-    private handleTitleTextAreaChange(event) {
-        this.setState({ title: event.target.value });
-    }
-
     componentDidMount() {
         //images coming from cloudinary let's add to state. They will be recognized by null file
         this.registerImagesPresentAtCloudinary();
-        this.fetchWarningInfo();
     }
 
     componentWillUnmount() {
@@ -655,8 +479,7 @@ export default class PostEdition extends React.Component<
                                 maxLength={100}
                                 placeholder="Tytuł"
                                 ref={this.titleTextArea}
-                                onChange={this.handleTitleTextAreaChange}
-                                value={this.state.title}
+                                defaultValue={this.props.post.title}
                                 className="textarea"
                             />
                             <p>Opis:</p>
@@ -666,8 +489,7 @@ export default class PostEdition extends React.Component<
                                 rows={10}
                                 placeholder="Treść posta..."
                                 ref={this.postDescriptionTextArea}
-                                onChange={this.handleDescriptionTextAreaChange}
-                                value={this.state.postDescription}
+                                defaultValue={this.props.post.description}
                                 className="textarea"
                             />
                         </div>

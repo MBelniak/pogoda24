@@ -43,7 +43,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/login")
                 .not().authenticated()
-                .antMatchers("/write", "/elist", "/writer", "/traffic", "/generator", "/console", "/factwriter")
+                .antMatchers("/write", "/elist", "/writer", "/traffic", "/generator", "/factwriter")
                 .authenticated()
                 .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/about", "/posts/**")
                 .permitAll()

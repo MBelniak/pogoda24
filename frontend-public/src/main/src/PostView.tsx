@@ -125,7 +125,7 @@ export default class PostView extends React.Component<{}, State> {
                                     <div style={{ textAlign: 'center' }}>
                                         <ForecastMapList
                                             imagesPublicIds={
-                                                this.post.imagesPublicIdsJSON
+                                                this.post.imagesPublicIds
                                             }
                                         />
                                     </div>

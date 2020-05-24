@@ -6,7 +6,7 @@ export default interface Post {
     postType: PostType;
     title: string;
     description: string;
-    imagesPublicIdsJSON?: string[];
+    imagesPublicIds?: string[];
 }
 
 export interface PostDTO {
@@ -15,7 +15,7 @@ export interface PostDTO {
     postType: PostType;
     title: string;
     description: string;
-    imagesPublicIdsJSON?: string[];
+    imagesPublicIds?: string[];
     addedToTopBar?: boolean;
     dueDate?: string;
     shortDescription?: string;

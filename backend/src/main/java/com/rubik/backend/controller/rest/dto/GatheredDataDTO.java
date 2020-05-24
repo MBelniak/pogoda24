@@ -1,12 +1,12 @@
-package com.rubik.backend.controller.rest;
+package com.rubik.backend.controller.rest.dto;
 
-public class GatheredData {
+public class GatheredDataDTO {
     private Long allPostsViews;
     private Long allSiteViews;
     private Integer postsCount;
     private Double averageViewsPerPost;
 
-    public GatheredData(Long allPostsViews, Long allSiteViews, Integer postsCount, Double averageViewsPerPost) {
+    public GatheredDataDTO(Long allPostsViews, Long allSiteViews, Integer postsCount, Double averageViewsPerPost) {
         this.allPostsViews = allPostsViews;
         this.allSiteViews = allSiteViews;
         this.postsCount = postsCount;

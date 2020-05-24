@@ -201,8 +201,8 @@ export default class PostsListItem extends React.Component<
                             />
                         </div>
                         <div className="postIconList">
-                            {this.props.post.imagesPublicIdsJSON
-                                ? this.props.post.imagesPublicIdsJSON.map(
+                            {this.props.post.imagesPublicIds
+                                ? this.props.post.imagesPublicIds.map(
                                       (imagePublicId, i) => (
                                           <div
                                               key={i}
