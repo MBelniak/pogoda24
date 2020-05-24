@@ -191,7 +191,7 @@ export default class PostEdition extends React.Component<
             return fns.format(
                 new Date(
                     new Date().setHours(0, 0, 0, 0) +
-                    (days + 1) * 24 * 3600 * 1000
+                        (days + 1) * 24 * 3600 * 1000
                 ),
                 BACKEND_DATE_FORMAT
             );
@@ -207,13 +207,13 @@ export default class PostEdition extends React.Component<
             dueDate:
                 this.state.postType === PostType.WARNING
                     ? calculateDueDate(
-                    parseInt(this.daysValidInput.current.value)
-                    )
+                          parseInt(this.daysValidInput.current.value)
+                      )
                     : null,
             shortDescription:
                 this.state.postType === PostType.WARNING
                     ? this.warningShortInput.current.value
-                    : null,
+                    : null
         };
 
         const uploadedFilesIdsOrdered: string[] = [];

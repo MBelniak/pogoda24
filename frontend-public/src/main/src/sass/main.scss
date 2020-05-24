@@ -1,6 +1,6 @@
 @charset "utf-8";
 $primary-color: #23425f;
-$secondary-color: #159f9f;
+$secondary-color: #25a5a5;
 $background: $primary-color;
 $body-background-color: $primary-color;
 $navbar-background-color: $secondary-color;
@@ -82,7 +82,7 @@ label {
     margin-top: 1rem;
     padding: 0.6rem;
     background: $secondary-color;
-    box-shadow: 0 0 10px $secondary-color;
+    box-shadow: 0 0 5px $secondary-color;
 }
 
 .postLink {
@@ -188,7 +188,7 @@ label {
 }
 .ekipaItem {
     border: solid 2px $primary-color;
-    border-radius: 15px;
+    border-radius: 10px;
     margin: 1rem;
     display: flex;
     flex-direction: row;
@@ -204,40 +204,6 @@ label {
 .ekipaPersonDescription {
     text-align: start;
     margin: 0.7rem;
-}
-
-.pagination {
-    text-align: center;
-}
-
-.pagingBar {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    margin: 2rem auto 0.7rem auto;
-    font-size: 18px;
-    background-color: $secondary-color;
-    box-shadow: 0 0 10px $secondary-color;
-}
-
-.pagingBar * {
-    margin: 0.6rem;
-}
-
-.pagingBar li a {
-    margin: 0.5rem;
-    color: white;
-    transition: 0.3s;
-}
-
-.pagingBarPrevious:hover, .pagingBarNext:hover, .pagingBar a:hover {
-    color: $primary-color;
-    transition: 0.3s;
-}
-
-.pagingBar .active a {
-    color: $primary-color;
-    cursor: default;
 }
 
 .sun-editor-editable, .sun-editor-editable * {

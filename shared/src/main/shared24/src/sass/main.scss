@@ -31,7 +31,6 @@ $footer-padding: 3rem 1.5rem 3rem;
     color: white;
     left: 0;
     position: relative;
-    font-family: Arial;
     animation: bar_anim 10s infinite;
 }
 .bgimg {
@@ -43,3 +42,46 @@ $footer-padding: 3rem 1.5rem 3rem;
     font-size: 0.8rem;
     color: white;
 }
+
+.pagingBar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 2rem 0 0.7rem 0;
+    font-size: 20px;
+}
+
+.pagingBar * {
+    margin: 0.6rem;
+}
+
+.pagingBar li {
+    background-color: $secondary-color;
+    box-shadow: 0 0 5px $secondary-color;
+}
+
+.pagingBar li a {
+    margin: 0.5rem;
+    color: white;
+    transition: 0.3s;
+    padding: 5px;
+}
+
+.pagingBar li:hover {
+    color: $primary-color;
+    transition: 0.3s;
+}
+
+.previous.disabled, .next.disabled {
+    display: none;
+}
+
+.pagingBar .active a {
+    color: $primary-color;
+    cursor: default;
+}
+
+.pagination {
+    text-align: center;
+}
+

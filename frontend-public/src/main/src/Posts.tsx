@@ -1,29 +1,29 @@
 import React from 'react';
-import { PagingBar } from './PagingBar';
 import { PostsList } from './PostsList';
 import Post, { postDTOToPost, PostType } from './Post';
 import { fetchApi } from './helper/fetchHelper';
 import CustomLinearProgress from './LinearProgress';
+const PagingBar = require('shared24').PagingBar;
 
 interface State {
     posts: Post[] | undefined;
+    totalPostsCount: number;
     currentPage: number;
 }
 
 export class Posts extends React.Component<{ postType: PostType }, State> {
     private readonly postsPerPage = 5;
-    private postsCount;
     private abortController;
 
     state: State = {
         posts: undefined,
+        totalPostsCount: 0,
         currentPage: 0
     };
 
     constructor(props) {
         super(props);
         this.handlePageClick = this.handlePageClick.bind(this);
-        this.postsCount = 0;
         this.abortController = new AbortController();
     }
 
@@ -37,8 +37,8 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                     response
                         .json()
                         .then(data => {
-                            this.postsCount = data;
-                            if (this.postsCount !== 0) {
+                            this.setState({ totalPostsCount: data });
+                            if (this.state.totalPostsCount !== 0) {
                                 fetchApi(
                                     'api/posts?postType=' +
                                         this.props.postType.toString() +
@@ -63,7 +63,7 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                                         console.log(error);
                                     });
                             } else {
-                                this.setState({posts: []})
+                                this.setState({ posts: [] });
                             }
                         })
                         .catch(error => {
@@ -98,7 +98,7 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                             console.log(error);
                         });
                 } else {
-                    this.setState({posts: []});
+                    this.setState({ posts: [] });
                 }
             })
             .catch(error => {
@@ -134,28 +134,38 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                 <div className="columns">
                     <div className="column is-1" />
                     <div className="column is-10 posts">
-                        {this.state.posts ? this.state.posts.length !== 0 ? (
-                            <>
-                                <PostsList posts={this.state.posts} />
-                                <PagingBar
-                                    pages={Math.ceil(
-                                        this.postsCount / this.postsPerPage
+                        {this.state.posts ? (
+                            this.state.posts.length !== 0 ? (
+                                <>
+                                    <PostsList posts={this.state.posts} />
+                                    {this.state.totalPostsCount <=
+                                    this.postsPerPage ? null : (
+                                        <PagingBar
+                                            pages={Math.ceil(
+                                                this.state.totalPostsCount /
+                                                    this.postsPerPage
+                                            )}
+                                            handlePageClick={
+                                                this.handlePageClick
+                                            }
+                                            currentPage={this.state.currentPage}
+                                        />
                                     )}
-                                    handlePageClick={this.handlePageClick}
-                                    currentPage={this.state.currentPage}
-                                />
-                            </>
+                                </>
+                            ) : (
+                                <div
+                                    style={{
+                                        textAlign: 'center',
+                                        marginTop: '20px'
+                                    }}>
+                                    <p className="noPosts">
+                                        Brak {this.postTypeToText()}.
+                                    </p>
+                                </div>
+                            )
                         ) : (
-                            <div
-                                style={{
-                                    textAlign: 'center',
-                                    marginTop: '20px'
-                                }}>
-                                <p className="noPosts" >
-                                    Brak {this.postTypeToText()}.
-                                </p>
-                            </div>
-                        ) : <CustomLinearProgress />}
+                            <CustomLinearProgress />
+                        )}
                     </div>
                     <div className="column is-1" />
                 </div>

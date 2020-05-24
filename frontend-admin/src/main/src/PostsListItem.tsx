@@ -2,31 +2,18 @@ import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
 import Post, { PostType } from './Post';
 import { fetchApi } from './helpers/fetchHelper';
-import * as fnstz from 'date-fns-tz';
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 interface PostListItemProps {
-    post: any;
+    post: Post;
     initiatePostEdit: (post: Post) => void;
 }
 
-interface State {
-    loading: boolean;
-}
-
-export default class PostsListItem extends React.Component<
-    PostListItemProps,
-    State
-> {
-
+export default class PostsListItem extends React.Component<PostListItemProps> {
     private warningInfoDueDate: Date | null;
     private abortController: AbortController;
-
-    state: State = {
-        loading: true
-    };
 
     constructor(props) {
         super(props);
@@ -140,89 +127,63 @@ export default class PostsListItem extends React.Component<
         }
     }
 
-    componentDidMount() {
-        if (this.props.post.postType === PostType.WARNING) {
-            fetchApi('api/warningInfo/byPostId/' + this.props.post.id, {signal: this.abortController.signal}).then(response => {
-                if (response && response.ok) {
-                    response.json().then(warningInfo => {
-                        this.warningInfoDueDate = fnstz.zonedTimeToUtc(warningInfo.dueDate, 'Europe/Warsaw');
-                        this.setState({ loading: false });
-                    }).catch(error => {
-                        this.setState({ loading: false });
-                        console.log(error);
-                    })
-                }
-            }).catch(error => {
-                console.log(error);
-            });
-        } else {
-            this.setState({ loading: false });
-        }
-    }
-
     render() {
         return (
             <div className="postsListItem columns">
-                {this.state.loading ? null : (
-                    <>
-                        <div className="column is-half">
-                            <p>
-                                Data dodania:{' '}
-                                {this.processDate(this.props.post.postDate)}
-                            </p>
-                            <p>Tytuł: {this.props.post.title}</p>
-                            <p>Opis: {this.processDescription()}</p>
-                            <p>
-                                Liczba wyświetleń:{' '}
-                                {this.props.post.views === null
-                                    ? 0
-                                    : this.props.post.views}
-                            </p>
-                            <p>Rodzaj postu: {this.processPostType()}</p>
-                            {this.warningInfoDueDate ? (
-                                <p>
-                                    Ważne do:{' '}
-                                    {this.processDate(this.warningInfoDueDate)}
-                                </p>
-                            ) : null}
-                            <input
-                                type="button"
-                                className="button"
-                                value="Edytuj"
-                                onClick={() =>
-                                    this.props.initiatePostEdit(this.props.post)
-                                }
-                            />
-                            <input
-                                type="button"
-                                className="button"
-                                value="Usuń"
-                                onClick={this.handleDeleteClick}
-                            />
-                        </div>
-                        <div className="postIconList">
-                            {this.props.post.imagesPublicIds
-                                ? this.props.post.imagesPublicIds.map(
-                                      (imagePublicId, i) => (
-                                          <div
-                                              key={i}
-                                              className="postIconListItem">
-                                              <Image
-                                                  publicId={imagePublicId}
-                                                  format="png"
-                                                  quality="auto">
-                                                  <Transformation
-                                                      crop="fill"
-                                                      gravity="faces"
-                                                  />
-                                              </Image>
-                                          </div>
-                                      )
-                                  )
-                                : null}
-                        </div>
-                    </>
-                )}
+                <div className="column is-half">
+                    <p>
+                        Data dodania:{' '}
+                        {this.processDate(this.props.post.postDate)}
+                    </p>
+                    <p>Tytuł: {this.props.post.title}</p>
+                    <p>Opis: {this.processDescription()}</p>
+                    <p>
+                        Liczba wyświetleń:{' '}
+                        {this.props.post.views === null
+                            ? 0
+                            : this.props.post.views}
+                    </p>
+                    <p>Rodzaj postu: {this.processPostType()}</p>
+                    {this.props.post.postType === PostType.WARNING ? (
+                        <p>
+                            Ważne do:{' '}
+                            {this.processDate(this.props.post.dueDate)}
+                        </p>
+                    ) : null}
+                    <input
+                        type="button"
+                        className="button"
+                        value="Edytuj"
+                        onClick={() =>
+                            this.props.initiatePostEdit(this.props.post)
+                        }
+                    />
+                    <input
+                        type="button"
+                        className="button"
+                        value="Usuń"
+                        onClick={this.handleDeleteClick}
+                    />
+                </div>
+                <div className="postIconList">
+                    {this.props.post.imagesPublicIds
+                        ? this.props.post.imagesPublicIds.map(
+                              (imagePublicId, i) => (
+                                  <div key={i} className="postIconListItem">
+                                      <Image
+                                          publicId={imagePublicId}
+                                          format="png"
+                                          quality="auto">
+                                          <Transformation
+                                              crop="fill"
+                                              gravity="faces"
+                                          />
+                                      </Image>
+                                  </div>
+                              )
+                          )
+                        : null}
+                </div>
             </div>
         );
     }
