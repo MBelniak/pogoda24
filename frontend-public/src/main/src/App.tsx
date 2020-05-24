@@ -17,10 +17,9 @@ const BarHolder = require('shared24').BarHolder;
 const Copyright = require('shared24').Copyright;
 
 interface WarningInfo {
-    id: number;
+    postId: string;
     dueDate: Date;
     shortDescription?: string;
-    postId?: number
 }
 
 interface State {
@@ -40,18 +39,30 @@ export default class App extends React.Component<{}, State> {
     }
 
     componentDidMount() {
-        fetchApi('api/warningInfo/topBarWarning', { signal: this.abortController.signal })
+        fetchApi('api/posts/topBarWarning', {
+            signal: this.abortController.signal
+        })
             .then(response => {
                 if (response && response.ok) {
-                    response.json().then(warningInfo => {
-                       this.setState({ warningInfo: {
-                               ...warningInfo,
-                               dueDate: warningInfo.dueDate ? fnstz.zonedTimeToUtc(warningInfo.dueDate, 'Europe/Warsaw') : undefined
-                           } });
-                    }).catch(error => {
-                        console.log(error);
-                        this.setState({ warningInfo: null });
-                    });
+                    response
+                        .json()
+                        .then(warningInfo => {
+                            this.setState({
+                                warningInfo: {
+                                    ...warningInfo,
+                                    dueDate: warningInfo.dueDate
+                                        ? fnstz.zonedTimeToUtc(
+                                              warningInfo.dueDate,
+                                              'Europe/Warsaw'
+                                          )
+                                        : undefined
+                                }
+                            });
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            this.setState({ warningInfo: null });
+                        });
                 } else {
                     console.log(response);
                 }
@@ -83,13 +94,13 @@ export default class App extends React.Component<{}, State> {
                     <Switch>
                         <Route exact path="/" component={MainPage} />
                         <Route path="/prognozy">
-                            <Posts postType={PostType.FORECAST}/>
+                            <Posts postType={PostType.FORECAST} />
                         </Route>
                         <Route path="/ostrzezenia">
-                            <Posts postType={PostType.WARNING}/>
+                            <Posts postType={PostType.WARNING} />
                         </Route>
                         <Route path="/ciekawostki">
-                            <Posts postType={PostType.FACT}/>
+                            <Posts postType={PostType.FACT} />
                         </Route>
                         <Route path="/about" component={ONas} />
                         <Route path="/posts/(\d+)" component={PostView} />

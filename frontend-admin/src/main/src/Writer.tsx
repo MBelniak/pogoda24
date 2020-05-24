@@ -23,9 +23,6 @@ export interface FileToUpload {
 interface State {
     postType: PostType;
     postTypeText: PostTypeText;
-    warningDaysValid: number | undefined;
-    title: string;
-    postDescription: string;
     filesToUpload: FileToUpload[];
 }
 
@@ -42,15 +39,11 @@ export default class Writer extends React.Component<{}, State> {
     state: State = {
         postType: PostType.FORECAST,
         postTypeText: PostTypeText.Prognoza,
-        warningDaysValid: undefined,
-        postDescription: '',
-        title: '',
         filesToUpload: []
     };
 
     private fileId: number;
     private fileInput;
-    private addToTopBarCheckBox;
     private postDescriptionTextArea;
     private titleTextArea;
     private daysValidInput;
@@ -61,7 +54,6 @@ export default class Writer extends React.Component<{}, State> {
         super(props);
         this.fileId = 0;
         this.fileInput = React.createRef();
-        this.addToTopBarCheckBox = React.createRef();
         this.postDescriptionTextArea = React.createRef();
         this.titleTextArea = React.createRef();
         this.daysValidInput = React.createRef();
@@ -69,12 +61,6 @@ export default class Writer extends React.Component<{}, State> {
         this.abortController = new AbortController();
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFilesAdded = this.onFilesAdded.bind(this);
-        this.handleDescriptionTextAreaChange = this.handleDescriptionTextAreaChange.bind(
-            this
-        );
-        this.handleTitleTextAreaChange = this.handleTitleTextAreaChange.bind(
-            this
-        );
         this.clearEverything = this.clearEverything.bind(this);
         this.validateField = this.validateField.bind(this);
         this.onRemoveFile = this.onRemoveFile.bind(this);
@@ -160,35 +146,11 @@ export default class Writer extends React.Component<{}, State> {
             .then(response => {
                 if (response && response.ok) {
                     response
-                        .json()
+                        .text()
                         .then((data: any) => {
                             if (data !== null) {
-                                let warningInfoPromise;
-                                if (
-                                    this.state.postType === PostType.WARNING &&
-                                    this.addToTopBarCheckBox.current.checked
-                                ) {
-                                    warningInfoPromise = this.saveWarningInfo(
-                                        data.id
-                                    );
-                                } else {
-                                    warningInfoPromise = Promise.resolve().then(
-                                        () => null
-                                    );
-                                }
                                 //post saved, send images to cloudinary
-                                warningInfoPromise
-                                    .then(response => {
-                                        this.saveImagesToCloudinary(
-                                            data.id,
-                                            response && response.ok
-                                                ? response.id
-                                                : undefined
-                                        );
-                                    })
-                                    .catch(error => {
-                                        console.log(error);
-                                    });
+                                this.saveImagesToCloudinary(data.id);
                             } else {
                                 this.showErrorMessage(
                                     'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
@@ -199,7 +161,9 @@ export default class Writer extends React.Component<{}, State> {
                             console.log(error);
                         });
                 } else {
-                    console.log(response.statusText + ', ' + response.body);
+                    response.text().then(text => {
+                        console.log(text);
+                    });
                     this.showErrorMessage(
                         'Wystąpił błąd serwera. Nie udało się zapisać postu.'
                     );
@@ -211,34 +175,6 @@ export default class Writer extends React.Component<{}, State> {
     }
 
     private sendPostToBackend(): Promise<Response> {
-        const requestBody = {
-            postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
-            postType: this.state.postType.toString(),
-            title: this.titleTextArea.current.value,
-            description: this.postDescriptionTextArea.current.value,
-            imagesPublicIds: ''
-        };
-
-        const uploadedFilesIdsOrdered: string[] = [];
-        for (let i = 0; i < this.state.filesToUpload.length; ++i) {
-            uploadedFilesIdsOrdered.push(
-                this.state.filesToUpload[i].publicId!!
-            );
-        }
-        requestBody['imagesPublicIds'] = JSON.stringify(
-            uploadedFilesIdsOrdered
-        );
-
-        return fetchApi('api/posts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-    }
-
-    private saveWarningInfo(id: number) {
         function calculateDueDate(days: number): string {
             return fns.format(
                 new Date(
@@ -250,6 +186,11 @@ export default class Writer extends React.Component<{}, State> {
         }
 
         const requestBody = {
+            postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
+            postType: this.state.postType.toString(),
+            title: this.titleTextArea.current.value,
+            description: this.postDescriptionTextArea.current.value,
+            imagesPublicIds: [] as string[],
             dueDate:
                 this.state.postType === PostType.WARNING
                     ? calculateDueDate(
@@ -259,11 +200,20 @@ export default class Writer extends React.Component<{}, State> {
             shortDescription:
                 this.state.postType === PostType.WARNING
                     ? this.warningShortInput.current.value
-                    : null,
-            postId: id
+                    : null
         };
 
-        return fetchApi('api/warningInfo', {
+        const uploadedFilesIdsOrdered: string[] = [];
+        for (let i = 0; i < this.state.filesToUpload.length; ++i) {
+            uploadedFilesIdsOrdered.push(
+                this.state.filesToUpload[i].publicId!!
+            );
+        }
+        requestBody['imagesPublicIds'] = uploadedFilesIdsOrdered;
+
+        console.log(requestBody);
+
+        return fetchApi('api/posts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -272,7 +222,7 @@ export default class Writer extends React.Component<{}, State> {
         });
     }
 
-    private saveImagesToCloudinary(postId: number, warningInfoId?: number) {
+    private saveImagesToCloudinary(postId: number) {
         const uploadPromises: Promise<Response>[] = uploadImages(
             this.state.filesToUpload,
             this.abortController.signal
@@ -291,9 +241,6 @@ export default class Writer extends React.Component<{}, State> {
                         'Nie udało się wysłać wszystkich plików. Post nie został zapisany.'
                     );
                     this.removePostFromBackend(postId);
-                    if (warningInfoId) {
-                        this.removeWarningInfoFromBackend(warningInfoId);
-                    }
                 }
             })
             .catch(error => {
@@ -321,31 +268,6 @@ export default class Writer extends React.Component<{}, State> {
             .catch(error => {
                 console.log(
                     'Error while deleting post. Error message: ' + error
-                );
-            });
-    }
-
-    private removeWarningInfoFromBackend(warningInfoId: number) {
-        fetchApi('api/warningInfo/' + warningInfoId, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (response && response.ok) {
-                    console.log(
-                        'Removed warningInfo with id: ' + warningInfoId
-                    );
-                } else {
-                    console.log(
-                        'Cannot remove warningInfo with id: ' +
-                            warningInfoId +
-                            '. Server response: ' +
-                            response
-                    );
-                }
-            })
-            .catch(error => {
-                console.log(
-                    'Error while deleting warningInfo. Error message: ' + error
                 );
             });
     }
@@ -393,8 +315,6 @@ export default class Writer extends React.Component<{}, State> {
         this.setState({
             postTypeText: PostTypeText.Prognoza,
             postType: PostType.FORECAST,
-            postDescription: '',
-            title: '',
             filesToUpload: []
         });
         closeModal();
@@ -433,17 +353,6 @@ export default class Writer extends React.Component<{}, State> {
     private renderForWarning() {
         return (
             <div>
-                <div style={{ margin: '10px' }}>
-                    <input
-                        id="addToBar"
-                        type="checkbox"
-                        ref={this.addToTopBarCheckBox}
-                    />
-                    <label htmlFor="addToBar">
-                        {' '}
-                        Dodaj ostrzeżenie do paska u góry strony
-                    </label>
-                </div>
                 <label htmlFor="warningDaysValidInput">
                     Czas trwania ostrzeżenia (0 = do końca dzisiejszego dnia,
                     max 14):{' '}
@@ -481,14 +390,6 @@ export default class Writer extends React.Component<{}, State> {
         );
     }
 
-    private handleDescriptionTextAreaChange(event) {
-        this.setState({ postDescription: event.target.value });
-    }
-
-    private handleTitleTextAreaChange(event) {
-        this.setState({ title: event.target.value });
-    }
-
     componentWillUnmount() {
         this.abortController.abort();
     }
@@ -515,8 +416,6 @@ export default class Writer extends React.Component<{}, State> {
                                     maxLength={100}
                                     placeholder="Tytuł"
                                     ref={this.titleTextArea}
-                                    onChange={this.handleTitleTextAreaChange}
-                                    value={this.state.title}
                                     className="input"
                                 />
                                 <p>
@@ -529,10 +428,6 @@ export default class Writer extends React.Component<{}, State> {
                                     rows={10}
                                     placeholder="Treść posta..."
                                     ref={this.postDescriptionTextArea}
-                                    onChange={
-                                        this.handleDescriptionTextAreaChange
-                                    }
-                                    value={this.state.postDescription}
                                     className="textarea"
                                 />
                             </div>

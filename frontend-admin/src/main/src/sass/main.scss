@@ -1,7 +1,6 @@
 @charset "utf-8";
 $primary-color: #23425f;
-$secondary-color: #159f9f;
-$tertiary-color: #25828f;
+$secondary-color: #25afaf;
 $background: $primary-color;
 $body-background-color: $primary-color;
 $navbar-background-color: $secondary-color;
@@ -44,7 +43,7 @@ $footer-padding: 3rem 1.5rem 3rem;
 }
 
 .button.is-primary:active {
-    background-color: $tertiary-color;
+    background-color: $secondary-color;
 }
 
 .writerForm {

@@ -1,13 +1,16 @@
 package com.rubik.backend.controller.rest;
 
+import com.rubik.backend.controller.rest.dto.WarningInfoDTO;
 import com.rubik.backend.entity.Post;
 import com.rubik.backend.entity.PostType;
+import com.rubik.backend.entity.validation.ValidPost;
 import com.rubik.backend.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +31,7 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public ResponseEntity<Long> getPostCount(@RequestParam(required = false) String postType) {
+    public ResponseEntity<Integer> getPostCount(@RequestParam(required = false) String postType) {
         if (postType != null) {
             if (!PostType.contains(postType)) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -50,27 +53,26 @@ public class PostControllerImpl implements PostController {
                 if (page == null || count == null) {
                     return new ResponseEntity<>(postService.getPostsOrderedByDate(PostType.valueOf(postType)), HttpStatus.OK);
                 } else {
-                    return new ResponseEntity<>(postService.getPostsOrderedByDate(PostType.valueOf(postType), page, count).getContent(),
-                            HttpStatus.OK);
+                    return new ResponseEntity<>(postService.getPostsOrderedByDate(PostType.valueOf(postType), page, count), HttpStatus.OK);
                 }
             }
         } else if (page == null || count == null) {
             return new ResponseEntity<>(postService.getPostsOrderedByDate(), HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(postService.getPostsOrderedByDate(page, count).getContent(), HttpStatus.OK);
+        return new ResponseEntity<>(postService.getPostsOrderedByDate(page, count), HttpStatus.OK);
     }
 
     @Override
-    public Post getPost(@PathVariable("id") Long postId, HttpServletRequest request) {
+    public Post getPost(@PathVariable("id") String postId, HttpServletRequest request) {
         return postService.getPostById(postId);
     }
 
     @Override
-    public ResponseEntity<Post> addPost(@RequestBody @Valid Post post, BindingResult bindingResult) throws BindException {
+    public ResponseEntity<String> addPost(@RequestBody Post post, BindingResult bindingResult) throws BindException {
         if (!bindingResult.hasErrors()) {
-            postService.savePost(post);
-            return new ResponseEntity<>(post, HttpStatus.OK);
+            String id = postService.savePost(post);
+            return id != null ? new ResponseEntity<>(id, HttpStatus.CREATED) : new ResponseEntity<>(HttpStatus.OK);
         }
         throw new BindException(bindingResult);
     }
@@ -108,9 +110,15 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public void deletePost(@PathVariable Long id) {
+    public void deletePost(@PathVariable String id) {
         if (id != null) {
             postService.deletePost(id);
         }
     }
+
+    @Override
+    public WarningInfoDTO getLatestWarningInfo() {
+        return postService.getLatestWarningInfo();
+    }
+
 }

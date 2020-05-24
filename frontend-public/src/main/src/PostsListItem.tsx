@@ -130,7 +130,7 @@ export default class PostsListItem extends React.Component<
                 />
                 <div style={{ textAlign: 'center' }}>
                     <ForecastMapList
-                        imagesPublicIds={this.props.post.imagesPublicIdsJSON}
+                        imagesPublicIds={this.props.post.imagesPublicIds}
                     />
                 </div>
             </div>

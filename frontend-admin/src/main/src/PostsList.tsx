@@ -7,11 +7,13 @@ const Copyright = require('shared24').Copyright;
 const TopImage = require('shared24').TopImage;
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
+const PagingBar = require('shared24').PagingBar;
 const LoadingIndicator = require('shared24').LoadingIndicator;
 
 interface State {
-    postsCount: number;
-    posts: Post[];
+    posts: Post[] | undefined;
+    totalPostsCount: number;
+    currentPage: number;
     postEdition: boolean;
     postToEdit?: Post;
 }
@@ -21,8 +23,9 @@ export default class PostsList extends React.Component<{}, State> {
     private abortController;
 
     state: State = {
-        postsCount: 0,
         posts: [],
+        totalPostsCount: 0,
+        currentPage: 0,
         postEdition: false,
         postToEdit: undefined
     };
@@ -31,6 +34,7 @@ export default class PostsList extends React.Component<{}, State> {
         super(props);
         this.initiatePostEdit = this.initiatePostEdit.bind(this);
         this.onFinishEditing = this.onFinishEditing.bind(this);
+        this.handlePageClick = this.handlePageClick.bind(this);
         this.abortController = new AbortController();
     }
 
@@ -51,9 +55,9 @@ export default class PostsList extends React.Component<{}, State> {
                 response
                     .json()
                     .then(data => {
-                        this.setState({ postsCount: data });
+                        this.setState({ totalPostsCount: data });
                         fetchApi(
-                            'api/posts?&page=0&count=' + this.postsPerPage,
+                            'api/posts?page=0&count=' + this.postsPerPage,
                             { signal: this.abortController.signal }
                         )
                             .then(response =>
@@ -86,6 +90,31 @@ export default class PostsList extends React.Component<{}, State> {
             });
     }
 
+    private handlePageClick(data) {
+        const selected = data.selected;
+        this.setState({ posts: undefined, currentPage: selected });
+        fetchApi('api/posts?page=' + selected + '&count=' + this.postsPerPage, {
+            signal: this.abortController.signal
+        })
+            .then(response => {
+                if (response && response.ok) {
+                    response
+                        .json()
+                        .then(posts => {
+                            this.setState({ posts: posts });
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                } else {
+                    this.setState({ posts: [] });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     componentDidMount() {
         this.fetchPostsFromApi();
     }
@@ -108,8 +137,8 @@ export default class PostsList extends React.Component<{}, State> {
                         <>
                             <h2 className="title">Lista postów: </h2>
                             <div className="container fluid">
-                                {!this.state.posts ||
-                                this.state.posts.length === 0 ? (
+                                {!this.state.posts ? null : this.state.posts
+                                      .length === 0 ? (
                                     <div
                                         style={{
                                             textAlign: 'center',
@@ -131,6 +160,19 @@ export default class PostsList extends React.Component<{}, State> {
                                     </div>
                                 )}
                             </div>
+                            {this.state.totalPostsCount <=
+                            this.postsPerPage ? null : (
+                                <PagingBar
+                                    pages={Math.ceil(
+                                        this.state.totalPostsCount /
+                                        this.postsPerPage
+                                    )}
+                                    handlePageClick={
+                                        this.handlePageClick
+                                    }
+                                    currentPage={this.state.currentPage}
+                                />
+                            )}
                         </>
                     )}
                 </section>

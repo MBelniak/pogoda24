@@ -23,7 +23,6 @@ import {
 } from 'suneditor/src/plugins';
 
 import {
-    cloudinaryDownloadUrl,
     uploadImages
 } from './helpers/CloudinaryHelper';
 import { FileToUpload } from './Writer';

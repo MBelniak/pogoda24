@@ -16,8 +16,8 @@ export class PagingBar extends React.Component<PagingBarProps> {
         return (
             <div className="pagination">
                 <ReactPaginate
-                    previousLabel={'Poprzednie'}
-                    nextLabel={'Następne'}
+                    previousLabel={'<'}
+                    nextLabel={'>'}
                     breakLabel={'...'}
                     breakClassName={'break-me'}
                     pageCount={this.props.pages}

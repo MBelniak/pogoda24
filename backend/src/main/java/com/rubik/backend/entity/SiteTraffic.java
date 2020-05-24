@@ -1,30 +1,27 @@
 package com.rubik.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.google.cloud.firestore.annotation.DocumentId;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
-@Entity
 public class SiteTraffic {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @DocumentId
+    private String id;
 
     @NotNull(message = "Property 'date' cannot be null.")
     @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Temporal(TemporalType.DATE)
     private Date date;
 
     private Long views;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

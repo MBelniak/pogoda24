@@ -1,74 +1,106 @@
 package com.rubik.backend.service;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
 import com.rubik.backend.entity.Post;
 import com.rubik.backend.entity.SiteTraffic;
-import com.rubik.backend.repository.PostRepository;
-import com.rubik.backend.repository.SiteRepository;
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import static com.rubik.backend.constants.ServiceConstants.POSTS_COLLECTION;
+import static com.rubik.backend.constants.ServiceConstants.SITE_VIEWS;
 
 @Service
 public class TrafficService {
 
-    private SiteRepository siteRepository;
-
-    private PostRepository postRepository;
+    private Firestore firestore;
 
     @Autowired
-    public TrafficService(SiteRepository siteRepository, PostRepository postRepository) {
-        this.siteRepository = siteRepository;
-        this.postRepository = postRepository;
+    public TrafficService(Firestore firestore) {
+        this.firestore = firestore;
     }
 
-    @Transactional
-    public SiteTraffic incrementSiteViewsForToday() {
-        Date now = new Date(Calendar.getInstance().getTimeInMillis());
-        SiteTraffic siteTraffic = siteRepository.getFirstByDate(now);
-        if (siteTraffic == null) {
-            siteTraffic = new SiteTraffic();
-            siteTraffic.setDate(now);
-            siteTraffic.setViews(0L);
+    public void incrementSiteViewsForToday() {
+        LocalDate localDate = new LocalDate();
+        Date today = localDate.toDate();
+
+        firestore.runTransaction(transaction -> {
+            Query query = firestore.collection(SITE_VIEWS).whereEqualTo("date", today);
+            List<QueryDocumentSnapshot> siteTraffics = transaction.get(query).get().getDocuments();
+
+            if (siteTraffics.size() > 0) {
+                QueryDocumentSnapshot snapshot = siteTraffics.get(0);
+                transaction.update(snapshot.getReference(), "views", snapshot.getLong("views") + 1);
+                return null;
+            } else {
+                SiteTraffic siteTraffic = new SiteTraffic();
+                siteTraffic.setDate(today);
+                siteTraffic.setViews(1L);
+                DocumentReference document = firestore.collection(SITE_VIEWS).document();
+                transaction.create(document, siteTraffic);
+                return null;
+            }
+        });
+    }
+
+    public void addViewsForPost(String postId, Long views) {
+        DocumentReference document = firestore.collection(POSTS_COLLECTION).document(postId);
+        firestore.runTransaction(transaction -> {
+            DocumentSnapshot snapshot = transaction.get(document).get();
+            transaction.update(document, "views", snapshot.getLong("views") + views);
+            return null;
+        });
+    }
+
+    public Long getViewsForPost(String postId) {
+        DocumentReference docRef = firestore.collection(POSTS_COLLECTION).document(postId);
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        try {
+            DocumentSnapshot document = future.get();
+            if (document.exists()) {
+                return document.toObject(Post.class).getViews();
+            } else {
+                return null;
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
         }
-        siteTraffic.setViews(siteTraffic.getViews() + 1);
-        siteRepository.save(siteTraffic);
-        return siteTraffic;
-    }
-
-    @Transactional
-    public void addViewsForPost(Long postId, Long views) {
-        Post post = postRepository.findFirstById(postId);
-        if (post != null) {
-            Long currentViews = post.getViews();
-            post.setViews(currentViews == null ? 1 : currentViews + views);
-            postRepository.save(post);
-        }
-    }
-
-    public Long getViewsForPost(Long postId) {
-        return postRepository.getViewsByPostId(postId);
     }
 
     public List<SiteTraffic> getViewsForSite(Integer daysBack) {
-        Date today = Calendar.getInstance().getTime();
+        LocalDate localDate = new LocalDate();
+        Date today = localDate.toDate();
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
+        c.setTime(today);
         c.add(Calendar.DATE, -daysBack);
-        List<SiteTraffic> siteViews = siteRepository.getAllByDateBetween(c.getTime(), today);
-        siteViews.sort((leftSiteViews, rightSiteViews) -> {
-            long left = leftSiteViews.getDate().getTime();
-            long right = rightSiteViews.getDate().getTime();
-            return Long.compare(right, left);
-        });
-        return siteViews;
+        Date back = c.getTime();
+
+        Query query = firestore.collection(SITE_VIEWS).whereGreaterThan("date", back).whereLessThan("date", today);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        try {
+            return querySnapshot.get().toObjects(SiteTraffic.class);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<SiteTraffic> getAllSiteTraffic() {
-        return siteRepository.findAll();
+        CollectionReference posts = firestore.collection(POSTS_COLLECTION);
+        ApiFuture<QuerySnapshot> querySnapshot = posts.get();
+        try {
+            return querySnapshot.get().toObjects(SiteTraffic.class);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 }

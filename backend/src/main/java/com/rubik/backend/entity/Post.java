@@ -1,28 +1,31 @@
 package com.rubik.backend.entity;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.cloud.firestore.annotation.DocumentId;
+import com.rubik.backend.entity.validation.ValidPost;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
 
-@Entity
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@ValidPost
 public class Post {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
+    @DocumentId
+    private String id;
 
     @NotNull(message = "Property 'postType' cannot be null.")
-    @Enumerated(EnumType.STRING)
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private PostType postType;
 
     @NotNull(message = "Property 'postDate' cannot be null.")
     @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private Timestamp postDate;
+    private Date postDate;
 
     @NotNull(message = "Property 'title' cannot be null.")
     @Size(max=100)
@@ -31,29 +34,32 @@ public class Post {
     @NotNull(message = "Property 'description' cannot be null.")
     private String description;
 
-    @JsonIgnore
-    @Access(AccessType.PROPERTY)
-    @Column(name ="images_public_ids")
-    private String imagesPublicIds;
-
-    @Transient
-    private JsonNode imagesPublicIdsJSON;
+    private List<String> imagesPublicIds;
 
     private Long views;
+
+    @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date dueDate;
+
+    private String shortDescription;
 
     public Post() {
         this.views = 0L;
     }
 
     @JsonCreator
-    public Post(@JsonProperty("id") Long id,
-                   @JsonProperty(value = "postDate", required = true) Timestamp postDate,
+    public Post(@JsonProperty("id") String id,
+                   @JsonProperty(value = "postDate", required = true) Date postDate,
                    @JsonProperty(value = "postType", required = true) String postType,
                    @JsonProperty(value = "title", required = true) String title,
                    @JsonProperty(value = "description", required = true) String description,
-                   @JsonProperty("imagesPublicIds") String imagesPublicIds,
-                   @JsonProperty("views") Long views) {
-        this.id = id;
+                   @JsonProperty("imagesPublicIds") List<String> imagesPublicIds,
+                   @JsonProperty("views") Long views,
+                   @JsonProperty("dueDate") Date dueDate,
+                   @JsonProperty("shortDescription") String shortDescription) {
+        if (id != null) {
+            this.id = id;
+        }
         this.postType = PostType.contains(postType) ? PostType.valueOf(postType) : null;
         this.postDate = postDate;
         this.title = title;
@@ -63,14 +69,22 @@ public class Post {
         }
         if (views != null) {
             this.views = views;
+        } else {
+            this.views = 0L;
+        }
+        if (dueDate != null) {
+            this.dueDate = dueDate;
+        }
+        if (shortDescription != null) {
+            this.shortDescription = shortDescription;
         }
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -82,11 +96,11 @@ public class Post {
         this.postType = postType;
     }
 
-    public Timestamp getPostDate() {
+    public Date getPostDate() {
         return postDate;
     }
 
-    public void setPostDate(Timestamp postDate) {
+    public void setPostDate(Date postDate) {
         this.postDate = postDate;
     }
 
@@ -106,31 +120,12 @@ public class Post {
         this.description = description;
     }
 
-    @Transient
-    public JsonNode getImagesPublicIdsJSON() {
-        return imagesPublicIdsJSON;
+    public List<String> getImagesPublicIds() {
+        return imagesPublicIds;
     }
 
-    public void setImagesPublicIdsJSON(JsonNode json) {
-        this.imagesPublicIdsJSON = json;
-    }
-
-    @JsonIgnore
-    public String getImagesPublicIds() {
-        if (imagesPublicIdsJSON == null) {
-            return "";
-        }
-        return imagesPublicIdsJSON.toString();
-    }
-
-    @JsonIgnore
-    public void setImagesPublicIds(String imagesPublicIds) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            imagesPublicIdsJSON = mapper.readTree(imagesPublicIds);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void setImagesPublicIds(List<String> imagesPublicIds) {
+        this.imagesPublicIds = imagesPublicIds;
     }
 
     public Long getViews() {
@@ -139,5 +134,21 @@ public class Post {
 
     public void setViews(Long views) {
         this.views = views;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
     }
 }

@@ -1,66 +1,159 @@
 package com.rubik.backend.service;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import com.rubik.backend.controller.rest.dto.WarningInfoDTO;
 import com.rubik.backend.entity.Post;
 import com.rubik.backend.entity.PostType;
-import com.rubik.backend.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import static com.rubik.backend.constants.ServiceConstants.POSTS_COLLECTION;
 
 @Service
 public class PostService {
 
-    private PostRepository postRepository;
+    private Firestore firestore;
 
     @Autowired
-    public PostService(PostRepository postRepository) {
-        this.postRepository = postRepository;
+    public PostService(Firestore firestore) {
+        this.firestore = firestore;
+    }
+
+    public Post getPostById(String id) {
+        DocumentReference docRef = firestore.collection(POSTS_COLLECTION).document(id);
+        ApiFuture<DocumentSnapshot> future = docRef.get();
+        try {
+            DocumentSnapshot document = future.get();
+            if (document.exists()) {
+                return document.toObject(Post.class);
+            } else {
+                return null;
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<Post> getPostsOrderedByDate() {
-        return postRepository.findAllOrderedByDate();
+        CollectionReference posts = firestore.collection(POSTS_COLLECTION);
+        Query query = posts.orderBy("postDate", Query.Direction.DESCENDING);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        try {
+            return querySnapshot.get().toObjects(Post.class);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public List<Post> getPostsOrderedByDate(PostType postType) {
-        return postRepository.findAllByPostTypeOrderedByDate(postType);
+        CollectionReference postsCollection = firestore.collection(POSTS_COLLECTION);
+        Query query = postsCollection.orderBy("postDate", Query.Direction.DESCENDING);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        try {
+            List<Post> posts = querySnapshot.get().toObjects(Post.class);
+            return posts.stream().filter(post -> post.getPostType() == postType).collect(Collectors.toList());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public Page<Post> getPostsOrderedByDate(int page, int count) {
-        Pageable pageable = PageRequest.of(page, count, Sort.by("postDate").descending());
-        return postRepository.findAll(pageable);
+    public List<Post> getPostsOrderedByDate(int page, int pageSize) {
+        CollectionReference postsCollection = firestore.collection(POSTS_COLLECTION);
+        Query query = postsCollection.orderBy("postDate", Query.Direction.DESCENDING).limit(pageSize).offset(page * pageSize);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        try {
+            return querySnapshot.get().toObjects(Post.class);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public Page<Post> getPostsOrderedByDate(PostType postType, int page, int count) {
-        Pageable pageable = PageRequest.of(page, count, Sort.by("postDate").descending());
-        return postRepository.findAllByPostType(postType, pageable);
+    public List<Post> getPostsOrderedByDate(PostType postType, int page, int pageSize) {
+        CollectionReference postsCollection = firestore.collection(POSTS_COLLECTION);
+        Query query = postsCollection.orderBy("postDate", Query.Direction.DESCENDING);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        try {
+            List<Post> posts = querySnapshot.get().toObjects(Post.class);
+            posts = posts.stream().filter(post -> post.getPostType() == postType).collect(Collectors.toList());
+            if (page * pageSize + pageSize <= posts.size()) {
+                return posts.subList(page * pageSize, page * pageSize + pageSize);
+            } else if (page * pageSize <= posts.size()) {
+                return posts.subList(page * pageSize, posts.size());
+            } else {
+                return new ArrayList<>();
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public Post getPostById(Long id) {
-        return postRepository.findFirstById(id);
+    public String savePost(Post post) {
+        if (post.getId() == null) {
+            ApiFuture<DocumentReference> addedDocRef = firestore.collection(POSTS_COLLECTION).add(post);
+            try {
+                return addedDocRef.get().getId();
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            firestore.collection(POSTS_COLLECTION).document(post.getId()).set(post);
+            return post.getId();
+        }
     }
 
-    public List<Post> getPostByIdIn(List<Long> ids) {
-        return postRepository.findAllByIdIn(ids);
+    public void deletePost(String id) {
+        firestore.collection(POSTS_COLLECTION).document(id).delete();
     }
 
-    public void savePost(Post post) {
-        postRepository.saveAndFlush(post);
+    public int getPostCount() {
+        CollectionReference posts = firestore.collection(POSTS_COLLECTION);
+        ApiFuture<QuerySnapshot> querySnapshot = posts.get();
+        try {
+            return querySnapshot.get().size();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
-    public void deletePost(Long id) {
-        postRepository.deleteById(id);
+    public int getPostCount(PostType postType) {
+        CollectionReference posts = firestore.collection(POSTS_COLLECTION);
+        ApiFuture<QuerySnapshot> querySnapshot = posts.whereEqualTo("postType", postType.toString()).get();
+        try {
+            return querySnapshot.get().size();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
-    public Long getPostCount() {
-        return postRepository.count();
-    }
-
-    public Long getPostCount(PostType postType) {
-        return postRepository.countByPostType(postType);
+    public WarningInfoDTO getLatestWarningInfo() {
+        CollectionReference postsRef = firestore.collection(POSTS_COLLECTION);
+        Query query = postsRef.orderBy("postDate", Query.Direction.DESCENDING);
+        ApiFuture<QuerySnapshot> querySnapshot = query.get();
+        try {
+            List<Post> posts = querySnapshot.get().toObjects(Post.class);
+            posts = posts.stream().filter(post -> post.getPostType() == PostType.WARNING && post.getDueDate() != null && post.getDueDate().getTime() >= new Date().getTime()).collect(Collectors.toList());
+            if (posts.size() > 0) {
+                return new WarningInfoDTO(posts.get(0));
+            }
+            return null;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
