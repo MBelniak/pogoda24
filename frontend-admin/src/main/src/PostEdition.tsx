@@ -375,58 +375,53 @@ export default class PostEdition extends React.Component<
         return (
             <div className="columns">
                 <div className="column is-half">
-                    <div className="columns">
-                        <div className="column">
-                            <label htmlFor="warningDaysValidInput">
-                                Czas trwania ostrzeżenia (0 = do końca
-                                dzisiejszego dnia:{' '}
-                            </label>
-                        </div>
-                        <div className="column">
-                            <input
-                                id="warningDaysValidInput"
-                                type="number"
-                                required={true}
-                                ref={this.daysValidInput}
-                                min="0"
-                                max="7"
-                                defaultValue={
-                                    fns.differenceInCalendarDays(
-                                        fnstz.zonedTimeToUtc(
-                                            this.props.post.dueDate,
-                                            'Europe/Warsaw'
-                                        ),
-                                        this.props.post.postDate
-                                    ) - 1
-                                }
-                                onBlur={e =>
-                                    this.validateField(
-                                        e.target,
-                                        daysValidInputConstraint
-                                    )
-                                }
-                            />
-                        </div>
-                    </div>
-                    <div className="columns">
-                        <div className="column">
-                            <label htmlFor="warningShortInput">
-                                Krótki opis (zostanie wyświetlony na pasku u
-                                góry strony):{' '}
-                            </label>
-                        </div>
-                        <div className="column">
-                            <input
-                                id="warningShortInput"
-                                type="text"
-                                required={true}
-                                maxLength={80}
-                                ref={this.warningShortInput}
-                                defaultValue={this.props.post.shortDescription}
-                                onBlur={e => this.validateField(e.target)}
-                            />
-                        </div>
-                    </div>
+                    <label htmlFor="warningDaysValidInput">
+                        Czas trwania ostrzeżenia (0 = do końca dzisiejszego
+                        dnia, max 14):{' '}
+                    </label>
+                    <br/>
+                    <input
+                        id="warningDaysValidInput"
+                        className="input daysValidInput"
+                        type="number"
+                        required={true}
+                        ref={this.daysValidInput}
+                        min="0"
+                        max="7"
+                        defaultValue={
+                            this.props.post.dueDate
+                                ? fns.differenceInCalendarDays(
+                                      fnstz.zonedTimeToUtc(
+                                          this.props.post.dueDate,
+                                          'Europe/Warsaw'
+                                      ),
+                                      this.props.post.postDate
+                                  ) - 1
+                                : ''
+                        }
+                        onBlur={e =>
+                            this.validateField(
+                                e.target,
+                                daysValidInputConstraint
+                            )
+                        }
+                    />
+                    <br/>
+                    <label htmlFor="warningShortInput">
+                        Krótki opis (zostanie wyświetlony na pasku u góry
+                        strony):{' '}
+                    </label>
+                    <br/>
+                    <input
+                        id="warningShortInput"
+                        className="input"
+                        type="text"
+                        required={true}
+                        maxLength={80}
+                        ref={this.warningShortInput}
+                        defaultValue={this.props.post.shortDescription}
+                        onBlur={e => this.validateField(e.target)}
+                    />
                 </div>
                 <div className="column is-half" />
             </div>
@@ -556,13 +551,12 @@ export default class PostEdition extends React.Component<
                     {this.state.postType === PostType.WARNING
                         ? this.renderForWarning()
                         : null}
-                    <form onSubmit={this.handleSubmit}>
-                        <input
-                            type="submit"
-                            className="button"
-                            value="Wyślij"
-                        />
-                    </form>
+                    <input
+                        type="submit"
+                        className="button"
+                        value="Wyślij"
+                        onClick={this.handleSubmit}
+                    />
                 </div>
             </>
         );

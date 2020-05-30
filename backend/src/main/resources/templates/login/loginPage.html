@@ -12,17 +12,36 @@
 <section class="section">
     <div class="container centered main">
         <span class="logoTitle">Pogoda 24/7</span>
-        <div style="max-width: 400px; align-content: center;" class="form">
+        <div style="max-width: 400px; align-content: center;" class="form" id="mainForm">
             <form action="/login" method="post">
                 <label class="label">Login: </label>
                 <input class="input" id="username" name="username" type="text" placeholder="Login"
-                       autofocus="autofocus"/><br/>
+                       autofocus="autofocus" maxlength="100"/><br/>
                 <label class="label">Hasło:</label>
-                <input class="input" name="password" id="password" type="password" placeholder="Hasło"/><br/>
+                <input class="input" name="password" id="password" type="password" placeholder="Hasło" maxlength="100"/><br/>
                 <input class="button is-primary" style="margin-top: 10px" type="submit" name="submit" value="Zaloguj"/>
             </form>
         </div>
     </div>
 </section>
+<script>
+    window.onload = function () {
+        const href = location.href;
+        let queryParams = href.substr(href.indexOf('?') + 1, href.length).split('&');
+        console.log(queryParams);
+        for (let i = 0; i < queryParams.length; i++) {
+            let pair = queryParams[i].split('=');
+            if (pair[0] === 'error') {
+                if (decodeURIComponent(pair[1]) === 'true') {
+                    let p = document.createElement("p");
+                    p.innerHTML = "Nieprawidłowe dane logowania";
+                    p.classList.add("loginFailMessage");
+                    document.getElementById('mainForm').appendChild(p);
+                }
+                break;
+            }
+        }
+    };
+</script>
 </body>
 </html>

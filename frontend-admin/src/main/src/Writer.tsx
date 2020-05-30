@@ -333,7 +333,7 @@ export default class Writer extends React.Component<{}, State> {
 
     private goToPost() {
         const origin = location.href.split('/')[0];
-        location.href = origin + '/posts/'+ this.savedPostId;
+        location.href = origin + '/posts/' + this.savedPostId;
     }
 
     private onRemoveFile(fileId: number) {
@@ -368,40 +368,52 @@ export default class Writer extends React.Component<{}, State> {
 
     private renderForWarning() {
         return (
-            <div>
-                <label htmlFor="warningDaysValidInput">
-                    Czas trwania ostrzeżenia (0 = do końca dzisiejszego dnia,
-                    max 14):{' '}
-                </label>
-                <input
-                    id="warningDaysValidInput"
-                    className="input daysValidInput"
-                    type="number"
-                    required={true}
-                    ref={this.daysValidInput}
-                    min="0"
-                    max="14"
-                    onKeyUp={e =>
-                        this.validateField(e.target, daysValidInputConstraint)
-                    }
-                    onBlur={e =>
-                        this.validateField(e.target, daysValidInputConstraint)
-                    }
-                />
-                <br />
-                <label htmlFor="warningShortInput">
-                    Krótki opis (zostanie wyświetlony na pasku u góry strony):{' '}
-                </label>
-                <input
-                    id="warningShortInput"
-                    type="text"
-                    className="input"
-                    required={true}
-                    maxLength={80}
-                    ref={this.warningShortInput}
-                    onKeyUp={e => this.validateField(e.target)}
-                    onBlur={e => this.validateField(e.target)}
-                />
+            <div className="columns">
+                <div className="column is-half">
+                    <label htmlFor="warningDaysValidInput">
+                        Czas trwania ostrzeżenia (0 = do końca dzisiejszego
+                        dnia, max 14):{' '}
+                    </label>
+                    <br />
+                    <input
+                        id="warningDaysValidInput"
+                        className="input daysValidInput"
+                        type="number"
+                        required={true}
+                        ref={this.daysValidInput}
+                        min="0"
+                        max="14"
+                        onKeyUp={e =>
+                            this.validateField(
+                                e.target,
+                                daysValidInputConstraint
+                            )
+                        }
+                        onBlur={e =>
+                            this.validateField(
+                                e.target,
+                                daysValidInputConstraint
+                            )
+                        }
+                    />
+                    <br />
+                    <label htmlFor="warningShortInput">
+                        Krótki opis (zostanie wyświetlony na pasku u góry
+                        strony):{' '}
+                    </label>
+                    <br />
+                    <input
+                        id="warningShortInput"
+                        type="text"
+                        className="input"
+                        required={true}
+                        maxLength={80}
+                        ref={this.warningShortInput}
+                        onKeyUp={e => this.validateField(e.target)}
+                        onBlur={e => this.validateField(e.target)}
+                    />
+                </div>
+                <div className="column is-half" />
             </div>
         );
     }
@@ -540,13 +552,12 @@ export default class Writer extends React.Component<{}, State> {
                         {this.state.postType === PostType.WARNING
                             ? this.renderForWarning()
                             : null}
-                        <form onSubmit={this.handleSubmit}>
-                            <input
-                                type="submit"
-                                className="button"
-                                value="Wyślij"
-                            />
-                        </form>
+                        <input
+                            type="submit"
+                            className="button"
+                            value="Wyślij"
+                            onClick={this.handleSubmit}
+                        />
                     </div>
                 </section>
                 <Copyright />

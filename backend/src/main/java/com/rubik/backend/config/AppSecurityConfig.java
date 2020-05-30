@@ -50,13 +50,13 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/login")
                 .successHandler(successHandler())
                 .failureUrl("/login?error=true")
-                .defaultSuccessUrl("/write?login=success")
+                .defaultSuccessUrl("/write")
                 .and()
                 .logout()
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login?logout=success");
+                .logoutSuccessUrl("/login");
     }
 
     @Bean
