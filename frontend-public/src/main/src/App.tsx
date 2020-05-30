@@ -9,7 +9,6 @@ import 'shared24/src/sass/main.scss';
 import * as fnstz from 'date-fns-tz';
 import { TopBar } from './TopBar';
 import PostView from './PostView';
-import ErrorPage from './ErrorPage';
 import { fetchApi } from './helper/fetchHelper';
 import { Posts } from './Posts';
 import { PostType } from './Post';
@@ -104,7 +103,6 @@ export default class App extends React.Component<{}, State> {
                         </Route>
                         <Route path="/about" component={ONas} />
                         <Route path="/posts/([a-zA-Z0-9]+)" component={PostView} />
-                        <Route component={ErrorPage} />
                     </Switch>
                     <Copyright />
                 </div>

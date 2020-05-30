@@ -67,7 +67,6 @@ export class MainPage extends React.Component<{}, State> {
                             </div>
                         ) : <CustomLinearProgress />}
                     </div>
-
                     <ExternalApi />
                 </div>
             </section>

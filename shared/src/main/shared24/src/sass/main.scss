@@ -85,6 +85,9 @@ $footer-padding: 3rem 1.5rem 3rem;
     background-color: $secondary-color;
     box-shadow: 0 0 5px $secondary-color;
     color: $white;
+}
+
+.pagingBar li:hover.active, .pagingBar li.active a:hover {
     cursor: default;
 }
 
