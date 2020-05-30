@@ -9,7 +9,7 @@ export class ONas extends React.Component {
 
     render() {
         return (
-            <section className="container fluid mainContent">
+            <section className="container is-fluid mainContent">
                 <div className="post ekipa">
                     <p style={{margin: "15px", wordWrap: "break-word"}}>Dziękujemy, że zajrzałeś na naszą stronę.<br/>
                         Zostawiając łapkę w górę na naszej stronie na <a

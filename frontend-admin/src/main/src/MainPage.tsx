@@ -11,7 +11,6 @@ export default class MainPage extends React.Component {
     private renderFlaticonAttribution() {
         return (
             <div className="attribution">
-                <div>
                     Icons made by{' '}
                     <a
                         href="https://www.flaticon.com/authors/freepik"
@@ -51,7 +50,6 @@ export default class MainPage extends React.Component {
                     <a href="https://www.flaticon.com/" title="Flaticon">
                         www.flaticon.com
                     </a>
-                </div>
             </div>
         );
     }
@@ -59,7 +57,7 @@ export default class MainPage extends React.Component {
     render() {
         return (
             <div className="main">
-                <section className="container fluid">
+                <section className="container">
                     <TopImage />
                     <Links />
                 </section>

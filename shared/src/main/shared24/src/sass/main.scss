@@ -38,9 +38,9 @@ $footer-padding: 3rem 1.5rem 3rem;
     height: 0;
 }
 
-.copyright {
+.copyright * {
     font-size: 0.8rem;
-    color: white;
+    color: white !important;
 }
 
 .pagingBar {
@@ -56,15 +56,15 @@ $footer-padding: 3rem 1.5rem 3rem;
 }
 
 .pagingBar li {
-    background-color: $secondary-color;
-    box-shadow: 0 0 5px $secondary-color;
+    background-color: white;
+    box-shadow: 0 0 5px white;
     border-radius: 0.3rem;
 }
 
 .pagingBar li a {
     margin: 0.5rem;
     padding: 5px;
-    color: white;
+    color: black;
     transition: 0.3s;
 }
 
@@ -81,8 +81,10 @@ $footer-padding: 3rem 1.5rem 3rem;
     display: none;
 }
 
-.pagingBar .active a {
-    color: $primary-color;
+.pagingBar .active {
+    background-color: $secondary-color;
+    box-shadow: 0 0 5px $secondary-color;
+    color: $white;
     cursor: default;
 }
 

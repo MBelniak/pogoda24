@@ -25,7 +25,7 @@ interface State {
 }
 
 const daysValidInputConstraint = (text: string): boolean => {
-    return parseInt(text) >= 0;
+    return parseInt(text) >= 0 && parseInt(text) <= 14;
 };
 
 export default class PostEdition extends React.Component<
@@ -114,19 +114,21 @@ export default class PostEdition extends React.Component<
             this.fileInput.current.value = null;
             return;
         }
+
+        let filesToBePushed: FileToUpload[] = [];
         for (let file of files) {
             let timestamp = new Date().getTime().toString();
             timestamp = timestamp.substr(0, timestamp.length - 3);
-            const newFile = {
+            filesToBePushed.push({
                 id: this.fileId++,
                 file: file,
                 publicId: file.name + timestamp,
                 timestamp: timestamp
-            };
-            this.setState({
-                filesToUpload: [...this.state.filesToUpload, newFile]
             });
         }
+        this.setState({
+            filesToUpload: [...this.state.filesToUpload, ...filesToBePushed]
+        });
         this.fileInput.current.value = null;
     }
 
@@ -134,7 +136,6 @@ export default class PostEdition extends React.Component<
         htmlInput,
         additionalConstraint?: (value) => boolean
     ) {
-        if (this.state.postType !== PostType.WARNING) return;
         if (
             !htmlInput.value ||
             (additionalConstraint
@@ -151,15 +152,19 @@ export default class PostEdition extends React.Component<
 
     private handleSubmit(event) {
         event.preventDefault();
+        let formValid = true;
         if (this.state.postType === PostType.WARNING) {
-            let formValid = this.validateField(
+            formValid = this.validateField(
                 this.daysValidInput.current,
                 daysValidInputConstraint
             );
             formValid =
                 this.validateField(this.warningShortInput.current) && formValid;
-            if (!formValid) return;
         }
+
+        formValid = formValid && this.validateField(this.titleTextArea.current);
+        if (!formValid) return;
+
         showModal(<LoadingIndicator />);
         this.sendPostToBackend()
             .then(response => {
@@ -379,7 +384,7 @@ export default class PostEdition extends React.Component<
                         Czas trwania ostrzeżenia (0 = do końca dzisiejszego
                         dnia, max 14):{' '}
                     </label>
-                    <br/>
+                    <br />
                     <input
                         id="warningDaysValidInput"
                         className="input daysValidInput"
@@ -387,7 +392,7 @@ export default class PostEdition extends React.Component<
                         required={true}
                         ref={this.daysValidInput}
                         min="0"
-                        max="7"
+                        max="14"
                         defaultValue={
                             this.props.post.dueDate
                                 ? fns.differenceInCalendarDays(
@@ -399,19 +404,32 @@ export default class PostEdition extends React.Component<
                                   ) - 1
                                 : ''
                         }
-                        onBlur={e =>
+                        onInput={e => {
+                            if (this.daysValidInput.current.value.length > 2)
+                                this.daysValidInput.current.value = this.daysValidInput.current.value.slice(
+                                    0,
+                                    2
+                                );
+                        }}
+                        onKeyUp={() => {
                             this.validateField(
-                                e.target,
+                                this.daysValidInput.current,
+                                daysValidInputConstraint
+                            );
+                        }}
+                        onBlur={() =>
+                            this.validateField(
+                                this.daysValidInput.current,
                                 daysValidInputConstraint
                             )
                         }
                     />
-                    <br/>
+                    <br />
                     <label htmlFor="warningShortInput">
                         Krótki opis (zostanie wyświetlony na pasku u góry
                         strony):{' '}
                     </label>
-                    <br/>
+                    <br />
                     <input
                         id="warningShortInput"
                         className="input"
@@ -420,6 +438,7 @@ export default class PostEdition extends React.Component<
                         maxLength={80}
                         ref={this.warningShortInput}
                         defaultValue={this.props.post.shortDescription}
+                        onKeyUp={e => this.validateField(e.target)}
                         onBlur={e => this.validateField(e.target)}
                     />
                 </div>
@@ -441,7 +460,7 @@ export default class PostEdition extends React.Component<
         return (
             <>
                 <h2 className="title">Edytuj post.</h2>
-                <div className="container fluid writerForm">
+                <div className="writerForm">
                     <div className="columns">
                         <div className="column">
                             <p>Tytuł:</p>
@@ -454,6 +473,8 @@ export default class PostEdition extends React.Component<
                                 ref={this.titleTextArea}
                                 defaultValue={this.props.post.title}
                                 className="textarea"
+                                onKeyUp={e => this.validateField(e.target)}
+                                onBlur={e => this.validateField(e.target)}
                             />
                             <p>Opis:</p>
                             <textarea

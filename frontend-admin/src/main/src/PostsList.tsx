@@ -110,7 +110,7 @@ export default class PostsList extends React.Component<{}, State> {
     render() {
         return (
             <div className="main">
-                <section className="container fluid">
+                <section className="container is-fluid">
                     <TopImage />
                     {this.state.postEdition ? (
                         <PostEdition
@@ -120,7 +120,7 @@ export default class PostsList extends React.Component<{}, State> {
                     ) : (
                         <>
                             <h2 className="title">Lista postów: </h2>
-                            <div className="container fluid">
+                            <div className="container">
                                 {!this.state.posts ? null : this.state.posts
                                       .length === 0 ? (
                                     <div
@@ -158,7 +158,6 @@ export default class PostsList extends React.Component<{}, State> {
                         </>
                     )}
                 </section>
-                )}
                 <Copyright />
             </div>
         );

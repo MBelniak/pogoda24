@@ -30,6 +30,11 @@ $footer-padding: 3rem 1.5rem 3rem;
     flex-direction: column;
 }
 
+.container.is-fluid {
+    padding-left: 64px;
+    padding-right: 64px;
+}
+
 .button {
     margin: 0.4rem 0.4rem 0.4rem 0;
 }
@@ -85,7 +90,7 @@ $footer-padding: 3rem 1.5rem 3rem;
 }
 
 .barTitle {
-    font-family: Sans;
+    font-family: Sans, sans-serif;
     position: absolute;
     top: 0.7rem;
     font-weight: bold;
@@ -102,7 +107,7 @@ $footer-padding: 3rem 1.5rem 3rem;
 .uploadedFilesItem {
     border: 2px solid $secondary-color;
     border-radius: 20px;
-    margin: 0.7rem 0 0.3rem 0.3rem;
+    margin: 0.7rem 0.3rem 0.3rem 0.3rem;
     position: relative;
 }
 .uploadedFilesItemContent {
@@ -204,9 +209,15 @@ $footer-padding: 3rem 1.5rem 3rem;
 .image-list {
     color: white;
 }
-.attribution * {
+
+.attribution {
+    margin-top: 1rem;
+}
+
+.attribution, .attribution * {
     font-size: 10px;
 }
+
 .mainPageLinks {
     margin: 15px 0 20px 0;
     max-width: 100%;

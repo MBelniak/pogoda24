@@ -159,7 +159,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
     render() {
         return (
             <div className="main">
-                <section className="container fluid">
+                <section className="container is-fluid">
                     <TopImage />
                     <div className="charts">
                         <div className="columns">

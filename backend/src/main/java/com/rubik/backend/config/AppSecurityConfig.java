@@ -41,7 +41,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/login").not().authenticated()
-                .antMatchers("/write", "/elist", "/writer", "/traffic", "/generator", "/factwriter").authenticated()
+                .antMatchers("/write", "/list", "/writer", "/traffic", "/generator", "/factwriter").authenticated()
                 .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/about", "/posts/**").permitAll()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)

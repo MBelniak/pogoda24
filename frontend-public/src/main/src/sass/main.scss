@@ -5,8 +5,8 @@ $background: $primary-color;
 $body-background-color: $primary-color;
 $navbar-background-color: $secondary-color;
 $navbar-item-hover-color: $primary-color;
-$divider-color: white;
-$divider-thickness: 1px;
+$divider-background-color: black;
+$divider-thickness: 2px;
 $gap: 64px;
 $desktop: 960px + (2 * $gap);
 $navbar-item-img-max-height: none;
@@ -49,7 +49,7 @@ body {
 p,
 span,
 label {
-    color: white;
+    color: black;
     font-size: 1em;
 }
 
@@ -61,7 +61,7 @@ label {
 }
 
 .basicLink {
-    color: white;
+    color: black;
     transition: 0.3s;
     text-decoration: underline;
 }
@@ -81,12 +81,12 @@ label {
 .post {
     margin-top: 1rem;
     padding: 0.6rem;
-    background: $secondary-color;
+    background: white;
     box-shadow: 0 0 5px $secondary-color;
 }
 
 .postLink {
-    color: white;
+    color: black;
     transition: 0.3s;
 }
 
@@ -122,7 +122,12 @@ label {
 }
 
 .forecastMapList * {
-    margin: 10px 0 10px 0;
+    margin: 0.7rem;
+}
+
+.forecastMapImage {
+    width: 45%;
+    cursor: pointer;
 }
 
 .externalApi {
@@ -160,7 +165,7 @@ label {
     margin-bottom: 0.6rem;
 }
 
-.topBar a {
+.topBar a, .topBar span {
     color: white;
     text-decoration: none;
     margin-right: 0.5rem;
