@@ -43,65 +43,25 @@ export default class PostsList extends React.Component<{}, State> {
     }
 
     private onFinishEditing() {
-        closeModal();
-        this.setState({ postEdition: false, postToEdit: undefined });
-        this.fetchPostsFromApi();
-    }
-
-    private fetchPostsFromApi() {
         showModal(<LoadingIndicator />);
-        fetchApi('api/posts/count', { signal: this.abortController.signal })
-            .then(response =>
-                response
-                    .json()
-                    .then(data => {
-                        this.setState({ totalPostsCount: data });
-                        fetchApi(
-                            'api/posts?page=0&count=' + this.postsPerPage,
-                            { signal: this.abortController.signal }
-                        )
-                            .then(response =>
-                                response
-                                    .json()
-                                    .then((posts: PostDTO[]) => {
-                                        this.setState({
-                                            posts: posts.map(post =>
-                                                postDTOToPost(post)
-                                            )
-                                        });
-                                        closeModal();
-                                    })
-                                    .catch(error => {
-                                        console.log(error);
-                                    })
-                            )
-                            .catch(error => {
-                                console.log(error);
-                            });
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        closeModal();
-                    })
-            )
-            .catch(error => {
-                console.log(error);
-                closeModal();
-            });
+        this.setState({ postEdition: false, postToEdit: undefined });
+        this.fetchPostsFromApi(0);
+        closeModal();
     }
 
-    private handlePageClick(data) {
-        const selected = data.selected;
-        this.setState({ posts: undefined, currentPage: selected });
-        fetchApi('api/posts?page=' + selected + '&count=' + this.postsPerPage, {
+    private fetchPostsFromApi(page: number): Promise<void> {
+        return fetchApi('api/posts?page=' + page + '&count=' + this.postsPerPage, {
             signal: this.abortController.signal
         })
             .then(response => {
                 if (response && response.ok) {
                     response
                         .json()
-                        .then(posts => {
-                            this.setState({ posts: posts });
+                        .then((posts: PostDTO[]) => {
+                            this.setState({
+                                posts: posts.map(post => postDTOToPost(post))
+                            });
+                            closeModal();
                         })
                         .catch(error => {
                             console.log(error);
@@ -115,8 +75,32 @@ export default class PostsList extends React.Component<{}, State> {
             });
     }
 
+    private handlePageClick(data) {
+        const selected = data.selected;
+        this.setState({ posts: undefined, currentPage: selected });
+        showModal(<LoadingIndicator />);
+        this.fetchPostsFromApi(selected).finally(closeModal);
+    }
+
     componentDidMount() {
-        this.fetchPostsFromApi();
+        showModal(<LoadingIndicator />);
+        fetchApi('api/posts/count', { signal: this.abortController.signal })
+            .then(response =>
+                response
+                    .json()
+                    .then(data => {
+                        this.setState({ totalPostsCount: data });
+                        this.fetchPostsFromApi(0).finally(closeModal);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                        closeModal();
+                    })
+            )
+            .catch(error => {
+                console.log(error);
+                closeModal();
+            });
     }
 
     componentWillUnmount() {
@@ -165,11 +149,9 @@ export default class PostsList extends React.Component<{}, State> {
                                 <PagingBar
                                     pages={Math.ceil(
                                         this.state.totalPostsCount /
-                                        this.postsPerPage
+                                            this.postsPerPage
                                     )}
-                                    handlePageClick={
-                                        this.handlePageClick
-                                    }
+                                    handlePageClick={this.handlePageClick}
                                     currentPage={this.state.currentPage}
                                 />
                             )}

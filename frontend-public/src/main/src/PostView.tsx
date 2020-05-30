@@ -23,8 +23,8 @@ export default class PostView extends React.Component<{}, State> {
 
     componentDidMount() {
         const splitted = location.href.split('/');
-        const postId = parseInt(splitted[splitted.length - 1]);
-        if (postId && postId > 0) {
+        const postId = splitted[splitted.length - 1];
+        if (postId) {
             fetchApi('api/posts/' + postId, { signal: this.controller.signal })
                 .then(response => {
                     if (response && response.ok) {
@@ -46,7 +46,7 @@ export default class PostView extends React.Component<{}, State> {
                     console.log(error);
                 });
         } else {
-            console.log('Incorrect URL: ' + location.href);
+            console.log('Incorrect URL for post: ' + location.href);
         }
     }
 

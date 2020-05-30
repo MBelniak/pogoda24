@@ -103,7 +103,7 @@ export default class App extends React.Component<{}, State> {
                             <Posts postType={PostType.FACT} />
                         </Route>
                         <Route path="/about" component={ONas} />
-                        <Route path="/posts/(\d+)" component={PostView} />
+                        <Route path="/posts/([a-zA-Z0-9]+)" component={PostView} />
                         <Route component={ErrorPage} />
                     </Switch>
                     <Copyright />

@@ -2,28 +2,23 @@ import React from 'react';
 import Post from './Post';
 import { fetchApi } from './helper/fetchHelper';
 import PostsListItem from './PostsListItem';
+import config from './config/config';
+
+const { nonExpandedPostLength } = config;
 
 interface PostsProps {
     posts: Post[];
 }
 
 export class PostsList extends React.Component<PostsProps> {
-    private postsViewed: number[] = [];
 
     constructor(props) {
         super(props);
         this.registerView = this.registerView.bind(this);
     }
 
-    private registerView(id: number) {
-        if (this.postsViewed.indexOf(id) < 0) {
-            this.postsViewed.push(id);
-        }
-    }
-
-    //send info about viewed posts to backend
-    componentWillUnmount() {
-        const body = this.postsViewed.map(postId => {
+    private registerView(ids: number[]) {
+        const body = ids.map(postId => {
             return {
                 postId: postId,
                 views: 1
@@ -36,6 +31,22 @@ export class PostsList extends React.Component<PostsProps> {
                 'Content-Type': 'application/json'
             }
         });
+    }
+
+    private registerPostsExpandedByDefault() {
+        const expandedPostsIds = this.props.posts.filter(post => this.isExpandedByDefault(post)).map(post => post.id);
+        this.registerView(expandedPostsIds);
+    }
+
+    private isExpandedByDefault(post: Post) {
+        return (
+            post.description.length <= nonExpandedPostLength &&
+            post.description.split(/[(\r\n)(\n)]/g).length <= 2
+        );
+    }
+
+    componentDidMount() {
+        this.registerPostsExpandedByDefault();
     }
 
     render() {

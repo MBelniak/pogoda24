@@ -203,7 +203,7 @@ export default class PostEdition extends React.Component<
             postType: this.state.postType.toString(),
             title: this.titleTextArea.current.value,
             description: this.postDescriptionTextArea.current.value,
-            imagesPublicIds: '',
+            imagesPublicIds: [] as string[],
             dueDate:
                 this.state.postType === PostType.WARNING
                     ? calculateDueDate(
@@ -220,9 +220,7 @@ export default class PostEdition extends React.Component<
         for (let i = 0; i < this.state.filesToUpload.length; ++i) {
             uploadedFilesIdsOrdered.push(this.state.filesToUpload[i].publicId);
         }
-        requestBodyPost['imagesPublicIds'] = JSON.stringify(
-            uploadedFilesIdsOrdered
-        );
+        requestBodyPost['imagesPublicIds'] = uploadedFilesIdsOrdered;
 
         return fetchApi('api/posts?temporary=true', {
             method: 'PUT',
@@ -233,7 +231,7 @@ export default class PostEdition extends React.Component<
         });
     }
 
-    private saveImagesToCloudinary(postHash: string, warningInfoHash?: string) {
+    private saveImagesToCloudinary(postHash: string) {
         const uploadPromises: Promise<Response>[] = uploadImages(
             this.getImagesToUpload(),
             this.abortController.signal
@@ -243,11 +241,6 @@ export default class PostEdition extends React.Component<
                 if (responses.every(response => response && response.ok)) {
                     //all images uploaded successfully
                     this.continueSavingPostToBackend(postHash);
-                    if (warningInfoHash) {
-                        this.continueSavingWarningInfoToBackend(
-                            warningInfoHash
-                        );
-                    }
                 } else {
                     responses = responses.filter(
                         response => !response || !response.ok
@@ -280,21 +273,6 @@ export default class PostEdition extends React.Component<
                     this.showErrorMessage(
                         'Wystąpił błąd przy zapisywaniu posta.'
                     );
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-    //Save temporarily saved changes to the database
-    private continueSavingWarningInfoToBackend(hash: string) {
-        fetchApi('api/warningInfo/continuePostUpdate/' + hash + '?success=true')
-            .then(response => {
-                if (response && response.ok) {
-                    this.showSuccessMessage();
-                } else {
-                    console.log(response.statusText + ', ' + response.body);
                 }
             })
             .catch(error => {

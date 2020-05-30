@@ -58,16 +58,21 @@ $footer-padding: 3rem 1.5rem 3rem;
 .pagingBar li {
     background-color: $secondary-color;
     box-shadow: 0 0 5px $secondary-color;
+    border-radius: 0.3rem;
 }
 
 .pagingBar li a {
     margin: 0.5rem;
+    padding: 5px;
     color: white;
     transition: 0.3s;
-    padding: 5px;
 }
 
 .pagingBar li:hover {
+    cursor: pointer;
+}
+
+.pagingBar li:hover a {
     color: $primary-color;
     transition: 0.3s;
 }

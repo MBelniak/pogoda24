@@ -17,6 +17,15 @@ public class SiteTraffic {
 
     private Long views;
 
+    public SiteTraffic() {
+    }
+
+    public SiteTraffic(String id, @NotNull(message = "Property 'date' cannot be null.") Date date, Long views) {
+        this.id = id;
+        this.date = date;
+        this.views = views;
+    }
+
     public String getId() {
         return id;
     }

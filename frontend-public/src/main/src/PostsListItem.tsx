@@ -8,7 +8,7 @@ const { nonExpandedPostLength } = config;
 
 interface PostsItemProps {
     post: Post;
-    registerView: (id: number) => void;
+    registerView: (id: number[]) => void;
 }
 
 interface PostsItemState {
@@ -25,10 +25,6 @@ export default class PostsListItem extends React.Component<
         this.state = {
             isExpanded: this.isExpandedByDefault()
         };
-        if (this.state.isExpanded) {
-            //post is too short to enable its expanding - it will be registered as viewed by default, which a little incorrect :/
-            this.props.registerView(this.props.post.id);
-        }
     }
 
     private isExpandedByDefault() {
@@ -45,7 +41,7 @@ export default class PostsListItem extends React.Component<
 
     private expandPost() {
         this.setState({ isExpanded: true });
-        this.props.registerView(this.props.post.id);
+        this.props.registerView([this.props.post.id]);
     }
 
     private createDescription() {
@@ -79,7 +75,7 @@ export default class PostsListItem extends React.Component<
             if (this.props.post.description.length > nonExpandedPostLength) {
                 description = description.substr(0, nonExpandedPostLength);
             }
-            if (description.split(/[(\r\n)(\n)]/g).length <= 2) {
+            if (description.split(/[(\r\n)(\n)]/g).length > 2) {
                 description = description
                     .split(/[(\r\n)(\n)]/g)
                     .slice(0, 2)

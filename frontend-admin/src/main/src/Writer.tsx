@@ -49,6 +49,7 @@ export default class Writer extends React.Component<{}, State> {
     private daysValidInput;
     private warningShortInput;
     private abortController;
+    private savedPostId;
 
     constructor(props) {
         super(props);
@@ -62,6 +63,7 @@ export default class Writer extends React.Component<{}, State> {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFilesAdded = this.onFilesAdded.bind(this);
         this.clearEverything = this.clearEverything.bind(this);
+        this.goToPost = this.goToPost.bind(this);
         this.validateField = this.validateField.bind(this);
         this.onRemoveFile = this.onRemoveFile.bind(this);
         this.onMoveForward = this.onMoveForward.bind(this);
@@ -144,13 +146,14 @@ export default class Writer extends React.Component<{}, State> {
 
         this.sendPostToBackend()
             .then(response => {
-                if (response && response.ok) {
+                if (response && response.status === 201) {
                     response
                         .text()
                         .then((data: any) => {
                             if (data !== null) {
+                                this.savedPostId = data;
                                 //post saved, send images to cloudinary
-                                this.saveImagesToCloudinary(data.id);
+                                this.saveImagesToCloudinary();
                             } else {
                                 this.showErrorMessage(
                                     'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
@@ -211,8 +214,6 @@ export default class Writer extends React.Component<{}, State> {
         }
         requestBody['imagesPublicIds'] = uploadedFilesIdsOrdered;
 
-        console.log(requestBody);
-
         return fetchApi('api/posts', {
             method: 'POST',
             headers: {
@@ -222,7 +223,7 @@ export default class Writer extends React.Component<{}, State> {
         });
     }
 
-    private saveImagesToCloudinary(postId: number) {
+    private saveImagesToCloudinary() {
         const uploadPromises: Promise<Response>[] = uploadImages(
             this.state.filesToUpload,
             this.abortController.signal
@@ -240,12 +241,12 @@ export default class Writer extends React.Component<{}, State> {
                     this.showErrorMessage(
                         'Nie udało się wysłać wszystkich plików. Post nie został zapisany.'
                     );
-                    this.removePostFromBackend(postId);
+                    this.removePostFromBackend(this.savedPostId);
                 }
             })
             .catch(error => {
                 console.log(error);
-                this.removePostFromBackend(postId);
+                this.removePostFromBackend(this.savedPostId);
             });
     }
 
@@ -293,6 +294,12 @@ export default class Writer extends React.Component<{}, State> {
                     onClick={this.clearEverything}>
                     Ok
                 </button>
+                <button
+                    className="button is-secondary"
+                    style={{ float: 'right' }}
+                    onClick={this.goToPost}>
+                    Przejdź do posta
+                </button>
             </div>
         );
     }
@@ -317,7 +324,16 @@ export default class Writer extends React.Component<{}, State> {
             postType: PostType.FORECAST,
             filesToUpload: []
         });
+        this.fileInput.current.value = null;
+        this.postDescriptionTextArea.current.value = null;
+        this.titleTextArea.current.value = null;
+        this.savedPostId = undefined;
         closeModal();
+    }
+
+    private goToPost() {
+        const origin = location.href.split('/')[0];
+        location.href = origin + '/posts/'+ this.savedPostId;
     }
 
     private onRemoveFile(fileId: number) {

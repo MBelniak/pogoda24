@@ -12,6 +12,26 @@ export class PagingBar extends React.Component<PagingBarProps> {
         super(props);
     }
 
+    componentDidMount() {
+        let elements = document.querySelectorAll(".pagingBar li");
+        elements.forEach(element => {
+            element.addEventListener("click", () => {
+                if (element.firstChild) {
+                    (element.firstChild as HTMLElement).click();
+                }
+            })
+        });
+        elements = document.querySelectorAll(".pagingBar li a");
+        elements.forEach(element => {
+            element.addEventListener("click", () => {
+                setTimeout(() => {
+                    (element as HTMLElement).blur();
+                }, 500);
+            })
+        });
+    }
+
+
     render() {
         return (
             <div className="pagination">

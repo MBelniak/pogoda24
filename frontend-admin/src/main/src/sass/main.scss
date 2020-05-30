@@ -79,10 +79,6 @@ $footer-padding: 3rem 1.5rem 3rem;
     margin-top: 0.7rem;
 }
 
-.dropzone-text {
-    text-align: center;
-}
-
 .subtitle {
     color: white;
     margin-top: 0.7rem;
@@ -160,11 +156,14 @@ $footer-padding: 3rem 1.5rem 3rem;
     font-family: helvetica, arial, sans-serif;
     font-size: 50px;
 }
-.deleteFile {
+.centerVertically {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    //align-items: center;
     justify-content: center;
+}
+.centerHorizontally {
+    text-align: center;
 }
 .arrowRight:hover,
 .arrowLeft:hover {
@@ -205,4 +204,32 @@ $footer-padding: 3rem 1.5rem 3rem;
 .image-list {
     color: white;
 }
+.attribution * {
+    font-size: 10px;
+}
+.mainPageLinks {
+    margin: 15px 0 20px 0;
+    max-width: 100%;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
 
+.mainPageLinksItem {
+    border: 2px white solid;
+    border-radius: 10px;
+    margin: 0 20px 0 20px;
+    box-sizing: border-box;
+    width: 20%;
+}
+
+.mainPageLinksItem img {
+    padding: 1rem;
+}
+
+.mainPageLinksItem span {
+    margin: 0.5rem;
+    color: white;
+    font-size: 18px;
+    box-sizing: initial;
+}

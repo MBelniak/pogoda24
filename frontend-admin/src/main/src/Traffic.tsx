@@ -1,8 +1,13 @@
 import React from 'react';
 import { fetchApi } from './helpers/fetchHelper';
+import * as fns from 'date-fns';
 import { SiteViewsChart } from './charts/SiteViewsChart';
 const Copyright = require('shared24').Copyright;
 const TopImage = require('shared24').TopImage;
+
+const daysBackInputConstraint = (text: string): boolean => {
+    return parseInt(text) >= 0 && parseInt(text) <= 9999;
+};
 
 interface GatheredData {
     allPostsViews: number;
@@ -11,26 +16,38 @@ interface GatheredData {
     averageViewsPerPost: number;
 }
 
+interface TrafficDTO {
+    id: number;
+    date: string;
+    views: number;
+}
+
 interface TrafficState {
-    gatheredData: GatheredData | null;
-    loading: boolean;
+    gatheredData?: GatheredData | null;
+    siteViewsChartData?: any[][];
 }
 
 export default class Traffic extends React.Component<{}, TrafficState> {
     private abortController: AbortController;
+    private daysBackInputRef;
+    private siteViewsDaysBack: number;
 
     state: TrafficState = {
-        gatheredData: null,
-        loading: true
+        gatheredData: undefined,
+        siteViewsChartData: undefined
     };
 
     constructor(props) {
         super(props);
         this.abortController = new AbortController();
+        this.siteViewsDaysBack = 31;
+        this.daysBackInputRef = React.createRef();
+        this.handleDaysBackChange = this.handleDaysBackChange.bind(this);
     }
 
     componentDidMount() {
         this.fetchGatheredData();
+        this.fetchSiteViews();
     }
 
     private fetchGatheredData() {
@@ -43,8 +60,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                         .json()
                         .then((gatheredData: GatheredData) => {
                             this.setState({
-                                gatheredData: gatheredData,
-                                loading: false
+                                gatheredData: gatheredData ? gatheredData : null
                             });
                         })
                         .catch(error => {
@@ -60,18 +76,133 @@ export default class Traffic extends React.Component<{}, TrafficState> {
             });
     }
 
+    private fetchSiteViews() {
+        this.setState({siteViewsChartData: undefined})
+        fetchApi('api/views/site?daysBack=' + this.siteViewsDaysBack, {
+            signal: this.abortController.signal
+        })
+            .then(response => {
+                if (response && response.ok) {
+                    response
+                        .json()
+                        .then((siteViewsData: TrafficDTO[]) => {
+                            this.setState({
+                                siteViewsChartData: this.siteViewsDataToChartData(
+                                    siteViewsData
+                                ),
+                            });
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                } else {
+                    this.setState({ siteViewsChartData: [] });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    private siteViewsDataToChartData(siteViewsData: TrafficDTO[]) {
+        const today = fns.startOfDay(new Date());
+        if (!siteViewsData) {
+            siteViewsData = [];
+        }
+        const chartData: any[][] = [[], []];
+        for (let chartLabel = 0, dataIndex = 0; chartLabel < this.siteViewsDaysBack, dataIndex < siteViewsData.length; ++chartLabel) {
+            const chartLabelDate = fns.subDays(today, this.siteViewsDaysBack - chartLabel - 1);
+            const dataIndexDate = fns.parseISO(siteViewsData[dataIndex].date);
+            if (fns.isSameDay(chartLabelDate, dataIndexDate)) {
+                chartData[0].push(chartLabelDate);
+                chartData[1].push(siteViewsData[dataIndex].views);
+                ++dataIndex;
+            } else {
+                chartData[0].push(chartLabelDate);
+                chartData[1].push(0);
+            }
+        }
+        return chartData;
+    }
+
+    private handleDaysBackChange() {
+        if (this.daysBackInputRef.current.value &&
+            this.validateField(this.daysBackInputRef.current, daysBackInputConstraint)
+        ) {
+            this.siteViewsDaysBack = this.daysBackInputRef.current.value;
+            this.fetchSiteViews();
+        }
+    }
+
+    private validateField(
+        htmlInput,
+        additionalConstraint?: (value) => boolean
+    ): boolean {
+        if (
+            htmlInput.value &&
+            (additionalConstraint
+                ? !additionalConstraint(htmlInput.value)
+                : false)
+        ) {
+            htmlInput.classList.add('is-danger');
+            return false;
+        } else {
+            htmlInput.classList.remove('is-danger');
+            return true;
+        }
+    }
+
+    componentWillUnmount() {
+        this.abortController.abort();
+    }
+
     render() {
         return (
             <div className="main">
                 <section className="container fluid">
                     <TopImage />
                     <div className="charts">
-                        <SiteViewsChart />
+                        <div className="columns">
+                            <div className="column is-4" style={{ marginTop: '1rem' }}>
+                                <label htmlFor="daysBackInput">Liczba dni wstecz: </label>
+                                <input
+                                    ref={this.daysBackInputRef}
+                                    id="daysBackInput"
+                                    type="number"
+                                    className="input"
+                                    max={9999}
+                                    min={0}
+                                    placeholder="(0-9999)"
+                                    onKeyUp={e =>
+                                        this.validateField(
+                                            e.target,
+                                            daysBackInputConstraint
+                                        )
+                                    }
+                                    onBlur={e =>
+                                        this.validateField(
+                                            e.target,
+                                            daysBackInputConstraint
+                                        )
+                                    }
+                                />
+                                <button
+                                    className="button"
+                                    onClick={this.handleDaysBackChange}>
+                                    Ustaw
+                                </button>
+                            </div>
+                            <div className="column centerVertically centerHorizontally">
+                                {this.state.siteViewsChartData ?
+                                <SiteViewsChart chartData={this.state.siteViewsChartData}/>
+                                     : <span>Trwa ładowanie danych...</span>}
+                            </div>
+                        </div>
                         <div className="is-divider" />
                         <div>
                             <p>
                                 Całkowita liczba odwiedzin strony:{' '}
-                                {this.state.loading
+                                {typeof this.state.gatheredData === 'undefined'
                                     ? null
                                     : this.state.gatheredData === null
                                     ? '--'
@@ -79,7 +210,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                             </p>
                             <p>
                                 Całkowita liczba wyświetleń postów:{' '}
-                                {this.state.loading
+                                {typeof this.state.gatheredData === 'undefined'
                                     ? null
                                     : this.state.gatheredData === null
                                     ? '--'
@@ -87,7 +218,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                             </p>
                             <p>
                                 Całkowita liczba postów:{' '}
-                                {this.state.loading
+                                {typeof this.state.gatheredData === 'undefined'
                                     ? null
                                     : this.state.gatheredData === null
                                     ? '--'
@@ -95,12 +226,12 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                             </p>
                             <p>
                                 Średnia liczba wyświetleń wszystkich postów:{' '}
-                                {this.state.loading
+                                {typeof this.state.gatheredData === 'undefined'
                                     ? null
                                     : this.state.gatheredData === null
                                     ? '--'
-                                    : this.state.gatheredData
-                                          .averageViewsPerPost}
+                                    : Number((this.state.gatheredData
+                                            .averageViewsPerPost).toFixed(3))}
                             </p>
                         </div>
                     </div>
