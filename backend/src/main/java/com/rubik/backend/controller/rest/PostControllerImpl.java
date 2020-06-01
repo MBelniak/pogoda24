@@ -120,8 +120,8 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public WarningInfoDTO getLatestWarningInfo() {
-        return postService.getLatestWarningInfo();
+    public List<WarningInfoDTO> getCurrentWarnings() {
+        return postService.getCurrentWarnings();
     }
 
 }

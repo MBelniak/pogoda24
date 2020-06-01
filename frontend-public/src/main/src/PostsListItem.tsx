@@ -59,10 +59,9 @@ export default class PostsListItem extends React.Component<
                 />
                 {this.state.isExpanded ? null :
                     this.props.post.postType === PostType.FACT ? <Link to={"/posts/" + this.props.post.id} className="postLink">
-                        {' '} więcej
+                        więcej
                     </Link>: (
                     <a className="postLink" onClick={this.expandPost}>
-                        {' '}
                         więcej
                     </a>
                 )}
@@ -85,13 +84,13 @@ export default class PostsListItem extends React.Component<
             const match = description.match(regex);
             if (match && match.length > 70) {
                 if (typeof match === 'string') {
-                    description = match + '...';
+                    description = match + '... ';
                 } else {
-                    description = match[0] + '...';
+                    description = match[0] + '... ';
                 }
             } else {
                 //let's not clip very long words (does a word over 50 characters long even exist? Probably.)
-                description = description + '...';
+                description = description + '... ';
             }
         }
 
@@ -122,7 +121,6 @@ export default class PostsListItem extends React.Component<
                 </div>
                 <div
                     className="is-divider"
-                    style={{ margin: '15px 0 10px 0' }}
                 />
                 <div style={{ textAlign: 'center' }}>
                     <ForecastMapList

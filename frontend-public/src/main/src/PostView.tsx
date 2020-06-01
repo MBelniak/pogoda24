@@ -120,7 +120,6 @@ export default class PostView extends React.Component<{}, State> {
                                     </div>
                                     <div
                                         className="is-divider"
-                                        style={{ margin: '15px 0 10px 0' }}
                                     />
                                     <div style={{ textAlign: 'center' }}>
                                         <ForecastMapList

@@ -3,11 +3,18 @@ import { PostsList } from './PostsList';
 import { ExternalApi } from './ExternalApi';
 import Post, { postDTOToPost } from './Post';
 import { fetchApi } from './helper/fetchHelper';
+import * as fnstz from 'date-fns-tz';
 import CustomLinearProgress from './LinearProgress';
 
+interface WarningInfo {
+    postId: string;
+    dueDate: Date;
+    title?: string;
+}
 
 interface State {
     posts: Post[] | undefined;
+    warningInfo?: WarningInfo[];
 }
 
 export class MainPage extends React.Component<{}, State> {
@@ -15,7 +22,8 @@ export class MainPage extends React.Component<{}, State> {
     private abortController;
 
     state: State = {
-        posts: undefined
+        posts: undefined,
+        warningInfo: undefined
     };
 
     constructor(props) {
@@ -37,9 +45,40 @@ export class MainPage extends React.Component<{}, State> {
                     })
                     .catch(error => {
                         console.log(error);
-                        this.setState({posts: []});
+                        this.setState({ posts: [] });
                     })
             )
+            .catch(error => {
+                console.log(error);
+            });
+
+        fetchApi('api/posts/currentWarnings', {
+            signal: this.abortController.signal
+        })
+            .then(response => {
+                if (response && response.ok) {
+                    response
+                        .json()
+                        .then(warningInfo => {
+                            this.setState({
+                                warningInfo: warningInfo.map(info => {
+                                    return {
+                                        ...info,
+                                        dueDate: warningInfo.dueDate
+                                            ? fnstz.zonedTimeToUtc(warningInfo.dueDate, 'Europe/Warsaw')
+                                            : undefined
+                                    };
+                                })
+                            });
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            this.setState({ warningInfo: [] });
+                        });
+                } else {
+                    console.log(response);
+                }
+            })
             .catch(error => {
                 console.log(error);
             });
@@ -53,21 +92,68 @@ export class MainPage extends React.Component<{}, State> {
         return (
             <section className="mainContent">
                 <div className="columns">
-                    <div className="column is-2" />
-                    <div className="column is-8 posts">
-                        {this.state.posts ? this.state.posts.length !== 0 ? (
-                            <PostsList posts={this.state.posts} />
-                        ) : (
-                            <div
-                                style={{
-                                    textAlign: 'center',
-                                    marginTop: '20px'
-                                }}>
-                                <p className="noPosts">Brak postów.</p>
+                    {!this.state.warningInfo && !this.state.posts ? (
+                        <div className="column is-10">
+                            <CustomLinearProgress />
+                        </div>
+                    ) : (
+                        <>
+                            <div className="column is-2 warnings">
+                                {this.state.warningInfo ? (
+                                    <div className="currentWarnings">
+                                        {this.state.warningInfo.length > 0 ? (
+                                            <>
+                                                <p
+                                                    className="postTitle"
+                                                    style={{
+                                                        wordWrap: 'break-word'
+                                                    }}>
+                                                    Aktualne ostrzeżenia
+                                                </p>
+                                                {this.state.warningInfo.map((info, key, list) => {
+                                                    const href = 'posts/' + info.postId;
+                                                    return (
+                                                        <div key={key} className="currentWarning">
+                                                            <a className="postLink" href={href}>
+                                                                {info.title}
+                                                            </a>
+                                                            {list.length - 1 === key ? null : (
+                                                                <div className="is-divider" />
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </>
+                                        ) : (
+                                            <p className="currentWarningsNone">Brak ostrzeżeń</p>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <CustomLinearProgress />
+                                )}
                             </div>
-                        ) : <CustomLinearProgress />}
+                            <div className="column is-8 posts">
+                                {this.state.posts ? (
+                                    this.state.posts.length !== 0 ? (
+                                        <PostsList posts={this.state.posts} />
+                                    ) : (
+                                        <div
+                                            style={{
+                                                textAlign: 'center',
+                                                marginTop: '20px'
+                                            }}>
+                                            <p className="noPosts">Brak postów.</p>
+                                        </div>
+                                    )
+                                ) : (
+                                    <CustomLinearProgress />
+                                )}
+                            </div>
+                        </>
+                    )}
+                    <div className="column is-2 externalApi">
+                        <ExternalApi />
                     </div>
-                    <ExternalApi />
                 </div>
             </section>
         );

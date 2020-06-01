@@ -25,7 +25,7 @@ export class Links extends React.Component {
                     </Link>
                 </div>
                 <div className="mainPageLinksItem centerHorizontally">
-                    <Link to="/elist">
+                    <Link to="/list">
                         <img src={elistImg} />
                         <span>Lista postów</span>
                     </Link>
