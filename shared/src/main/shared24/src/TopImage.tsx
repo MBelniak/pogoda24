@@ -1,5 +1,5 @@
-    import React from 'react';
-import img from './img/bg.jpg';
+import React from 'react';
+import img from './img/shelf.jpg';
 
 export class TopImage extends React.Component {
     render() {

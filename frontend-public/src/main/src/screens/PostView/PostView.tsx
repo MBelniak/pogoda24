@@ -1,7 +1,8 @@
 import React from 'react';
-import Post, { postDTOToPost, PostType } from './Post';
-import { fetchApi } from './helper/fetchHelper';
-import { ForecastMapList } from './ForecastMapList';
+import Post, { postDTOToPost, PostType } from '../../model/Post';
+import { fetchApi } from '../../helpers/fetchHelper';
+import { ForecastMapList } from '../../components/ForecastMapList';
+import '../../sass/main.scss';
 
 interface State {
     loading: boolean;
@@ -23,8 +24,8 @@ export default class PostView extends React.Component<{}, State> {
 
     componentDidMount() {
         const splitted = location.href.split('/');
-        const postId = parseInt(splitted[splitted.length - 1]);
-        if (postId && postId > 0) {
+        const postId = splitted[splitted.length - 1];
+        if (postId) {
             fetchApi('api/posts/' + postId, { signal: this.controller.signal })
                 .then(response => {
                     if (response && response.ok) {
@@ -46,7 +47,7 @@ export default class PostView extends React.Component<{}, State> {
                     console.log(error);
                 });
         } else {
-            console.log('Incorrect URL: ' + location.href);
+            console.log('Incorrect URL for post: ' + location.href);
         }
     }
 
@@ -91,17 +92,17 @@ export default class PostView extends React.Component<{}, State> {
                         <div className="posts">
                             {this.post ? (
                                 <div className="post">
-                                    <div className="postdate">
+                                    <div className="postdate fontSizeSmall">
                                         {this.processDate(this.post.postDate)}
                                     </div>
                                     <br />
-                                    <div className="postTitle">
+                                    <div className="postTitle fontSizeLarge">
                                         <span
                                             style={{ wordWrap: 'break-word' }}>
                                             {this.post.title}
                                         </span>
                                     </div>
-                                    <div className="postDescription">
+                                    <div className="postDescription fontSizeSmall">
                                         {this.post.postType ===
                                         PostType.FACT ? (
                                             this.processDescriptionForFact(
@@ -120,7 +121,6 @@ export default class PostView extends React.Component<{}, State> {
                                     </div>
                                     <div
                                         className="is-divider"
-                                        style={{ margin: '15px 0 10px 0' }}
                                     />
                                     <div style={{ textAlign: 'center' }}>
                                         <ForecastMapList
@@ -136,7 +136,7 @@ export default class PostView extends React.Component<{}, State> {
                                         textAlign: 'center',
                                         marginTop: '20px'
                                     }}>
-                                    <p className="noPosts">
+                                    <p className="fontSizeLarge">
                                         Nie udało się znaleźć posta.
                                     </p>
                                 </div>

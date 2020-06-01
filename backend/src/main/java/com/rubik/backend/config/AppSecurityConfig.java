@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.method.configuration.Globa
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
@@ -31,34 +32,31 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf()
-                .disable()
+                .csrf().disable()
                 .headers()
-                .frameOptions()
-                .disable()
+                .frameOptions().disable()
                 .and()
                 .exceptionHandling()
                 .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), new AntPathRequestMatcher("/api/**"))
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login")
-                .not().authenticated()
-                .antMatchers("/write", "/elist", "/writer", "/traffic", "/generator", "/factwriter")
-                .authenticated()
-                .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/about", "/posts/**")
-                .permitAll()
+                .antMatchers("/login").not().authenticated()
+                .antMatchers("/write", "/list", "/writer", "/traffic", "/generator", "/factwriter").authenticated()
+                .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/about", "/posts/**").permitAll()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 .and()
                 .formLogin()
                 .loginPage("/login")
                 .successHandler(successHandler())
                 .failureUrl("/login?error=true")
-                .defaultSuccessUrl("/write?login=success")
+                .defaultSuccessUrl("/write")
                 .and()
                 .logout()
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login?logout=success");
+                .logoutSuccessUrl("/login");
     }
 
     @Bean

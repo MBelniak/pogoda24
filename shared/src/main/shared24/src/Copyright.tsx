@@ -1,6 +1,10 @@
 import React from 'react';
 
-export class Copyright extends React.Component {
+interface CopyrightProps {
+    additionalRender: () => JSX.Element | undefined;
+}
+
+export class Copyright extends React.Component<CopyrightProps> {
     constructor(props) {
         super(props);
     }
@@ -8,8 +12,9 @@ export class Copyright extends React.Component {
     render() {
         return (
             <footer className="footer">
-                <div className="content has-text-centered copyright">
-                    <p>Copyright &copy; 2020 by Pogoda24/7</p>
+                <div className="content has-text-centered">
+                    <p className="fontSizeSmall">Copyright &copy; 2020 by Pogoda24/7</p>
+                    {this.props.additionalRender ? this.props.additionalRender() : null}
                 </div>
             </footer>
         );

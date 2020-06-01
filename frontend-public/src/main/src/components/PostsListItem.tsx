@@ -1,14 +1,16 @@
 import React from 'react';
-import Post, { PostType } from './Post';
+import Post, { PostType } from '../model/Post';
 import { Link } from 'react-router-dom';
 import { ForecastMapList } from './ForecastMapList';
-import config from './config/config';
+import config from '../config/config';
+import '../sass/main.scss';
+import 'suneditor/dist/css/suneditor.min.css';
 
 const { nonExpandedPostLength } = config;
 
 interface PostsItemProps {
     post: Post;
-    registerView: (id: number) => void;
+    registerView: (id: number[]) => void;
 }
 
 interface PostsItemState {
@@ -25,10 +27,6 @@ export default class PostsListItem extends React.Component<
         this.state = {
             isExpanded: this.isExpandedByDefault()
         };
-        if (this.state.isExpanded) {
-            //post is too short to enable its expanding - it will be registered as viewed by default, which a little incorrect :/
-            this.props.registerView(this.props.post.id);
-        }
     }
 
     private isExpandedByDefault() {
@@ -45,7 +43,7 @@ export default class PostsListItem extends React.Component<
 
     private expandPost() {
         this.setState({ isExpanded: true });
-        this.props.registerView(this.props.post.id);
+        this.props.registerView([this.props.post.id]);
     }
 
     private createDescription() {
@@ -63,10 +61,9 @@ export default class PostsListItem extends React.Component<
                 />
                 {this.state.isExpanded ? null :
                     this.props.post.postType === PostType.FACT ? <Link to={"/posts/" + this.props.post.id} className="postLink">
-                        {' '} więcej
+                        więcej
                     </Link>: (
                     <a className="postLink" onClick={this.expandPost}>
-                        {' '}
                         więcej
                     </a>
                 )}
@@ -79,7 +76,7 @@ export default class PostsListItem extends React.Component<
             if (this.props.post.description.length > nonExpandedPostLength) {
                 description = description.substr(0, nonExpandedPostLength);
             }
-            if (description.split(/[(\r\n)(\n)]/g).length <= 2) {
+            if (description.split(/[(\r\n)(\n)]/g).length > 2) {
                 description = description
                     .split(/[(\r\n)(\n)]/g)
                     .slice(0, 2)
@@ -89,13 +86,13 @@ export default class PostsListItem extends React.Component<
             const match = description.match(regex);
             if (match && match.length > 70) {
                 if (typeof match === 'string') {
-                    description = match + '...';
+                    description = match + '... ';
                 } else {
-                    description = match[0] + '...';
+                    description = match[0] + '... ';
                 }
             } else {
                 //let's not clip very long words (does a word over 50 characters long even exist? Probably.)
-                description = description + '...';
+                description = description + '... ';
             }
         }
 
@@ -116,17 +113,16 @@ export default class PostsListItem extends React.Component<
     render() {
         return (
             <div className="post">
-                <div className="postdate">{this.processDate()}</div>
+                <div className="postDate fontSizeSmall">{this.processDate()}</div>
                 <br />
-                <div className="postTitle">
+                <div className="postTitle fontSizeLarge">
                     <span>{this.props.post.title}</span>
                 </div>
-                <div className="postDescription">
+                <div className="postDescription fontSizeSmall">
                     {this.createDescription()}
                 </div>
                 <div
                     className="is-divider"
-                    style={{ margin: '15px 0 10px 0' }}
                 />
                 <div style={{ textAlign: 'center' }}>
                     <ForecastMapList

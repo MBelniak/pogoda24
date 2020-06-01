@@ -11,7 +11,7 @@ export default {
         {
             imageURL: "sampleProfile.png",
             description: "Imię nazwisko\nZajmuje się meteo od 5 lat. Jest pasjonatem ekstremalnych zjawisk pogodowych.\n" +
-            "Tutaj jakiś dłuższy opis aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa Tutaj jakiś dłuższy opis aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " +
+            "Tutaj jakiś dłuższy opis aaaaaaaaaa Tutaj jakiś dłuższy opis aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " +
             "Zajmuje się meteo od 5 lat. Jest pasjonatem ekstremalnych zjawisk pogodowych"
         },
         {

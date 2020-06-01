@@ -42,6 +42,6 @@ public interface PostController {
     @PreAuthorize("isAuthenticated()")
     void deletePost(@PathVariable String id);
 
-    @GetMapping(value = "/topBarWarning")
-    WarningInfoDTO getLatestWarningInfo();
+    @GetMapping(value = "/currentWarnings")
+    List<WarningInfoDTO> getCurrentWarnings();
 }

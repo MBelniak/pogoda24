@@ -9,7 +9,7 @@ public class WarningInfoDTO {
 
     private Date dueDate;
 
-    private String shortDescription;
+    private String title;
 
     public WarningInfoDTO() {
     }
@@ -17,7 +17,7 @@ public class WarningInfoDTO {
     public WarningInfoDTO(Post post) {
         this.postId = post.getId();
         this.dueDate = post.getDueDate();
-        this.shortDescription = post.getShortDescription();
+        this.title = post.getShortDescription();
     }
 
     public String getPostId() {
@@ -36,11 +36,11 @@ public class WarningInfoDTO {
         this.dueDate = dueDate;
     }
 
-    public String getShortDescription() {
-        return shortDescription;
+    public String getTitle() {
+        return title;
     }
 
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

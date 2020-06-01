@@ -1,14 +1,14 @@
 @charset "utf-8";
 $primary-color: #23425f;
 $secondary-color: #25a5a5;
-$background: $primary-color;
-$body-background-color: $primary-color;
+$primary-font-color: #222;
+$secondary-font-color: #353535;
 $navbar-background-color: $secondary-color;
-$navbar-item-hover-color: $primary-color;
-$divider-color: white;
+$divider-background-color: $primary-color;
 $divider-thickness: 1px;
 $gap: 64px;
 $desktop: 960px + (2 * $gap);
+$tablet: 960px + (2 * $gap);
 $navbar-item-img-max-height: none;
 // Import only what you need from Bulma
 @import '../../node_modules/bulma/sass/utilities/_all.sass';
@@ -19,13 +19,11 @@ $navbar-item-img-max-height: none;
 @import '../../node_modules/bulma/sass/elements/title.sass';
 @import '../../node_modules/bulma/sass/components/navbar.sass';
 @import '../../node_modules/bulma/sass/layout/section.sass';
-@import '../../node_modules/bulma/sass/layout/footer.sass';
 @import '../../node_modules/bulma/sass/grid/columns.sass';
 @import '../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass';
 
 body {
-    background: url('../img/logo_bg.jpg') no-repeat fixed;
-    //background-color: $primary-color;
+    background-color: rgba(#00B5F5, 0.05);
     background-size: 100vw 100%;
 }
 
@@ -43,131 +41,107 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
 }
 
-p,
-span,
-label {
-    color: white;
-    font-size: 1em;
+.fontSizeLarge {
+    font-size: 18px;
 }
 
-.noPosts {
-    font-size: 1.2em;
+.fontSizeMedium {
+    font-size: 16px;
 }
-.columns {
-    flex-grow: 1;
+
+
+.fontSizeSmall {
+    font-size: 14px;
+}
+
+
+.is-divider {
+    margin: 15px 0 15px 0;
 }
 
 .basicLink {
-    color: white;
+    color: $secondary-font-color;
     transition: 0.3s;
     text-decoration: underline;
 }
 
 .basicLink:hover {
     transition: 0.3s;
-    color: $primary-color;
-}
-
-.posts {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    color: $secondary-color;
 }
 
 .post {
-    margin-top: 1rem;
-    padding: 0.6rem;
-    background: $secondary-color;
-    box-shadow: 0 0 5px $secondary-color;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.4rem;
+    box-shadow: 0 0 4px $primary-color;
+    text-align: center;
 }
 
 .postLink {
-    color: white;
+    color: $primary-font-color;
     transition: 0.3s;
+    text-decoration: underline;
 }
 
 .postLink:hover {
-    color: $primary-color;
+    color: $secondary-color;
     transition: 0.3s;
 }
 
-.postdate {
-    color: #222222;
+.postDate {
+    color: $primary-font-color;
     cursor: default;
     float: right;
-    font-size: 14px;
 }
 
 .postTitle {
-    font-size: 20px;
     text-align: center;
     margin-top: 0.35rem;
     margin-bottom: 1rem;
     word-wrap: break-word;
+    color: $primary-font-color;
 }
 
 .postDescription {
-    font-size: 16px;
     text-align: left;
+    color: $secondary-font-color;
 }
-
-.forecastMapList {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.forecastMapList * {
-    margin: 10px 0 10px 0;
-}
-
-.externalApi {
-    height: 100%;
-    color: white;
-    font-size: 15px;
-    text-align: center;
-    margin-top: 1rem;
-}
-
-@keyframes bar_anim {
-    0% {
-        left: 100%;
-    }
-    25% {
-        left: 0%;
-    }
-    50% {
-        left: 0%;
-    }
-    100% {
-        left: -100%;
-    }
-}
-
 .topBar {
     overflow: hidden;
     position: relative;
     width: 100%;
-    min-height: 4rem;
 }
 
-.topBar div * :not(.logoImg) {
-    margin-top: 0.6rem;
-    margin-bottom: 0.6rem;
+.topBarFontSizeMedium {
+    font-size: 16px;
 }
 
-.topBar a {
+.topBar .navbar-burger {
+    color: white;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.topBar .navbar-item, .topBar .navbar-brand {
     color: white;
     text-decoration: none;
-    margin-right: 0.5rem;
-    transition: 0.4s;
+    margin: 0 0.3rem 0 0.3rem;
+    border-bottom: 2px solid $secondary-color;
 }
-.topBar a:hover {
-    color: $primary-color;
+
+.topBar .navbar-brand a:hover {
+    color: white;
+    text-decoration: none;
+    border-bottom: 2px solid $secondary-color;
+}
+
+.topBar .navbar-brand {
+    margin-left: 0.8rem;
 }
 
 .logoImg {
@@ -175,35 +149,59 @@ label {
     height: 3.1rem;
     width: 3.2rem;
 }
-.externalApiImg {
-    margin-bottom: 1.4rem;
+
+@media all and (max-width: 640px) {
+    .topBarFontSizeMedium {
+        font-size: 2.5vw;
+    }
+    .logoImg {
+        height: 7.75vw;
+        width: 8vw;
+    }
 }
-.ekipa {
-    width: 95%;
-    margin-left: auto;
-    margin-right: auto;
+
+@media all and (max-width: 500px) {
+    .topBarFontSizeMedium {
+        font-size: 12px;
+    }
+    .logoImg {
+        height: 39px;
+        width: 40px;
+    }
 }
-.ekipa * {
-    font-size: 17px;
+
+@media all and (max-width: $tablet) {
+    .topBar a:hover {
+        color: $primary-color;
+    }
 }
-.ekipaItem {
-    border: solid 2px $primary-color;
-    border-radius: 10px;
-    margin: 1rem;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
+
+@media all and (min-width: $tablet) {
+    .topBar a:hover {
+        color: white;
+        background-color: $secondary-color;
+        border-bottom: 2px solid white;
+    }
+    .topBar a.last {
+        margin-right: 0.8rem;
+    }
 }
-.ekipaImg {
-    margin: 0.7rem;
-    min-width: 6.5rem;
-    max-width: 6.5rem;
-    min-height: 6.5rem;
-    max-height: 6.5rem;
+
+
+@media all and (max-width: 640px) {
+    .fontSizeSmall {
+        font-size: 2.188vw;
+    }
+    .fontSizeMedium {
+        font-size: 2.5vw;
+    }
+    .fontSizeLarge {
+        font-size: 2.813vw;
+    }
 }
-.ekipaPersonDescription {
-    text-align: start;
-    margin: 0.7rem;
+
+.warnings {
+    padding: 1rem;
 }
 
 .sun-editor-editable, .sun-editor-editable * {
@@ -221,4 +219,86 @@ label {
 
 .sun-editor-editable[contenteditable=true] .se-component {
     outline: none;
+}
+
+/* Wrapper */
+.icon-button {
+    background-color: white;
+    box-shadow: 0 0 3px $primary-color;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 2.0rem;
+    height: 3rem;
+    //line-height: 3rem;
+    margin: 0.5rem 5px;
+    position: relative;
+    text-align: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 3rem;
+}
+
+.icon-button span {
+    border-radius: 0;
+    display: block;
+    height: 0;
+    left: 50%;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+    width: 0;
+}
+.icon-button:hover span {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 4px;
+    margin: -1.5rem;
+}
+.twitter span {
+    background-color: #4099ff;
+}
+.facebook span {
+    background-color: #3B5998;
+}
+
+/* Icons */
+.icon-button i {
+    font-size: 20px;
+    background: none;
+    color: white;
+    height: 3rem;
+    left: 0;
+    line-height: 3rem;
+    position: absolute;
+    top: 0;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+    width: 3rem;
+    z-index: 10;
+}
+
+.icon-facebook:before {
+    content: "\f09a";
+}
+.icon-twitter:before {
+    content: "\f099";
+}
+.icon-button .icon-twitter {
+    color: #4099ff;
+}
+.icon-button .icon-facebook {
+    color: #3B5998;
+}
+.icon-button:hover .icon-twitter,
+.icon-button:hover .icon-facebook {
+    color: white;
 }

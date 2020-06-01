@@ -304,7 +304,7 @@ export default class FactWriter extends React.Component<{}> {
     render() {
         return (
             <div className="main">
-                <section className="container">
+                <section className="container is-fluid">
                     <TopImage />
                     <div style={{ color: 'white', margin: '10px 0 10px 0' }}>
                         <label htmlFor="titleInput">

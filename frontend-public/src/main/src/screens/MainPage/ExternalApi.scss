@@ -1,0 +1,32 @@
+@import '../../sass/main';
+
+.externalApi {
+  padding: 1.5rem;
+  height: 100%;
+  color: $primary-font-color;
+  text-align: center;
+}
+
+.externalApi h3 {
+  margin: 0 0.5rem 0.5rem 0.5rem;
+}
+
+@media all and (max-width: 640px) {
+  .externalApiItem {
+    width: 45%;
+  }
+}
+
+@media all and (max-width: $tablet) {
+  .externalApi {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  .externalApiItem {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}

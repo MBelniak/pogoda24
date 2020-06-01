@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoImg from './img/logo-wHalo.png';
+import logoImg from '../img/logo-wHalo.png';
+import '../sass/main.scss';
 
 export class TopBar extends React.Component {
     componentDidMount() {
@@ -32,7 +33,7 @@ export class TopBar extends React.Component {
     render() {
         return (
             <nav
-                className="topBar navbar"
+                className="topBar navbar topBarFontSizeMedium"
                 role="navigation"
                 aria-label="main navigation">
                 <div className="navbar-brand">
@@ -62,7 +63,7 @@ export class TopBar extends React.Component {
                         <Link to="/ciekawostki" className="navbar-item">
                             Ciekawostki
                         </Link>
-                        <Link to="/about" className="navbar-item">
+                        <Link to="/about" className="navbar-item last">
                             O Nas
                         </Link>
                     </div>

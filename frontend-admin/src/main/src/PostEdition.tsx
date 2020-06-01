@@ -25,7 +25,7 @@ interface State {
 }
 
 const daysValidInputConstraint = (text: string): boolean => {
-    return parseInt(text) >= 0;
+    return parseInt(text) >= 0 && parseInt(text) <= 14;
 };
 
 export default class PostEdition extends React.Component<
@@ -114,19 +114,21 @@ export default class PostEdition extends React.Component<
             this.fileInput.current.value = null;
             return;
         }
+
+        let filesToBePushed: FileToUpload[] = [];
         for (let file of files) {
             let timestamp = new Date().getTime().toString();
             timestamp = timestamp.substr(0, timestamp.length - 3);
-            const newFile = {
+            filesToBePushed.push({
                 id: this.fileId++,
                 file: file,
                 publicId: file.name + timestamp,
                 timestamp: timestamp
-            };
-            this.setState({
-                filesToUpload: [...this.state.filesToUpload, newFile]
             });
         }
+        this.setState({
+            filesToUpload: [...this.state.filesToUpload, ...filesToBePushed]
+        });
         this.fileInput.current.value = null;
     }
 
@@ -134,7 +136,6 @@ export default class PostEdition extends React.Component<
         htmlInput,
         additionalConstraint?: (value) => boolean
     ) {
-        if (this.state.postType !== PostType.WARNING) return;
         if (
             !htmlInput.value ||
             (additionalConstraint
@@ -151,15 +152,19 @@ export default class PostEdition extends React.Component<
 
     private handleSubmit(event) {
         event.preventDefault();
+        let formValid = true;
         if (this.state.postType === PostType.WARNING) {
-            let formValid = this.validateField(
+            formValid = this.validateField(
                 this.daysValidInput.current,
                 daysValidInputConstraint
             );
             formValid =
                 this.validateField(this.warningShortInput.current) && formValid;
-            if (!formValid) return;
         }
+
+        formValid = formValid && this.validateField(this.titleTextArea.current);
+        if (!formValid) return;
+
         showModal(<LoadingIndicator />);
         this.sendPostToBackend()
             .then(response => {
@@ -203,7 +208,7 @@ export default class PostEdition extends React.Component<
             postType: this.state.postType.toString(),
             title: this.titleTextArea.current.value,
             description: this.postDescriptionTextArea.current.value,
-            imagesPublicIds: '',
+            imagesPublicIds: [] as string[],
             dueDate:
                 this.state.postType === PostType.WARNING
                     ? calculateDueDate(
@@ -220,9 +225,7 @@ export default class PostEdition extends React.Component<
         for (let i = 0; i < this.state.filesToUpload.length; ++i) {
             uploadedFilesIdsOrdered.push(this.state.filesToUpload[i].publicId);
         }
-        requestBodyPost['imagesPublicIds'] = JSON.stringify(
-            uploadedFilesIdsOrdered
-        );
+        requestBodyPost['imagesPublicIds'] = uploadedFilesIdsOrdered;
 
         return fetchApi('api/posts?temporary=true', {
             method: 'PUT',
@@ -233,7 +236,7 @@ export default class PostEdition extends React.Component<
         });
     }
 
-    private saveImagesToCloudinary(postHash: string, warningInfoHash?: string) {
+    private saveImagesToCloudinary(postHash: string) {
         const uploadPromises: Promise<Response>[] = uploadImages(
             this.getImagesToUpload(),
             this.abortController.signal
@@ -243,11 +246,6 @@ export default class PostEdition extends React.Component<
                 if (responses.every(response => response && response.ok)) {
                     //all images uploaded successfully
                     this.continueSavingPostToBackend(postHash);
-                    if (warningInfoHash) {
-                        this.continueSavingWarningInfoToBackend(
-                            warningInfoHash
-                        );
-                    }
                 } else {
                     responses = responses.filter(
                         response => !response || !response.ok
@@ -280,21 +278,6 @@ export default class PostEdition extends React.Component<
                     this.showErrorMessage(
                         'Wystąpił błąd przy zapisywaniu posta.'
                     );
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-    //Save temporarily saved changes to the database
-    private continueSavingWarningInfoToBackend(hash: string) {
-        fetchApi('api/warningInfo/continuePostUpdate/' + hash + '?success=true')
-            .then(response => {
-                if (response && response.ok) {
-                    this.showSuccessMessage();
-                } else {
-                    console.log(response.statusText + ', ' + response.body);
                 }
             })
             .catch(error => {
@@ -397,58 +380,67 @@ export default class PostEdition extends React.Component<
         return (
             <div className="columns">
                 <div className="column is-half">
-                    <div className="columns">
-                        <div className="column">
-                            <label htmlFor="warningDaysValidInput">
-                                Czas trwania ostrzeżenia (0 = do końca
-                                dzisiejszego dnia:{' '}
-                            </label>
-                        </div>
-                        <div className="column">
-                            <input
-                                id="warningDaysValidInput"
-                                type="number"
-                                required={true}
-                                ref={this.daysValidInput}
-                                min="0"
-                                max="7"
-                                defaultValue={
-                                    fns.differenceInCalendarDays(
-                                        fnstz.zonedTimeToUtc(
-                                            this.props.post.dueDate,
-                                            'Europe/Warsaw'
-                                        ),
-                                        this.props.post.postDate
-                                    ) - 1
-                                }
-                                onBlur={e =>
-                                    this.validateField(
-                                        e.target,
-                                        daysValidInputConstraint
-                                    )
-                                }
-                            />
-                        </div>
-                    </div>
-                    <div className="columns">
-                        <div className="column">
-                            <label htmlFor="warningShortInput">
-                                Krótki opis (zostanie wyświetlony na pasku u
-                                góry strony):{' '}
-                            </label>
-                        </div>
-                        <div className="column">
-                            <input
-                                id="warningShortInput"
-                                type="text"
-                                required={true}
-                                maxLength={80}
-                                ref={this.warningShortInput}
-                                defaultValue={this.props.post.shortDescription}
-                                onBlur={e => this.validateField(e.target)}
-                            />
-                        </div>
-                    </div>
+                    <label htmlFor="warningDaysValidInput">
+                        Czas trwania ostrzeżenia (0 = do końca dzisiejszego
+                        dnia, max 14):{' '}
+                    </label>
+                    <br />
+                    <input
+                        id="warningDaysValidInput"
+                        className="input daysValidInput"
+                        type="number"
+                        required={true}
+                        ref={this.daysValidInput}
+                        min="0"
+                        max="14"
+                        defaultValue={
+                            this.props.post.dueDate
+                                ? fns.differenceInCalendarDays(
+                                      fnstz.zonedTimeToUtc(
+                                          this.props.post.dueDate,
+                                          'Europe/Warsaw'
+                                      ),
+                                      this.props.post.postDate
+                                  ) - 1
+                                : ''
+                        }
+                        onInput={e => {
+                            if (this.daysValidInput.current.value.length > 2)
+                                this.daysValidInput.current.value = this.daysValidInput.current.value.slice(
+                                    0,
+                                    2
+                                );
+                        }}
+                        onKeyUp={() => {
+                            this.validateField(
+                                this.daysValidInput.current,
+                                daysValidInputConstraint
+                            );
+                        }}
+                        onBlur={() =>
+                            this.validateField(
+                                this.daysValidInput.current,
+                                daysValidInputConstraint
+                            )
+                        }
+                    />
+                    <br />
+                    <label htmlFor="warningShortInput">
+                        Krótki opis (zostanie wyświetlony na pasku u góry
+                        strony):{' '}
+                    </label>
+                    <br />
+                    <input
+                        id="warningShortInput"
+                        className="input"
+                        type="text"
+                        required={true}
+                        maxLength={80}
+                        ref={this.warningShortInput}
+                        defaultValue={this.props.post.shortDescription}
+                        onKeyUp={e => this.validateField(e.target)}
+                        onBlur={e => this.validateField(e.target)}
+                    />
                 </div>
                 <div className="column is-half" />
             </div>
@@ -468,7 +460,7 @@ export default class PostEdition extends React.Component<
         return (
             <>
                 <h2 className="title">Edytuj post.</h2>
-                <div className="container fluid writerForm">
+                <div className="writerForm">
                     <div className="columns">
                         <div className="column">
                             <p>Tytuł:</p>
@@ -481,6 +473,8 @@ export default class PostEdition extends React.Component<
                                 ref={this.titleTextArea}
                                 defaultValue={this.props.post.title}
                                 className="textarea"
+                                onKeyUp={e => this.validateField(e.target)}
+                                onBlur={e => this.validateField(e.target)}
                             />
                             <p>Opis:</p>
                             <textarea
@@ -578,13 +572,12 @@ export default class PostEdition extends React.Component<
                     {this.state.postType === PostType.WARNING
                         ? this.renderForWarning()
                         : null}
-                    <form onSubmit={this.handleSubmit}>
-                        <input
-                            type="submit"
-                            className="button"
-                            value="Wyślij"
-                        />
-                    </form>
+                    <input
+                        type="submit"
+                        className="button"
+                        value="Wyślij"
+                        onClick={this.handleSubmit}
+                    />
                 </div>
             </>
         );

@@ -49,6 +49,7 @@ export default class Writer extends React.Component<{}, State> {
     private daysValidInput;
     private warningShortInput;
     private abortController;
+    private savedPostId;
 
     constructor(props) {
         super(props);
@@ -62,6 +63,7 @@ export default class Writer extends React.Component<{}, State> {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFilesAdded = this.onFilesAdded.bind(this);
         this.clearEverything = this.clearEverything.bind(this);
+        this.goToPost = this.goToPost.bind(this);
         this.validateField = this.validateField.bind(this);
         this.onRemoveFile = this.onRemoveFile.bind(this);
         this.onMoveForward = this.onMoveForward.bind(this);
@@ -90,31 +92,25 @@ export default class Writer extends React.Component<{}, State> {
             return;
         }
 
+        let filesToBePushed: FileToUpload[] = [];
         for (let file of files) {
-            this.prepareAndPushFile(file);
+            let timestamp = new Date().getTime().toString();
+            timestamp = timestamp.substr(0, timestamp.length - 3);
+            filesToBePushed.push({
+                id: this.fileId++,
+                file: file,
+                publicId: file.name + timestamp,
+                timestamp: timestamp
+            });
         }
+        this.setState({filesToUpload: [...this.state.filesToUpload, ...filesToBePushed]});
         this.fileInput.current.value = null;
-    }
-
-    private prepareAndPushFile(file: File) {
-        let timestamp = new Date().getTime().toString();
-        timestamp = timestamp.substr(0, timestamp.length - 3);
-        const fileToUpload = {
-            id: this.fileId++,
-            file: file,
-            publicId: file.name + timestamp,
-            timestamp: timestamp
-        };
-        this.setState({
-            filesToUpload: [...this.state.filesToUpload, fileToUpload]
-        });
     }
 
     private validateField(
         htmlInput,
         additionalConstraint?: (value) => boolean
     ) {
-        if (this.state.postType !== PostType.WARNING) return;
         if (
             !htmlInput.value ||
             (additionalConstraint
@@ -131,26 +127,31 @@ export default class Writer extends React.Component<{}, State> {
 
     private handleSubmit(event) {
         event.preventDefault();
+        let formValid = true;
         if (this.state.postType === PostType.WARNING) {
-            let formValid = this.validateField(
+            formValid = this.validateField(
                 this.daysValidInput.current,
                 daysValidInputConstraint
             );
             formValid =
                 this.validateField(this.warningShortInput.current) && formValid;
-            if (!formValid) return;
         }
+        formValid = formValid && this.validateField(this.titleTextArea.current);
+
+        if (!formValid) return;
+
         showModal(<LoadingIndicator />);
 
         this.sendPostToBackend()
             .then(response => {
-                if (response && response.ok) {
+                if (response && response.status === 201) {
                     response
                         .text()
                         .then((data: any) => {
                             if (data !== null) {
+                                this.savedPostId = data;
                                 //post saved, send images to cloudinary
-                                this.saveImagesToCloudinary(data.id);
+                                this.saveImagesToCloudinary();
                             } else {
                                 this.showErrorMessage(
                                     'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
@@ -211,8 +212,6 @@ export default class Writer extends React.Component<{}, State> {
         }
         requestBody['imagesPublicIds'] = uploadedFilesIdsOrdered;
 
-        console.log(requestBody);
-
         return fetchApi('api/posts', {
             method: 'POST',
             headers: {
@@ -222,7 +221,7 @@ export default class Writer extends React.Component<{}, State> {
         });
     }
 
-    private saveImagesToCloudinary(postId: number) {
+    private saveImagesToCloudinary() {
         const uploadPromises: Promise<Response>[] = uploadImages(
             this.state.filesToUpload,
             this.abortController.signal
@@ -240,12 +239,12 @@ export default class Writer extends React.Component<{}, State> {
                     this.showErrorMessage(
                         'Nie udało się wysłać wszystkich plików. Post nie został zapisany.'
                     );
-                    this.removePostFromBackend(postId);
+                    this.removePostFromBackend(this.savedPostId);
                 }
             })
             .catch(error => {
                 console.log(error);
-                this.removePostFromBackend(postId);
+                this.removePostFromBackend(this.savedPostId);
             });
     }
 
@@ -293,6 +292,12 @@ export default class Writer extends React.Component<{}, State> {
                     onClick={this.clearEverything}>
                     Ok
                 </button>
+                <button
+                    className="button is-secondary"
+                    style={{ float: 'right' }}
+                    onClick={this.goToPost}>
+                    Przejdź do posta
+                </button>
             </div>
         );
     }
@@ -317,7 +322,16 @@ export default class Writer extends React.Component<{}, State> {
             postType: PostType.FORECAST,
             filesToUpload: []
         });
+        this.fileInput.current.value = null;
+        this.postDescriptionTextArea.current.value = null;
+        this.titleTextArea.current.value = null;
+        this.savedPostId = undefined;
         closeModal();
+    }
+
+    private goToPost() {
+        const origin = location.href.split('/')[0];
+        location.href = origin + '/posts/' + this.savedPostId;
     }
 
     private onRemoveFile(fileId: number) {
@@ -352,40 +366,59 @@ export default class Writer extends React.Component<{}, State> {
 
     private renderForWarning() {
         return (
-            <div>
-                <label htmlFor="warningDaysValidInput">
-                    Czas trwania ostrzeżenia (0 = do końca dzisiejszego dnia,
-                    max 14):{' '}
-                </label>
-                <input
-                    id="warningDaysValidInput"
-                    className="input daysValidInput"
-                    type="number"
-                    required={true}
-                    ref={this.daysValidInput}
-                    min="0"
-                    max="14"
-                    onKeyUp={e =>
-                        this.validateField(e.target, daysValidInputConstraint)
-                    }
-                    onBlur={e =>
-                        this.validateField(e.target, daysValidInputConstraint)
-                    }
-                />
-                <br />
-                <label htmlFor="warningShortInput">
-                    Krótki opis (zostanie wyświetlony na pasku u góry strony):{' '}
-                </label>
-                <input
-                    id="warningShortInput"
-                    type="text"
-                    className="input"
-                    required={true}
-                    maxLength={80}
-                    ref={this.warningShortInput}
-                    onKeyUp={e => this.validateField(e.target)}
-                    onBlur={e => this.validateField(e.target)}
-                />
+            <div className="columns">
+                <div className="column is-half">
+                    <label htmlFor="warningDaysValidInput">
+                        Czas trwania ostrzeżenia (0 = do końca dzisiejszego
+                        dnia, max 14):{' '}
+                    </label>
+                    <br />
+                    <input
+                        id="warningDaysValidInput"
+                        className="input daysValidInput"
+                        type="number"
+                        required={true}
+                        ref={this.daysValidInput}
+                        min="0"
+                        max="14"
+                        onInput={e => {
+                            if (this.daysValidInput.current.value.length > 2)
+                                this.daysValidInput.current.value = this.daysValidInput.current.value.slice(
+                                    0,
+                                    2
+                                );
+                        }}
+                        onKeyUp={() => {
+                            this.validateField(
+                                this.daysValidInput.current,
+                                daysValidInputConstraint
+                            );
+                        }}
+                        onBlur={() =>
+                            this.validateField(
+                                this.daysValidInput.current,
+                                daysValidInputConstraint
+                            )
+                        }
+                    />
+                    <br />
+                    <label htmlFor="warningShortInput">
+                        Krótki opis (zostanie wyświetlony na pasku u góry
+                        strony):{' '}
+                    </label>
+                    <br />
+                    <input
+                        id="warningShortInput"
+                        type="text"
+                        className="input"
+                        required={true}
+                        maxLength={80}
+                        ref={this.warningShortInput}
+                        onKeyUp={e => this.validateField(e.target)}
+                        onBlur={e => this.validateField(e.target)}
+                    />
+                </div>
+                <div className="column is-half" />
             </div>
         );
     }
@@ -397,14 +430,14 @@ export default class Writer extends React.Component<{}, State> {
     render() {
         return (
             <div className="main">
-                <section className="container fluid">
+                <section className="container is-fluid">
                     <TopImage />
                     <h2 className="title">Witaj w edytorze wpisów.</h2>
                     <h2 className="title is-5">
                         Możesz tutaj tworzyć nowe posty do umieszczenia na
                         stronie.
                     </h2>
-                    <div className="container fluid writerForm">
+                    <div className="writerForm">
                         <div className="columns">
                             <div className="column">
                                 <p>
@@ -417,6 +450,8 @@ export default class Writer extends React.Component<{}, State> {
                                     placeholder="Tytuł"
                                     ref={this.titleTextArea}
                                     className="input"
+                                    onKeyUp={e => this.validateField(e.target)}
+                                    onBlur={e => this.validateField(e.target)}
                                 />
                                 <p>
                                     Dodaj opis do{' '}
@@ -495,7 +530,7 @@ export default class Writer extends React.Component<{}, State> {
                             multiple={true}
                             ref={this.fileInput}
                             onChange={() =>
-                                this.onFilesAdded(this.fileInput.files)
+                                this.onFilesAdded(this.fileInput.current.files)
                             }
                         />
                         <p>
@@ -524,13 +559,12 @@ export default class Writer extends React.Component<{}, State> {
                         {this.state.postType === PostType.WARNING
                             ? this.renderForWarning()
                             : null}
-                        <form onSubmit={this.handleSubmit}>
-                            <input
-                                type="submit"
-                                className="button"
-                                value="Wyślij"
-                            />
-                        </form>
+                        <input
+                            type="submit"
+                            className="button"
+                            value="Wyślij"
+                            onClick={this.handleSubmit}
+                        />
                     </div>
                 </section>
                 <Copyright />

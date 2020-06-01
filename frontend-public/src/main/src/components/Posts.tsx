@@ -1,8 +1,9 @@
 import React from 'react';
 import { PostsList } from './PostsList';
-import Post, { postDTOToPost, PostType } from './Post';
-import { fetchApi } from './helper/fetchHelper';
+import Post, { postDTOToPost, PostType } from '../model/Post';
+import { fetchApi } from '../helpers/fetchHelper';
 import CustomLinearProgress from './LinearProgress';
+import './Posts.scss';
 const PagingBar = require('shared24').PagingBar;
 
 interface State {
@@ -27,9 +28,35 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
         this.abortController = new AbortController();
     }
 
-    private fetchPosts() {
+    private fetchPosts(page: number) {
+        fetchApi(
+            'api/posts?postType=' +
+            this.props.postType.toString() +
+            '&page=' + page + '&count=' +
+            this.postsPerPage
+        )
+            .then(response =>
+                response
+                    .json()
+                    .then(posts => {
+                        this.setState({
+                            posts: posts.map(post =>
+                                postDTOToPost(post)
+                            )
+                        });
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            )
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    private refreshPosts() {
         this.setState({ posts: undefined });
-        fetchApi('api/posts/count?postType=' + this.props.postType.toString(), {
+        return fetchApi('api/posts/count?postType=' + this.props.postType.toString(), {
             signal: this.abortController.signal
         })
             .then(response => {
@@ -39,60 +66,10 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                         .then(data => {
                             this.setState({ totalPostsCount: data });
                             if (this.state.totalPostsCount !== 0) {
-                                fetchApi(
-                                    'api/posts?postType=' +
-                                        this.props.postType.toString() +
-                                        '&page=0&count=' +
-                                        this.postsPerPage
-                                )
-                                    .then(response =>
-                                        response
-                                            .json()
-                                            .then(posts => {
-                                                this.setState({
-                                                    posts: posts.map(post =>
-                                                        postDTOToPost(post)
-                                                    )
-                                                });
-                                            })
-                                            .catch(error => {
-                                                console.log(error);
-                                            })
-                                    )
-                                    .catch(error => {
-                                        console.log(error);
-                                    });
+                                this.fetchPosts(0);
                             } else {
                                 this.setState({ posts: [] });
                             }
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-                } else {
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-    private handlePageClick(data) {
-        const selected = data.selected;
-        this.setState({ posts: undefined, currentPage: selected });
-        fetchApi(
-            'api/posts?postType=FORECAST&page=' +
-                selected +
-                '&count=' +
-                this.postsPerPage,
-            { signal: this.abortController.signal }
-        )
-            .then(response => {
-                if (response && response.ok) {
-                    response
-                        .json()
-                        .then(posts => {
-                            this.setState({ posts: posts });
                         })
                         .catch(error => {
                             console.log(error);
@@ -106,6 +83,12 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
             });
     }
 
+    private handlePageClick(data) {
+        const selected = data.selected;
+        this.setState({ posts: undefined, currentPage: selected });
+        this.fetchPosts(selected);
+    }
+
     private postTypeToText(): string {
         return this.props.postType == PostType.FACT
             ? 'ciekawostek'
@@ -116,12 +99,13 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
 
     componentDidUpdate(prevProps) {
         if (this.props.postType !== prevProps.postType) {
-            this.fetchPosts();
+            this.setState({totalPostsCount: 0, currentPage: 0});
+            this.refreshPosts();
         }
     }
 
     componentDidMount() {
-        this.fetchPosts();
+        this.refreshPosts();
     }
 
     componentWillUnmount() {
@@ -158,7 +142,7 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                                         textAlign: 'center',
                                         marginTop: '20px'
                                     }}>
-                                    <p className="noPosts">
+                                    <p className="fontSizeLarge">
                                         Brak {this.postTypeToText()}.
                                     </p>
                                 </div>

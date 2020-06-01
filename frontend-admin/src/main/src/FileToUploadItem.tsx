@@ -101,7 +101,7 @@ export default class FileToUploadItem extends React.Component<
                                 &lt;
                             </span>
                         </div>
-                        <div className="deleteFile">
+                        <div className="centerVertically">
                             <p style={{ fontSize: '25px' }}>Usuń</p>
                             <div
                                 className="uploadedFilesItemDelete"

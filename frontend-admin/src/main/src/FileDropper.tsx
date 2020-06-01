@@ -19,9 +19,9 @@ export default class FileDropper extends React.Component<FileDropperProps> {
                 noClick={true}>
                 {({ getRootProps, getInputProps }) => (
                     <div className="section dropzone" {...getRootProps()}>
-                        <div className="container fluid">
+                        <div className="container is-fluid">
                             <input {...getInputProps()} />
-                            <h2 className="title is-4 dropzone-text">
+                            <h2 className="title is-4 centerHorizontally">
                                 Upuść pliki tutaj
                             </h2>
                         </div>

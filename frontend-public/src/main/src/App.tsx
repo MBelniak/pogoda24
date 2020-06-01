@@ -1,76 +1,43 @@
 import React from 'react';
 import { Switch, Route } from 'react-router';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { MainPage } from './MainPage';
-import { ONas } from './ONas';
+import { MainPage } from './screens/MainPage/MainPage';
+import { ONas } from './screens/About/ONas';
 import { CloudinaryContext } from 'cloudinary-react';
 import './sass/main.scss';
-import 'shared24/src/sass/main.scss';
-import * as fnstz from 'date-fns-tz';
-import { TopBar } from './TopBar';
-import PostView from './PostView';
-import ErrorPage from './ErrorPage';
-import { fetchApi } from './helper/fetchHelper';
-import { Posts } from './Posts';
-import { PostType } from './Post';
-const BarHolder = require('shared24').BarHolder;
+import { TopBar } from './components/TopBar';
+import PostView from './screens/PostView/PostView';
+import { Posts } from './components/Posts';
+import { PostType } from './model/Post';
 const Copyright = require('shared24').Copyright;
 
-interface WarningInfo {
-    postId: string;
-    dueDate: Date;
-    shortDescription?: string;
-}
-
-interface State {
-    warningInfo: WarningInfo | null;
-}
-
-export default class App extends React.Component<{}, State> {
+export default class App extends React.Component {
     private abortController;
-
-    state: State = {
-        warningInfo: null
-    };
 
     constructor(props) {
         super(props);
         this.abortController = new AbortController();
     }
 
-    componentDidMount() {
-        fetchApi('api/posts/topBarWarning', {
-            signal: this.abortController.signal
-        })
-            .then(response => {
-                if (response && response.ok) {
-                    response
-                        .json()
-                        .then(warningInfo => {
-                            this.setState({
-                                warningInfo: {
-                                    ...warningInfo,
-                                    dueDate: warningInfo.dueDate
-                                        ? fnstz.zonedTimeToUtc(
-                                              warningInfo.dueDate,
-                                              'Europe/Warsaw'
-                                          )
-                                        : undefined
-                                }
-                            });
-                        })
-                        .catch(error => {
-                            console.log(error);
-                            this.setState({ warningInfo: null });
-                        });
-                } else {
-                    console.log(response);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
+    private renderSocialMedia() {
+        return (
+            <div className="social-container">
+                <a href="https://www.facebook.com/Polska24nadobe"
+                   target="_blank" className="icon-button facebook">
+                    <i className="icon-facebook" />
+                    <span />
+                </a>
+                <a
+                    href="https://twitter.com"
+                    className="icon-button twitter">
+                    <i className="icon-twitter" />
+                    <span />
+                </a>
+            </div>
+        );
     }
+
+    componentDidMount() {}
 
     componentWillUnmount() {
         this.abortController.abort();
@@ -80,16 +47,6 @@ export default class App extends React.Component<{}, State> {
         return (
             <Router>
                 <div className="main">
-                    <BarHolder
-                        handleClick={() => {
-                            return;
-                        }}
-                        warningShort={
-                            this.state.warningInfo
-                                ? this.state.warningInfo.shortDescription
-                                : 'Brak ostrzeżeń'
-                        }
-                    />
                     <TopBar />
                     <Switch>
                         <Route exact path="/" component={MainPage} />
@@ -103,10 +60,12 @@ export default class App extends React.Component<{}, State> {
                             <Posts postType={PostType.FACT} />
                         </Route>
                         <Route path="/about" component={ONas} />
-                        <Route path="/posts/(\d+)" component={PostView} />
-                        <Route component={ErrorPage} />
+                        <Route
+                            path="/posts/([a-zA-Z0-9]+)"
+                            component={PostView}
+                        />
                     </Switch>
-                    <Copyright />
+                    <Copyright additionalRender={this.renderSocialMedia} />
                 </div>
             </Router>
         );
