@@ -1,4 +1,5 @@
 import React from 'react';
+import './ExternalApi.scss';
 
 export class ExternalApi extends React.Component {
     constructor(props) {
@@ -7,7 +8,7 @@ export class ExternalApi extends React.Component {
 
     render() {
         return (
-            <>
+            <div className="externalApi">
                 <div className="externalApiItem">
                     <h3>Wyładowania (blitzortung)</h3>
                     <a href="http://pl.blitzortung.org/live_lightning_maps.php?map=15" target="_blank">
@@ -41,7 +42,7 @@ export class ExternalApi extends React.Component {
                         />
                     </a>
                 </div>
-            </>
+            </div>
         );
     }
 }

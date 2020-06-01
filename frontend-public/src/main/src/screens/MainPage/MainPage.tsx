@@ -1,10 +1,12 @@
 import React from 'react';
-import { PostsList } from './PostsList';
+import { PostsList } from '../../components/PostsList';
 import { ExternalApi } from './ExternalApi';
-import Post, { postDTOToPost } from './Post';
-import { fetchApi } from './helper/fetchHelper';
+import Post, { postDTOToPost } from '../../model/Post';
+import { fetchApi } from '../../helpers/fetchHelper';
 import * as fnstz from 'date-fns-tz';
-import CustomLinearProgress from './LinearProgress';
+import CustomLinearProgress from '../../components/LinearProgress';
+import { CurrentWarnings } from './CurrentWarnings';
+import '../../sass/main.scss';
 
 interface WarningInfo {
     postId: string;
@@ -100,34 +102,7 @@ export class MainPage extends React.Component<{}, State> {
                         <>
                             <div className="column is-2 warnings">
                                 {this.state.warningInfo ? (
-                                    <div className="currentWarnings">
-                                        {this.state.warningInfo.length > 0 ? (
-                                            <>
-                                                <p
-                                                    className="postTitle fontSizeLarge"
-                                                    style={{
-                                                        wordWrap: 'break-word'
-                                                    }}>
-                                                    Aktualne ostrzeżenia
-                                                </p>
-                                                {this.state.warningInfo.map((info, key, list) => {
-                                                    const href = 'posts/' + info.postId;
-                                                    return (
-                                                        <div key={key} className="currentWarning fontSizeSmall">
-                                                            <a className="postLink" href={href}>
-                                                                {info.title}
-                                                            </a>
-                                                            {list.length - 1 === key ? null : (
-                                                                <div className="is-divider" />
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
-                                            </>
-                                        ) : (
-                                            <p className="currentWarningsNone fontSizeLarge">Brak ostrzeżeń</p>
-                                        )}
-                                    </div>
+                                    <CurrentWarnings warningInfo={this.state.warningInfo}/>
                                 ) : (
                                     <CustomLinearProgress />
                                 )}
@@ -151,7 +126,7 @@ export class MainPage extends React.Component<{}, State> {
                             </div>
                         </>
                     )}
-                    <div className="column is-2 externalApi fontSizeMedium">
+                    <div className="column is-2 fontSizeMedium">
                         <ExternalApi />
                     </div>
                 </div>

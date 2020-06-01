@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoImg from './img/logo-wHalo.png';
+import logoImg from '../img/logo-wHalo.png';
+import '../sass/main.scss';
 
 export class TopBar extends React.Component {
     componentDidMount() {

@@ -1,5 +1,7 @@
 import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
+import '../sass/main.scss';
+import './ForecastMapList.scss';
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
 

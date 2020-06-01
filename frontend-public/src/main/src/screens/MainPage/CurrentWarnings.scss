@@ -1,0 +1,28 @@
+@import '../../sass/main';
+
+.currentWarnings {
+  background: white;
+  border-radius: 0.4rem;
+  box-shadow: 0 0 4px red;
+  text-align: center;
+  padding: 1rem;
+}
+
+.currentWarningsNone {
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  word-wrap: break-word;
+  color: $primary-font-color;
+}
+
+.currentWarning {
+  text-align: left;
+}
+
+@media screen and (max-width: $desktop) {
+  .warnings {
+    display: block;
+    width: 100%;
+  }
+}

@@ -13,7 +13,7 @@ export class Copyright extends React.Component<CopyrightProps> {
         return (
             <footer className="footer">
                 <div className="content has-text-centered">
-                    <p className="fontSizeMedium">Copyright &copy; 2020 by Pogoda24/7</p>
+                    <p className="fontSizeSmall">Copyright &copy; 2020 by Pogoda24/7</p>
                     {this.props.additionalRender ? this.props.additionalRender() : null}
                 </div>
             </footer>

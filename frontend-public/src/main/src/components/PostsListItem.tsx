@@ -1,8 +1,10 @@
 import React from 'react';
-import Post, { PostType } from './Post';
+import Post, { PostType } from '../model/Post';
 import { Link } from 'react-router-dom';
 import { ForecastMapList } from './ForecastMapList';
-import config from './config/config';
+import config from '../config/config';
+import '../sass/main.scss';
+import 'suneditor/dist/css/suneditor.min.css';
 
 const { nonExpandedPostLength } = config;
 
@@ -111,7 +113,7 @@ export default class PostsListItem extends React.Component<
     render() {
         return (
             <div className="post">
-                <div className="postdate fontSizeSmall">{this.processDate()}</div>
+                <div className="postDate fontSizeSmall">{this.processDate()}</div>
                 <br />
                 <div className="postTitle fontSizeLarge">
                     <span>{this.props.post.title}</span>

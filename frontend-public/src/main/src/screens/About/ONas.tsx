@@ -1,6 +1,7 @@
 import React from "react";
-import config from './config/config';
+import config from '../../config/config';
 import StaffItem from "./StaffItem";
+import './ONas.scss'
 
 export class ONas extends React.Component {
     constructor(props) {

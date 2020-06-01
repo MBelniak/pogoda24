@@ -1,4 +1,5 @@
 import React from 'react';
+import './ONas.scss'
 
 interface Person {
     imageURL: string;
