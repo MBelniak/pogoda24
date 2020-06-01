@@ -1,14 +1,16 @@
 @charset "utf-8";
 $primary-color: #23425f;
 $secondary-color: #25a5a5;
+$primary-font-color: #222;
+$secondary-font-color: #353535;
 $background: $primary-color;
 $body-background-color: $primary-color;
 $navbar-background-color: $secondary-color;
-$navbar-item-hover-color: $primary-color;
-$divider-background-color: black;
-$divider-thickness: 2px;
+$divider-background-color: $primary-color;
+$divider-thickness: 1px;
 $gap: 64px;
 $desktop: 960px + (2 * $gap);
+$tablet: 960px + (2 * $gap);
 $navbar-item-img-max-height: none;
 // Import only what you need from Bulma
 @import '../../node_modules/bulma/sass/utilities/_all.sass';
@@ -24,8 +26,7 @@ $navbar-item-img-max-height: none;
 @import '../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass';
 
 body {
-    background: url('../img/logo_bg.jpg') no-repeat fixed;
-    //background-color: $primary-color;
+    background-color: rgba(#00B5F5, 0.05);
     background-size: 100vw 100%;
 }
 
@@ -43,33 +44,32 @@ body {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
 }
 
 p,
 span,
 label {
-    color: black;
     font-size: 1em;
+}
+
+.is-divider {
+    margin: 15px 0 15px 0;
 }
 
 .noPosts {
     font-size: 1.2em;
-    color: white;
-}
-.columns {
-    flex-grow: 1;
 }
 
 .basicLink {
-    color: black;
+    color: $secondary-font-color;
     transition: 0.3s;
     text-decoration: underline;
 }
 
 .basicLink:hover {
     transition: 0.3s;
-    color: $primary-color;
+    color: $secondary-color;
 }
 
 .posts {
@@ -77,27 +77,70 @@ label {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    padding: 1rem;
+}
+
+.warnings {
+    padding: 1rem;
+}
+
+@media screen and (max-width: $desktop) {
+    .warnings {
+        display: block;
+        width: 100%;
+    }
+}
+
+.currentWarnings {
+    background: white;
+    border-radius: 0.4rem;
+    box-shadow: 0 0 4px red;
+    text-align: center;
+    padding: 1rem;
+}
+
+.currentWarningsNone {
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 20px;
+    text-align: center;
+    word-wrap: break-word;
+    color: $primary-font-color;
+}
+
+.currentWarningsTitle {
+    text-align: left;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.currentWarning {
+    text-align: left;
+    font-size: 14px;
 }
 
 .post {
-    margin-top: 1rem;
-    padding: 0.6rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
     background: white;
-    box-shadow: 0 0 5px $secondary-color;
+    border-radius: 0.4rem;
+    box-shadow: 0 0 4px $primary-color;
+    text-align: center;
 }
 
 .postLink {
-    color: black;
+    color: $primary-font-color;
     transition: 0.3s;
+    text-decoration: underline;
 }
 
 .postLink:hover {
-    color: $primary-color;
+    color: $secondary-color;
     transition: 0.3s;
 }
 
 .postdate {
-    color: #222222;
+    color: $primary-font-color;
     cursor: default;
     float: right;
     font-size: 14px;
@@ -109,49 +152,56 @@ label {
     margin-top: 0.35rem;
     margin-bottom: 1rem;
     word-wrap: break-word;
+    color: $primary-font-color;
 }
 
 .postDescription {
-    font-size: 16px;
+    font-size: 14px;
     text-align: left;
+    color: $secondary-font-color;
 }
 
 .forecastMapList {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: space-between;
 }
 
-.forecastMapList * {
-    margin: 0.7rem;
-}
 
 .forecastMapImage {
-    width: 45%;
+    width: 48%;
     cursor: pointer;
 }
 
-.externalApi {
-    height: 100%;
-    color: white;
-    font-size: 15px;
-    text-align: center;
-    margin-top: 1rem;
+@media all and (max-width: $tablet) {
+    .externalApi {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .externalApiItem {
+        width: 20%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
 }
 
-@keyframes bar_anim {
-    0% {
-        left: 100%;
+.externalApi {
+    padding: 1.5rem;
+    height: 100%;
+    color: $primary-font-color;
+    font-size: 15px;
+    text-align: center;
+}
+
+@media all and (max-width: 640px) {
+    .externalApiItem {
+        width: 45%;
     }
-    25% {
-        left: 0%;
-    }
-    50% {
-        left: 0%;
-    }
-    100% {
-        left: -100%;
-    }
+}
+.externalApi h3 {
+    margin: 0 0.5rem 0.5rem 0.5rem;
 }
 
 .topBar {
@@ -161,19 +211,49 @@ label {
     min-height: 4rem;
 }
 
-.topBar div * :not(.logoImg) {
-    margin-top: 0.6rem;
-    margin-bottom: 0.6rem;
+.topBar .navbar-burger {
+    color: white;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
-.topBar a, .topBar span {
+
+.topBar .navbar-item, .topBar .navbar-brand {
     color: white;
     text-decoration: none;
-    margin-right: 0.5rem;
-    transition: 0.4s;
+    margin: 0 0.3rem 0 0.3rem;
+    border-bottom: 2px solid $secondary-color;
 }
-.topBar a:hover {
-    color: $primary-color;
+
+
+@media all and (max-width: $desktop) {
+    .topBar a:hover {
+        color: $primary-color;
+    }
+}
+
+@media all and (min-width: $desktop) {
+    .topBar a:hover {
+        color: white;
+        background-color: $secondary-color;
+        border-bottom: 2px solid white;
+    }
+}
+
+.topBar .navbar-brand a:hover {
+    color: white;
+    text-decoration: none;
+    border-bottom: 2px solid $secondary-color;
+}
+
+.topBar .navbar-brand {
+    margin-left: 0.8rem;
+}
+
+@media all and (min-width: $tablet) {
+    .topBar a.last {
+        margin-right: 0.8rem;
+    }
 }
 
 .logoImg {
@@ -181,20 +261,17 @@ label {
     height: 3.1rem;
     width: 3.2rem;
 }
-.externalApiImg {
-    margin-bottom: 1.4rem;
-}
+
 .ekipa {
     width: 95%;
     margin-left: auto;
     margin-right: auto;
 }
 .ekipa * {
-    font-size: 17px;
+    font-size: 16px;
 }
 .ekipaItem {
-    border: solid 2px $primary-color;
-    border-radius: 10px;
+    border-radius: 5px;
     margin: 1rem;
     display: flex;
     flex-direction: row;
@@ -212,6 +289,10 @@ label {
     margin: 0.7rem;
 }
 
+.copyright * {
+    color: $primary-font-color;
+}
+
 .sun-editor-editable, .sun-editor-editable * {
     background-color: transparent;
     font-family: $family-sans-serif;
@@ -227,4 +308,86 @@ label {
 
 .sun-editor-editable[contenteditable=true] .se-component {
     outline: none;
+}
+
+/* Wrapper */
+.icon-button {
+    background-color: white;
+    box-shadow: 0 0 3px $primary-color;
+    border-radius: 3.6rem;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 2.0rem;
+    height: 3.6rem;
+    line-height: 3.6rem;
+    margin: 0.5rem 5px;
+    position: relative;
+    text-align: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 3.6rem;
+}
+
+/* Circle */
+.icon-button span {
+    border-radius: 0;
+    display: block;
+    height: 0;
+    left: 50%;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+    width: 0;
+}
+.icon-button:hover span {
+    width: 3.6rem;
+    height: 3.6rem;
+    border-radius: 3.6rem;
+    margin: -1.8rem;
+}
+.twitter span {
+    background-color: #4099ff;
+}
+.facebook span {
+    background-color: #3B5998;
+}
+.google-plus span {
+    background-color: #db5a3c;
+}
+
+/* Icons */
+.icon-button i {
+    background: none;
+    color: white;
+    height: 3.6rem;
+    left: 0;
+    line-height: 3.6rem;
+    position: absolute;
+    top: 0;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+    width: 3.6rem;
+    z-index: 10;
+}
+.icon-button .icon-twitter {
+    color: #4099ff;
+}
+.icon-button .icon-facebook {
+    color: #3B5998;
+}
+.icon-button .icon-google-plus {
+    color: #db5a3c;
+}
+.icon-button:hover .icon-twitter,
+.icon-button:hover .icon-facebook,
+.icon-button:hover .icon-google-plus {
+    color: white;
 }

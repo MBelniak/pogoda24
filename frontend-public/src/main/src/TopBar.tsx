@@ -62,7 +62,7 @@ export class TopBar extends React.Component {
                         <Link to="/ciekawostki" className="navbar-item">
                             Ciekawostki
                         </Link>
-                        <Link to="/about" className="navbar-item">
+                        <Link to="/about" className="navbar-item last">
                             O Nas
                         </Link>
                     </div>
