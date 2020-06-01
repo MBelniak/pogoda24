@@ -104,7 +104,7 @@ export class MainPage extends React.Component<{}, State> {
                                         {this.state.warningInfo.length > 0 ? (
                                             <>
                                                 <p
-                                                    className="postTitle"
+                                                    className="postTitle fontSizeLarge"
                                                     style={{
                                                         wordWrap: 'break-word'
                                                     }}>
@@ -113,7 +113,7 @@ export class MainPage extends React.Component<{}, State> {
                                                 {this.state.warningInfo.map((info, key, list) => {
                                                     const href = 'posts/' + info.postId;
                                                     return (
-                                                        <div key={key} className="currentWarning">
+                                                        <div key={key} className="currentWarning fontSizeSmall">
                                                             <a className="postLink" href={href}>
                                                                 {info.title}
                                                             </a>
@@ -125,7 +125,7 @@ export class MainPage extends React.Component<{}, State> {
                                                 })}
                                             </>
                                         ) : (
-                                            <p className="currentWarningsNone">Brak ostrzeżeń</p>
+                                            <p className="currentWarningsNone fontSizeLarge">Brak ostrzeżeń</p>
                                         )}
                                     </div>
                                 ) : (
@@ -142,7 +142,7 @@ export class MainPage extends React.Component<{}, State> {
                                                 textAlign: 'center',
                                                 marginTop: '20px'
                                             }}>
-                                            <p className="noPosts">Brak postów.</p>
+                                            <p className="fontSizeLarge">Brak postów.</p>
                                         </div>
                                     )
                                 ) : (
@@ -151,7 +151,7 @@ export class MainPage extends React.Component<{}, State> {
                             </div>
                         </>
                     )}
-                    <div className="column is-2 externalApi">
+                    <div className="column is-2 externalApi fontSizeMedium">
                         <ExternalApi />
                     </div>
                 </div>

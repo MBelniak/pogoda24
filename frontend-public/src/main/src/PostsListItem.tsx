@@ -111,12 +111,12 @@ export default class PostsListItem extends React.Component<
     render() {
         return (
             <div className="post">
-                <div className="postdate">{this.processDate()}</div>
+                <div className="postdate fontSizeSmall">{this.processDate()}</div>
                 <br />
-                <div className="postTitle">
+                <div className="postTitle fontSizeLarge">
                     <span>{this.props.post.title}</span>
                 </div>
-                <div className="postDescription">
+                <div className="postDescription fontSizeSmall">
                     {this.createDescription()}
                 </div>
                 <div

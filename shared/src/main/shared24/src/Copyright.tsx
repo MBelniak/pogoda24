@@ -12,8 +12,8 @@ export class Copyright extends React.Component<CopyrightProps> {
     render() {
         return (
             <footer className="footer">
-                <div className="content has-text-centered copyright">
-                    <p>Copyright &copy; 2020 by Pogoda24/7</p>
+                <div className="content has-text-centered">
+                    <p className="fontSizeMedium">Copyright &copy; 2020 by Pogoda24/7</p>
                     {this.props.additionalRender ? this.props.additionalRender() : null}
                 </div>
             </footer>

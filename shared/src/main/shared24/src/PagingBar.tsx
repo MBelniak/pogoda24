@@ -44,7 +44,7 @@ export class PagingBar extends React.Component<PagingBarProps> {
                     marginPagesDisplayed={2}
                     pageRangeDisplayed={1}
                     onPageChange={this.props.handlePageClick}
-                    containerClassName={'pagingBar'}
+                    containerClassName={'pagingBar fontSizeLarge'}
                     subContainerClassName={'pagingBarSub'}
                     activeClassName={'active'}
                     previousLinkClassName={'pagingBarPrevious'}

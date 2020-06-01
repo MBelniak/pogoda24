@@ -32,7 +32,7 @@ export class TopBar extends React.Component {
     render() {
         return (
             <nav
-                className="topBar navbar"
+                className="topBar navbar topBarFontSizeMedium"
                 role="navigation"
                 aria-label="main navigation">
                 <div className="navbar-brand">

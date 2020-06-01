@@ -91,17 +91,17 @@ export default class PostView extends React.Component<{}, State> {
                         <div className="posts">
                             {this.post ? (
                                 <div className="post">
-                                    <div className="postdate">
+                                    <div className="postdate fontSizeSmall">
                                         {this.processDate(this.post.postDate)}
                                     </div>
                                     <br />
-                                    <div className="postTitle">
+                                    <div className="postTitle fontSizeLarge">
                                         <span
                                             style={{ wordWrap: 'break-word' }}>
                                             {this.post.title}
                                         </span>
                                     </div>
-                                    <div className="postDescription">
+                                    <div className="postDescription fontSizeSmall">
                                         {this.post.postType ===
                                         PostType.FACT ? (
                                             this.processDescriptionForFact(
@@ -135,7 +135,7 @@ export default class PostView extends React.Component<{}, State> {
                                         textAlign: 'center',
                                         marginTop: '20px'
                                     }}>
-                                    <p className="noPosts">
+                                    <p className="fontSizeLarge">
                                         Nie udało się znaleźć posta.
                                     </p>
                                 </div>

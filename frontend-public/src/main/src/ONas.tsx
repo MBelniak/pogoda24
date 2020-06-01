@@ -11,7 +11,7 @@ export class ONas extends React.Component {
         return (
             <section className="container is-fluid mainContent">
                 <div className="post ekipa">
-                    <p style={{ margin: '15px', wordWrap: 'break-word' }}>
+                    <p className="fontSizeMedium" style={{ margin: '15px', wordWrap: 'break-word' }}>
                         Dziękujemy, że zajrzałeś na naszą stronę.
                         <br />
                         Zostawiając łapkę w górę na naszej stronie na{' '}
@@ -28,12 +28,12 @@ export class ONas extends React.Component {
                         Ekipę tworzą:
                     </p>
                     {config.staff.map((person, key, list) => (
-                        <>
-                            <StaffItem person={person} key={key} />
+                        <div key={key}>
+                            <StaffItem person={person} />
                             {list.length - 1 !== key ? <div className="is-divider" /> : null}
-                        </>
+                        </div>
                     ))}
-                    <p style={{ margin: '15px', wordWrap: 'break-word' }}>
+                    <p style={{ margin: '15px', wordWrap: 'break-word' }} className="fontSizeMedium">
                         To właśnie my czuwamy nad waszym bezpieczeństwem, ostrzegamy was w porę oraz przekazujemy wam
                         najświeższe informacje pogodowe z naszego kraju.
                         <br />

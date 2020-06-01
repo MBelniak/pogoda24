@@ -19,7 +19,7 @@ export default class StaffItem extends React.Component<{ person: Person }> {
             <div className="ekipaItem">
                 <img src={require('img/onas/' + this.props.person.imageURL)} className="ekipaImg" />
                 <p
-                    className="ekipaPersonDescription"
+                    className="ekipaPersonDescription fontSizeSmall"
                     dangerouslySetInnerHTML={{ __html: this.description() }}
                 />
             </div>

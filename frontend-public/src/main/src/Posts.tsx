@@ -142,7 +142,7 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                                         textAlign: 'center',
                                         marginTop: '20px'
                                     }}>
-                                    <p className="noPosts">
+                                    <p className="fontSizeLarge">
                                         Brak {this.postTypeToText()}.
                                     </p>
                                 </div>

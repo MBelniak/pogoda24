@@ -20,18 +20,18 @@ export default class App extends React.Component {
         this.abortController = new AbortController();
     }
 
-    private additionalRender() {
+    private renderSocialMedia() {
         return (
             <div className="social-container">
+                <a href="https://www.facebook.com/Polska24nadobe"
+                   target="_blank" className="icon-button facebook">
+                    <i className="icon-facebook" />
+                    <span />
+                </a>
                 <a
                     href="https://twitter.com"
                     className="icon-button twitter">
                     <i className="icon-twitter" />
-                    <span />
-                </a>
-                <a href="https://www.facebook.com/Polska24nadobe"
-                   target="_blank" className="icon-button facebook">
-                    <i className="icon-facebook" />
                     <span />
                 </a>
             </div>
@@ -66,7 +66,7 @@ export default class App extends React.Component {
                             component={PostView}
                         />
                     </Switch>
-                    <Copyright additionalRender={this.additionalRender} />
+                    <Copyright additionalRender={this.renderSocialMedia} />
                 </div>
             </Router>
         );
