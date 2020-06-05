@@ -33,18 +33,17 @@ public class TrafficService {
         CollectionReference collectionReference = firestore.collection(SITE_TRAFFIC);
 
         Query query = collectionReference.whereEqualTo("date", today);
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-        try {
-            List<SiteTraffic> siteTraffics = querySnapshot.get().toObjects(SiteTraffic.class);
-            if (siteTraffics.isEmpty()) {
-                collectionReference.add(new SiteTraffic(null, today, 1L));
+
+        firestore.runTransaction(transaction -> {
+            List<QueryDocumentSnapshot> snapshot = transaction.get(query).get().getDocuments();
+            if (snapshot.isEmpty()) {
+                transaction.set(collectionReference.document(), new SiteTraffic(null, today, 1L));
             } else {
-                SiteTraffic siteTraffic = siteTraffics.get(0);
-                collectionReference.document(siteTraffic.getId()).update("views", siteTraffic.getViews() + 1);
+                DocumentSnapshot documentSnapshot = transaction.get(snapshot.get(0).getReference()).get();
+                transaction.update(snapshot.get(0).getReference(), "views", documentSnapshot.getLong("views") + 1);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+            return null;
+        });
     }
 
     public void addViewsForPost(String postId, Long views) {
@@ -84,7 +83,9 @@ public class TrafficService {
         c.add(Calendar.DATE, -daysBack);
         Date back = c.getTime();
 
-        Query query = firestore.collection(SITE_TRAFFIC).whereGreaterThan("date", back).whereLessThanOrEqualTo("date", today);
+        Query query = firestore.collection(SITE_TRAFFIC)
+                .whereGreaterThanOrEqualTo("date", back)
+                .whereLessThanOrEqualTo("date", today);
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         try {
             return querySnapshot.get().toObjects(SiteTraffic.class);

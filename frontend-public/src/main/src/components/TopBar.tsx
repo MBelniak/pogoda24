@@ -60,16 +60,16 @@ export class TopBar extends React.Component {
                 <div id="pogodaMenu" className="navbar-menu">
                     <div className="navbar-end">
                         <Link to="/prognozy" className="navbar-item">
-                            Prognozy<FontAwesomeIcon icon={faCloudSun}/>
+                            <FontAwesomeIcon icon={faCloudSun}/>Prognozy
                         </Link>
                         <Link to="/ostrzezenia" className="navbar-item">
-                            Ostrzeżenia<FontAwesomeIcon icon={faBolt}/>
+                            <FontAwesomeIcon icon={faBolt}/>Ostrzeżenia
                         </Link>
                         <Link to="/ciekawostki" className="navbar-item">
-                            Ciekawostki<FontAwesomeIcon icon={faNewspaper}/>
+                            <FontAwesomeIcon icon={faNewspaper}/>Ciekawostki
                         </Link>
-                        <Link to="/about" className="navbar-item last">
-                            O Nas<FontAwesomeIcon icon={faSmileBeam}/>
+                        <Link to="/onas" className="navbar-item last">
+                            <FontAwesomeIcon icon={faSmileBeam}/>O Nas
                         </Link>
                     </div>
                 </div>

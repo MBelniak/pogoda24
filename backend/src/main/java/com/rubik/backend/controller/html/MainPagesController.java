@@ -11,7 +11,7 @@ public class MainPagesController {
         return "admin/index";
     }
 
-    @RequestMapping(value = {"/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/onas"})
+    @RequestMapping(value = {"/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/onas", "/posts/**"})
     public String getIndexPage() {
         return "index";
     }

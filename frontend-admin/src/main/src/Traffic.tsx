@@ -40,7 +40,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
     constructor(props) {
         super(props);
         this.abortController = new AbortController();
-        this.siteViewsDaysBack = 31;
+        this.siteViewsDaysBack = 30;
         this.daysBackInputRef = React.createRef();
         this.handleDaysBackChange = this.handleDaysBackChange.bind(this);
     }
@@ -110,8 +110,8 @@ export default class Traffic extends React.Component<{}, TrafficState> {
             siteViewsData = [];
         }
         const chartData: any[][] = [[], []];
-        for (let chartLabel = 0, dataIndex = 0; chartLabel < this.siteViewsDaysBack && dataIndex < siteViewsData.length; ++chartLabel) {
-            const chartLabelDate = fns.subDays(today, this.siteViewsDaysBack - chartLabel - 1);
+        for (let chartLabel = 0, dataIndex = 0; chartLabel <= this.siteViewsDaysBack; ++chartLabel) {
+            const chartLabelDate = fns.subDays(today, this.siteViewsDaysBack - chartLabel);
             const dataIndexDate = fns.parseISO(siteViewsData[dataIndex].date);
             if (fns.isSameDay(chartLabelDate, dataIndexDate)) {
                 chartData[0].push(chartLabelDate);
