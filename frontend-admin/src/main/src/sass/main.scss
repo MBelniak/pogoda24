@@ -30,6 +30,35 @@ $footer-padding: 3rem 1.5rem 3rem;
     flex-direction: column;
 }
 
+.copyright {
+    color: white;
+}
+
+.fontSizeLarge {
+    font-size: 18px;
+}
+
+.fontSizeMedium {
+    font-size: 16px;
+}
+
+
+.fontSizeSmall {
+    font-size: 14px;
+}
+
+@media all and (max-width: 640px) {
+    .fontSizeSmall {
+        font-size: 2.188vw;
+    }
+    .fontSizeMedium {
+        font-size: 2.5vw;
+    }
+    .fontSizeLarge {
+        font-size: 2.813vw;
+    }
+}
+
 .container.is-fluid {
     padding-left: 64px;
     padding-right: 64px;
@@ -88,16 +117,6 @@ $footer-padding: 3rem 1.5rem 3rem;
     color: white;
     margin-top: 0.7rem;
 }
-
-.barTitle {
-    font-family: Sans, sans-serif;
-    position: absolute;
-    top: 0.7rem;
-    font-weight: bold;
-    font-size: 23px;
-    margin-left: 0.7rem;
-}
-
 
 .bgimg {
     width: 100%;
@@ -212,10 +231,19 @@ $footer-padding: 3rem 1.5rem 3rem;
 
 .attribution {
     margin-top: 1rem;
+    color: white;
 }
 
 .attribution, .attribution * {
     font-size: 10px;
+}
+
+.attribution a {
+    color: $secondary-color;
+}
+
+.attribution a:hover {
+    text-decoration: underline;
 }
 
 .mainPageLinks {
@@ -244,7 +272,6 @@ $footer-padding: 3rem 1.5rem 3rem;
     font-size: 18px;
     box-sizing: initial;
 }
-
 
 .copyright * {
     color: white;

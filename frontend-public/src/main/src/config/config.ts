@@ -6,7 +6,12 @@ export default {
     staff: [
         {
             imageURL: "sampleProfile.png",
-            description: "Imię nazwisko\nZajmuje się meteo od 5 lat. Jest pasjonatem ekstremalnych zjawisk pogodowych"
+            description: "Michał Belniak\n" +
+            "Przygodę z meteorologią rozpoczął w wieku 6 lat, gdy rodzice kupili mu pierwszą książkę o pogodzie. " +
+            "Od tamtego momentu nie było dnia, w którym nie sprawdziłby prognozy pogody. " +
+            "Na początku 2018 roku poznał Krzyśka, który zaciągnął go do zespołu Pogoda 24/7. \n" +
+            "Jest odpowiedzialny nie tylko za wiele prognoz i ostrzeżeń, ale także za obecną stronę internetową.\n" +
+            "Poza tym, windsurfer, basista, programista i fan kawy alternatywnej.\n"
         },
         {
             imageURL: "sampleProfile.png",

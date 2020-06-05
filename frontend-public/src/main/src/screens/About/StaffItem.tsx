@@ -12,7 +12,7 @@ export default class StaffItem extends React.Component<{ person: Person }> {
     }
 
     private description() {
-        return this.props.person.description.replace('\n', '<br/>');
+        return this.props.person.description.replace(/\n/g, '<br/>');
     }
 
     render() {

@@ -28,7 +28,8 @@ export default class App extends React.Component {
                     <span />
                 </a>
                 <a
-                    href="https://twitter.com"
+                    href="https://twitter.com/Pogoda24_7"
+                    target="_blank"
                     className="icon-button twitter">
                     <i className="icon-twitter" />
                     <span />
