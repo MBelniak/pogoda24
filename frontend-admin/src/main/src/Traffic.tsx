@@ -110,7 +110,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
             siteViewsData = [];
         }
         const chartData: any[][] = [[], []];
-        for (let chartLabel = 0, dataIndex = 0; chartLabel < this.siteViewsDaysBack, dataIndex < siteViewsData.length; ++chartLabel) {
+        for (let chartLabel = 0, dataIndex = 0; chartLabel < this.siteViewsDaysBack && dataIndex < siteViewsData.length; ++chartLabel) {
             const chartLabelDate = fns.subDays(today, this.siteViewsDaysBack - chartLabel - 1);
             const dataIndexDate = fns.parseISO(siteViewsData[dataIndex].date);
             if (fns.isSameDay(chartLabelDate, dataIndexDate)) {
