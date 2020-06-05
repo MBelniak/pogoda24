@@ -138,6 +138,10 @@ body {
     border-bottom: 2px solid $secondary-color;
 }
 
+.topBar .navbar-item svg {
+    margin: 0 0.4rem;
+}
+
 .topBar .navbar-brand a:hover {
     color: white;
     text-decoration: none;

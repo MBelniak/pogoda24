@@ -21,12 +21,15 @@ export default class PostsListItem extends React.Component<
     PostsItemProps,
     PostsItemState
 > {
+
+    private postHref;
     constructor(props) {
         super(props);
         this.expandPost = this.expandPost.bind(this);
         this.state = {
             isExpanded: this.isExpandedByDefault()
         };
+        this.postHref = "posts/" + this.props.post.id;
     }
 
     private isExpandedByDefault() {
@@ -116,7 +119,7 @@ export default class PostsListItem extends React.Component<
                 <div className="postDate fontSizeSmall">{this.processDate()}</div>
                 <br />
                 <div className="postTitle fontSizeLarge">
-                    <span>{this.props.post.title}</span>
+                    <a href={this.postHref} className="basicLink" style={{textDecoration: "none"}}>{this.props.post.title}</a>
                 </div>
                 <div className="postDescription fontSizeSmall">
                     {this.createDescription()}
