@@ -44,6 +44,10 @@ body {
     justify-content: space-between;
 }
 
+.copyright {
+    color: $primary-font-color;
+}
+
 .fontSizeLarge {
     font-size: 18px;
 }
@@ -132,6 +136,10 @@ body {
     text-decoration: none;
     margin: 0 0.3rem 0 0.3rem;
     border-bottom: 2px solid $secondary-color;
+}
+
+.topBar .navbar-item svg {
+    margin: 0 0.4rem;
 }
 
 .topBar .navbar-brand a:hover {
@@ -229,7 +237,7 @@ body {
     cursor: pointer;
     display: inline-block;
     font-size: 2.0rem;
-    height: 3rem;
+    height: 2.7rem;
     //line-height: 3rem;
     margin: 0.5rem 5px;
     position: relative;
@@ -238,7 +246,7 @@ body {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    width: 3rem;
+    width: 2.7rem;
 }
 
 .icon-button span {
@@ -256,10 +264,10 @@ body {
     width: 0;
 }
 .icon-button:hover span {
-    width: 3rem;
-    height: 3rem;
+    width: 2.7rem;
+    height: 2.7rem;
     border-radius: 4px;
-    margin: -1.5rem;
+    margin: -1.35rem;
 }
 .twitter span {
     background-color: #4099ff;
@@ -273,7 +281,7 @@ body {
     font-size: 20px;
     background: none;
     color: white;
-    height: 3rem;
+    height: 2.7rem;
     left: 0;
     line-height: 3rem;
     position: absolute;
@@ -282,7 +290,7 @@ body {
     -moz-transition: all 0.3s;
     -o-transition: all 0.3s;
     transition: all 0.3s;
-    width: 3rem;
+    width: 2.7rem;
     z-index: 10;
 }
 

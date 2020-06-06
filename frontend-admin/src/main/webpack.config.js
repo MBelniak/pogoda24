@@ -14,6 +14,7 @@ module.exports = {
     devServer: {
         proxy: {
             '/api/': 'http://localhost:8080',
+            '/login': 'http://localhost:8080',
             '/admin/': {
                     target: 'http://localhost:3001/',
                     pathRewrite: { '^/admin': '' },

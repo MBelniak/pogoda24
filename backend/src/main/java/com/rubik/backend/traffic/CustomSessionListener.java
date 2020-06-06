@@ -9,7 +9,6 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 @Component
-@WebListener
 public class CustomSessionListener implements HttpSessionListener {
 
     private TrafficService trafficService;

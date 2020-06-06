@@ -30,6 +30,35 @@ $footer-padding: 3rem 1.5rem 3rem;
     flex-direction: column;
 }
 
+.copyright {
+    color: white;
+}
+
+.fontSizeLarge {
+    font-size: 18px;
+}
+
+.fontSizeMedium {
+    font-size: 16px;
+}
+
+
+.fontSizeSmall {
+    font-size: 14px;
+}
+
+@media all and (max-width: 800px) {
+    .fontSizeSmall {
+        font-size: 1.75vw;
+    }
+    .fontSizeMedium {
+        font-size: 2vw;
+    }
+    .fontSizeLarge {
+        font-size: 2.25vw;
+    }
+}
+
 .container.is-fluid {
     padding-left: 64px;
     padding-right: 64px;
@@ -88,16 +117,6 @@ $footer-padding: 3rem 1.5rem 3rem;
     color: white;
     margin-top: 0.7rem;
 }
-
-.barTitle {
-    font-family: Sans, sans-serif;
-    position: absolute;
-    top: 0.7rem;
-    font-weight: bold;
-    font-size: 23px;
-    margin-left: 0.7rem;
-}
-
 
 .bgimg {
     width: 100%;
@@ -212,15 +231,49 @@ $footer-padding: 3rem 1.5rem 3rem;
 
 .attribution {
     margin-top: 1rem;
+    color: white;
 }
 
 .attribution, .attribution * {
     font-size: 10px;
 }
 
+.attribution a {
+    color: $secondary-color;
+}
+
+.attribution a:hover {
+    text-decoration: underline;
+}
+
+.mainLoginWindow {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    text-align: center;
+}
+
+.mainLoginWindow .button:hover {
+    background-color: $secondary-color;
+}
+
+.mainLoginWindow .input {
+    margin:  0.5rem 0;
+}
+
+.loginTitle {
+    font-size: 26px;
+    margin: 5px 5px 5px 10px;
+}
+
+.loginFailMessage {
+    color: red;
+    margin: 5px 0;
+}
+
 .mainPageLinks {
     margin: 15px 0 20px 0;
-    max-width: 100%;
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -229,22 +282,26 @@ $footer-padding: 3rem 1.5rem 3rem;
 .mainPageLinksItem {
     border: 2px white solid;
     border-radius: 10px;
-    margin: 0 20px 0 20px;
     box-sizing: border-box;
-    width: 20%;
+    text-align: center;
+    width: 15%;
+}
+
+.mainPageLinksItem a {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .mainPageLinksItem img {
-    padding: 1rem;
+    margin: 1rem;
 }
 
 .mainPageLinksItem span {
-    margin: 0.5rem;
     color: white;
-    font-size: 18px;
     box-sizing: initial;
 }
-
 
 .copyright * {
     color: white;

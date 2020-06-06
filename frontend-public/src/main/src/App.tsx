@@ -12,12 +12,6 @@ import { PostType } from './model/Post';
 const Copyright = require('shared24').Copyright;
 
 export default class App extends React.Component {
-    private abortController;
-
-    constructor(props) {
-        super(props);
-        this.abortController = new AbortController();
-    }
 
     private renderSocialMedia() {
         return (
@@ -28,19 +22,14 @@ export default class App extends React.Component {
                     <span />
                 </a>
                 <a
-                    href="https://twitter.com"
+                    href="https://twitter.com/Pogoda24_7"
+                    target="_blank"
                     className="icon-button twitter">
                     <i className="icon-twitter" />
                     <span />
                 </a>
             </div>
         );
-    }
-
-    componentDidMount() {}
-
-    componentWillUnmount() {
-        this.abortController.abort();
     }
 
     render() {
@@ -59,7 +48,7 @@ export default class App extends React.Component {
                         <Route path="/ciekawostki">
                             <Posts postType={PostType.FACT} />
                         </Route>
-                        <Route path="/about" component={ONas} />
+                        <Route path="/onas" component={ONas} />
                         <Route
                             path="/posts/([a-zA-Z0-9]+)"
                             component={PostView}

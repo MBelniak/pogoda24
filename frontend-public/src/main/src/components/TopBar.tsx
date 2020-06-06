@@ -1,6 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import logoImg from '../img/logo-wHalo.png';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBolt } from '@fortawesome/free-solid-svg-icons'
+import { faCloudSun } from '@fortawesome/free-solid-svg-icons'
+import { faNewspaper } from '@fortawesome/free-solid-svg-icons'
+import { faSmileBeam } from '@fortawesome/free-solid-svg-icons'
 import '../sass/main.scss';
 
 export class TopBar extends React.Component {
@@ -55,16 +60,16 @@ export class TopBar extends React.Component {
                 <div id="pogodaMenu" className="navbar-menu">
                     <div className="navbar-end">
                         <Link to="/prognozy" className="navbar-item">
-                            Prognozy
+                            <FontAwesomeIcon icon={faCloudSun}/>Prognozy
                         </Link>
                         <Link to="/ostrzezenia" className="navbar-item">
-                            Ostrzeżenia
+                            <FontAwesomeIcon icon={faBolt}/>Ostrzeżenia
                         </Link>
                         <Link to="/ciekawostki" className="navbar-item">
-                            Ciekawostki
+                            <FontAwesomeIcon icon={faNewspaper}/>Ciekawostki
                         </Link>
-                        <Link to="/about" className="navbar-item last">
-                            O Nas
+                        <Link to="/onas" className="navbar-item last">
+                            <FontAwesomeIcon icon={faSmileBeam}/>O Nas
                         </Link>
                     </div>
                 </div>

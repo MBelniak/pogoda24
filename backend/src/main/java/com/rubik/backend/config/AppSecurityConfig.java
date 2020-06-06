@@ -20,6 +20,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
 
+
+    private final AuthenticationEntryPoint authEntryPoint;
+
+    @Autowired
+    public AppSecurityConfig(AuthenticationEntryPoint authEntryPoint) {
+        this.authEntryPoint = authEntryPoint;
+    }
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
@@ -42,7 +50,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/login").not().authenticated()
                 .antMatchers("/write", "/list", "/writer", "/traffic", "/generator", "/factwriter").authenticated()
-                .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/about", "/posts/**").permitAll()
+                .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/onas", "/posts/**").permitAll()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 .and()
@@ -56,7 +64,9 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                .logoutSuccessUrl("/login");
+                .logoutSuccessUrl("/login")
+                .and().httpBasic()
+                .authenticationEntryPoint(authEntryPoint);
     }
 
     @Bean
