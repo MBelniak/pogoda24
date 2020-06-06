@@ -47,15 +47,15 @@ $footer-padding: 3rem 1.5rem 3rem;
     font-size: 14px;
 }
 
-@media all and (max-width: 640px) {
+@media all and (max-width: 800px) {
     .fontSizeSmall {
-        font-size: 2.188vw;
+        font-size: 1.75vw;
     }
     .fontSizeMedium {
-        font-size: 2.5vw;
+        font-size: 2vw;
     }
     .fontSizeLarge {
-        font-size: 2.813vw;
+        font-size: 2.25vw;
     }
 }
 
@@ -274,7 +274,6 @@ $footer-padding: 3rem 1.5rem 3rem;
 
 .mainPageLinks {
     margin: 15px 0 20px 0;
-    max-width: 100%;
     display: flex;
     justify-content: space-between;
     width: 100%;
@@ -283,19 +282,24 @@ $footer-padding: 3rem 1.5rem 3rem;
 .mainPageLinksItem {
     border: 2px white solid;
     border-radius: 10px;
-    margin: 0 20px 0 20px;
     box-sizing: border-box;
-    width: 20%;
+    text-align: center;
+    width: 15%;
+}
+
+.mainPageLinksItem a {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .mainPageLinksItem img {
-    padding: 1rem;
+    margin: 1rem;
 }
 
 .mainPageLinksItem span {
-    margin: 0.5rem;
     color: white;
-    font-size: 18px;
     box-sizing: initial;
 }
 
