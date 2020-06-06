@@ -77,7 +77,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
     }
 
     private fetchSiteViews() {
-        this.setState({siteViewsChartData: undefined})
+        this.setState({ siteViewsChartData: undefined });
         fetchApi('api/views/site?daysBack=' + this.siteViewsDaysBack, {
             signal: this.abortController.signal
         })
@@ -87,9 +87,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                         .json()
                         .then((siteViewsData: TrafficDTO[]) => {
                             this.setState({
-                                siteViewsChartData: this.siteViewsDataToChartData(
-                                    siteViewsData
-                                ),
+                                siteViewsChartData: this.siteViewsDataToChartData(siteViewsData)
                             });
                         })
                         .catch(error => {
@@ -112,8 +110,10 @@ export default class Traffic extends React.Component<{}, TrafficState> {
         const chartData: any[][] = [[], []];
         for (let chartLabel = 0, dataIndex = 0; chartLabel <= this.siteViewsDaysBack; ++chartLabel) {
             const chartLabelDate = fns.subDays(today, this.siteViewsDaysBack - chartLabel);
-            const dataIndexDate = fns.parseISO(siteViewsData[dataIndex].date);
-            if (fns.isSameDay(chartLabelDate, dataIndexDate)) {
+            if (
+                dataIndex < siteViewsData.length &&
+                fns.isSameDay(chartLabelDate, fns.parseISO(siteViewsData[dataIndex].date))
+            ) {
                 chartData[0].push(chartLabelDate);
                 chartData[1].push(siteViewsData[dataIndex].views);
                 ++dataIndex;
@@ -126,7 +126,8 @@ export default class Traffic extends React.Component<{}, TrafficState> {
     }
 
     private handleDaysBackChange() {
-        if (this.daysBackInputRef.current.value &&
+        if (
+            this.daysBackInputRef.current.value &&
             this.validateField(this.daysBackInputRef.current, daysBackInputConstraint)
         ) {
             this.siteViewsDaysBack = this.daysBackInputRef.current.value;
@@ -134,16 +135,8 @@ export default class Traffic extends React.Component<{}, TrafficState> {
         }
     }
 
-    private validateField(
-        htmlInput,
-        additionalConstraint?: (value) => boolean
-    ): boolean {
-        if (
-            htmlInput.value &&
-            (additionalConstraint
-                ? !additionalConstraint(htmlInput.value)
-                : false)
-        ) {
+    private validateField(htmlInput, additionalConstraint?: (value) => boolean): boolean {
+        if (htmlInput.value && (additionalConstraint ? !additionalConstraint(htmlInput.value) : false)) {
             htmlInput.classList.add('is-danger');
             return false;
         } else {
@@ -173,29 +166,19 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                                     max={9999}
                                     min={0}
                                     placeholder="(0-9999)"
-                                    onKeyUp={e =>
-                                        this.validateField(
-                                            e.target,
-                                            daysBackInputConstraint
-                                        )
-                                    }
-                                    onBlur={e =>
-                                        this.validateField(
-                                            e.target,
-                                            daysBackInputConstraint
-                                        )
-                                    }
+                                    onKeyUp={e => this.validateField(e.target, daysBackInputConstraint)}
+                                    onBlur={e => this.validateField(e.target, daysBackInputConstraint)}
                                 />
-                                <button
-                                    className="button"
-                                    onClick={this.handleDaysBackChange}>
+                                <button className="button" onClick={this.handleDaysBackChange}>
                                     Ustaw
                                 </button>
                             </div>
                             <div className="column centerVertically centerHorizontally">
-                                {this.state.siteViewsChartData ?
-                                <SiteViewsChart chartData={this.state.siteViewsChartData}/>
-                                     : <span>Trwa ładowanie danych...</span>}
+                                {this.state.siteViewsChartData ? (
+                                    <SiteViewsChart chartData={this.state.siteViewsChartData} />
+                                ) : (
+                                    <span>Trwa ładowanie danych...</span>
+                                )}
                             </div>
                         </div>
                         <div className="is-divider" />
@@ -230,8 +213,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                                     ? null
                                     : this.state.gatheredData === null
                                     ? '--'
-                                    : Number((this.state.gatheredData
-                                            .averageViewsPerPost).toFixed(3))}
+                                    : Number(this.state.gatheredData.averageViewsPerPost.toFixed(3))}
                             </p>
                         </div>
                     </div>

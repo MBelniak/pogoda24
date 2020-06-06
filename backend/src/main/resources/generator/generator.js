@@ -187,7 +187,7 @@ window.context = canvas.getContext("2d");
 var context = window.context;
 var canvas = window.canvas;
 var img = new Image();
-img.src = "gen_img/map.png";
+img.src = "generator/gen_img/map.png";
 img.onload = function()
 {
 	context.drawImage(img,0,0);
@@ -207,11 +207,11 @@ document.getElementById("done").addEventListener("click",function(e)
 	var jImg = new Image();
 	if(document.getElementById("dayC").checked)
 	{
-		jImg.src = "gen_img/map.png";
+		jImg.src = "generator/gen_img/map.png";
 	}
 	else
 	{
-		jImg.src = "gen_img/map_night.png";
+		jImg.src = "generator/gen_img/map_night.png";
 	}
 	jImg.onload = function(){
 	window.context.clearRect(0,0,1000,1000);
@@ -239,7 +239,7 @@ document.getElementById("done").addEventListener("click",function(e)
 		if(cityname_type.value!="null")
 		{
 			var icon = new Image();
-			icon.src="gen_img/"+cityname_type.value+".png"; // Ładowanie odpowiedniej ikonki
+			icon.src="generator/gen_img/"+cityname_type.value+".png"; // Ładowanie odpowiedniej ikonki
 			icon.setAttribute("cordX",cX);
 			icon.setAttribute("cordY",cY);
 			icon.onload = function(e)
@@ -301,7 +301,7 @@ document.getElementById("dayC").addEventListener("click",function(e)
 		}
 		window.context.clearRect(0,0,800,600);
 		var cImg = new Image();
-		cImg.src = "gen_img/map.png";
+		cImg.src = "generator/gen_img/map.png";
 		cImg.onload = function()
 		{
 			window.context.drawImage(cImg,0,0);
@@ -326,7 +326,7 @@ document.getElementById("nightC").addEventListener("click",function(e)
 		}
 		window.context.clearRect(0,0,800,600);
 		var cImg = new Image();
-		cImg.src = "gen_img/map_night.png";
+		cImg.src = "generator/gen_img/map_night.png";
 		cImg.onload = function()
 		{
 			window.context.drawImage(cImg,0,0);
