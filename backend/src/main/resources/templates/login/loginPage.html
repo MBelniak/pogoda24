@@ -10,7 +10,7 @@
 </head>
 <body>
 <section class="section">
-    <div class="container centered main">
+    <div class="container mainLoginWindow">
         <span class="logoTitle">Pogoda 24/7</span>
         <div style="max-width: 400px; align-content: center;" class="form" id="mainForm">
             <form action="/login" method="post">
@@ -28,7 +28,6 @@
     window.onload = function () {
         const href = location.href;
         let queryParams = href.substr(href.indexOf('?') + 1, href.length).split('&');
-        console.log(queryParams);
         for (let i = 0; i < queryParams.length; i++) {
             let pair = queryParams[i].split('=');
             if (pair[0] === 'error') {

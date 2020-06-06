@@ -7,17 +7,18 @@ export default {
         {
             imageURL: "sampleProfile.png",
             description: "Michał Belniak\n" +
-            "Przygodę z meteorologią rozpoczął w wieku 6 lat, gdy rodzice kupili mu pierwszą książkę o pogodzie. " +
-            "Od tamtego momentu nie ma dnia, w którym nie sprawdziłby prognozy pogody. " +
-            "Na początku 2018 roku poznał Krzyśka, który zaciągnął go do zespołu Pogoda 24/7. \n" +
-            "Jest odpowiedzialny nie tylko za wiele prognoz i ostrzeżeń, ale także za obecną stronę internetową.\n" +
+            "Przygodę z meteorologią rozpocząłem w wieku 6 lat, gdy rodzice kupili mi pierwszą książkę o pogodzie. " +
+            "Od tamtego momentu nie ma dnia, w którym nie sprawdziłbym prognozy pogody. " +
+            "Na początku 2018 roku poznałem Krzyśka, który zaciągnął mnie do zespołu Pogoda 24/7. \n" +
+            "Jestem odpowiedzialny nie tylko za wiele prognoz i ostrzeżeń, ale także za obecną stronę internetową.\n" +
             "Poza tym, windsurfer, basista, programista i fan kawy alternatywnej.\n"
         },
         {
-            imageURL: "sampleProfile.png",
-            description: "Imię nazwisko\nZajmuje się meteo od 5 lat. Jest pasjonatem ekstremalnych zjawisk pogodowych.\n" +
-            "Tutaj jakiś dłuższy opis aaaaaaaaaa Tutaj jakiś dłuższy opis aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa " +
-            "Zajmuje się meteo od 5 lat. Jest pasjonatem ekstremalnych zjawisk pogodowych"
+            imageURL: "MikołajC.jpg",
+            description: "Mikołaj Chachlowski.\n" +
+            "Mam 16 lat, obecnie chodzę do pierwszej klasy liceum o profilu biologiczno-chemicznym z rozszerzoną geografią. " +
+            "Meteorologią i rozmaitymi zjawiskami pogodowymi, a przede wszystkim burzami jaram się od 8 roku życia. " +
+            "Innymi moimi zainteresowaniami są wędkarstwo, piłka nożna, pływanie czy jazda na rowerze."
         },
         {
             imageURL: "sampleProfile.png",

@@ -33,9 +33,15 @@ export default class PostsListItem extends React.Component<
     }
 
     private isExpandedByDefault() {
+        let description;
+        if (this.props.post.postType === "FACT") {
+            description = this.getDescriptionForFact();
+        } else {
+            description = this.props.post.description;
+        }
         return (
-            this.props.post.description.length <= nonExpandedPostLength &&
-            this.props.post.description.split(/[(\r\n)(\n)]/g).length <= 2
+            description.length <= nonExpandedPostLength &&
+            description.split(/[(\r\n)(\n)]/g).length <= 2
         );
     }
 
@@ -52,7 +58,7 @@ export default class PostsListItem extends React.Component<
     private createDescription() {
         const description =
             this.props.post.postType === PostType.FACT
-                ? this.processDescriptionForFact()
+                ? this.processDescription(this.getDescriptionForFact())
                 : this.processDescription(this.props.post.description);
         return (
             <>
@@ -76,7 +82,7 @@ export default class PostsListItem extends React.Component<
 
     private processDescription(description: string): string {
         if (!this.state.isExpanded) {
-            if (this.props.post.description.length > nonExpandedPostLength) {
+            if (description.length > nonExpandedPostLength) {
                 description = description.substr(0, nonExpandedPostLength);
             }
             if (description.split(/[(\r\n)(\n)]/g).length > 2) {
@@ -106,11 +112,11 @@ export default class PostsListItem extends React.Component<
         return description;
     }
 
-    private processDescriptionForFact(): string {
+    private getDescriptionForFact(): string {
         const dummyDomEl = document.createElement('html');
         dummyDomEl.innerHTML = this.props.post.description.replace(/\\"/g, '"');
         const description: string = dummyDomEl.textContent ? dummyDomEl.textContent : '';
-        return this.processDescription(description);
+        return description;
     }
 
     render() {

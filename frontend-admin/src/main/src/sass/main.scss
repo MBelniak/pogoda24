@@ -246,6 +246,32 @@ $footer-padding: 3rem 1.5rem 3rem;
     text-decoration: underline;
 }
 
+.mainLoginWindow {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    text-align: center;
+}
+
+.mainLoginWindow .button:hover {
+    background-color: $secondary-color;
+}
+
+.mainLoginWindow .input {
+    margin:  0.5rem 0;
+}
+
+.loginTitle {
+    font-size: 26px;
+    margin: 5px 5px 5px 10px;
+}
+
+.loginFailMessage {
+    color: red;
+    margin: 5px 0;
+}
+
 .mainPageLinks {
     margin: 15px 0 20px 0;
     max-width: 100%;

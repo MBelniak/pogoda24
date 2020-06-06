@@ -22,9 +22,7 @@ import {
     link
 } from 'suneditor/src/plugins';
 
-import {
-    uploadImages
-} from './helpers/CloudinaryHelper';
+import { uploadImages } from './helpers/CloudinaryHelper';
 import { FileToUpload } from './Writer';
 import { ButtonListItem } from 'suneditor/src/options';
 import { fetchApi } from './helpers/fetchHelper';
@@ -59,16 +57,73 @@ export default class FactWriter extends React.Component<{}> {
     private nextImageId = 0;
     private abortController;
     private titleInput;
+    private loginInput;
+    private passwordInput;
+
+    private authenticationWindow: (authFailed?: boolean) => JSX.Element;
 
     constructor(props) {
         super(props);
         this.abortController = new AbortController();
         this.titleInput = React.createRef();
+        this.loginInput = React.createRef();
+        this.passwordInput = React.createRef();
         this.handleImageUploadBefore = this.handleImageUploadBefore.bind(this);
         this.handleImageUpload = this.handleImageUpload.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.reloadPage = this.reloadPage.bind(this);
+        this.validateField = this.validateField.bind(this);
         this.closeModalAndShowEditor = this.closeModalAndShowEditor.bind(this);
+        this.handleLoginClick = this.handleLoginClick.bind(this);
+        this.authenticationWindow = (authFailed?: boolean) => (
+            <div className="container mainLoginWindow">
+                <span className="loginTitle">Pogoda 24/7</span>
+                <span style={{ margin: '5px 0', fontSize: '18px' }}>Zaloguj się, aby zapisać post</span>
+                <div className="mainForm" id="mainForm">
+                    {authFailed ? <p className="loginFailMessage">Nieprawidłowe dane logowania</p> : null}
+                    <label className="label">Login: </label>
+                    <input
+                        className="input"
+                        ref={this.loginInput}
+                        type="text"
+                        placeholder="Login"
+                        autoFocus={true}
+                        maxLength={100}
+                        onKeyUp={e => this.validateField(e.target)}
+                        onBlur={e => this.validateField(e.target)}
+                    />
+                    <br />
+                    <label className="label">Hasło:</label>
+                    <input
+                        className="input"
+                        ref={this.passwordInput}
+                        type="password"
+                        placeholder="Hasło"
+                        maxLength={100}
+                        onKeyUp={e => this.validateField(e.target)}
+                        onBlur={e => this.validateField(e.target)}
+                    />
+                    <br />
+                    <input
+                        className="button is-primary"
+                        style={{ marginTop: '10px' }}
+                        type="submit"
+                        value="Zaloguj"
+                        onClick={this.handleLoginClick}
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    private validateField(htmlInput, additionalConstraint?: (value) => boolean) {
+        if (!htmlInput.value || (additionalConstraint ? !additionalConstraint(htmlInput.value) : false)) {
+            htmlInput.classList.add('is-danger');
+            return false;
+        } else {
+            htmlInput.classList.remove('is-danger');
+            return true;
+        }
     }
 
     private handleImageUploadBefore(files: Array<File>, info: object) {
@@ -82,9 +137,7 @@ export default class FactWriter extends React.Component<{}> {
                     publicId: file.name + timestamp,
                     timestamp: timestamp
                 },
-                fileExtension: file.name
-                    .slice(file.name.lastIndexOf('.'), file.name.length)
-                    .toLowerCase()
+                fileExtension: file.name.slice(file.name.lastIndexOf('.'), file.name.length).toLowerCase()
             });
         }
 
@@ -102,9 +155,7 @@ export default class FactWriter extends React.Component<{}> {
             this.imagesList.splice(findIndex(this.imagesList, index), 1);
         } else {
             if (state === 'create') {
-                const image = this.imagesList[
-                    findIndex(this.imagesList, index)
-                ];
+                const image = this.imagesList[findIndex(this.imagesList, index)];
                 image.htmlElement = targetImgElement;
             }
         }
@@ -131,31 +182,27 @@ export default class FactWriter extends React.Component<{}> {
                     // Save url from cloudinary to images info
                     for (let i = 0; i < this.imagesList.length; ++i) {
                         if (this.imagesList[i].htmlElement) {
-                            this.imagesSrcQueue.push(   //save local images urls in case upload is not successful
+                            this.imagesSrcQueue.push(
+                                //save local images urls in case upload is not successful
                                 this.imagesList[i].htmlElement!!.src
                             );
-                            jsonPromises.push(responses[i].json().then(response => {
-                                this.imagesList[i].htmlElement!!.src =
-                                    response.url;
-                            }));
+                            jsonPromises.push(
+                                responses[i].json().then(response => {
+                                    this.imagesList[i].htmlElement!!.src = response.url;
+                                })
+                            );
                         }
                     }
                     Promise.all(jsonPromises).then(() => this.sendPostToBackend());
                 } else {
-                    responses = responses.filter(
-                        response => !response || !response.ok
-                    );
+                    responses = responses.filter(response => !response || !response.ok);
                     console.log(responses.toString());
-                    this.showErrorMessage(
-                        'Nie udało się wysłać wszystkich plików. Ciekawostka nie została zapisana.'
-                    );
+                    this.showErrorMessage('Nie udało się wysłać wszystkich plików. Ciekawostka nie została zapisana.');
                 }
             })
             .catch(error => {
                 console.log(error);
-                this.showErrorMessage(
-                    'Nie udało się wysłać wszystkich plików. Ciekawostka nie została zapisana.'
-                );
+                this.showErrorMessage('Nie udało się wysłać wszystkich plików. Ciekawostka nie została zapisana.');
             });
     }
 
@@ -169,10 +216,10 @@ export default class FactWriter extends React.Component<{}> {
         }
     }
 
-    private sendPostToBackend() {
-        let target = document.getElementsByClassName(
-            'se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable'
-        )[0].cloneNode(true) as HTMLElement;
+    private sendPostToBackend(authHeader?: string) {
+        let target = document
+            .getElementsByClassName('se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable')[0]
+            .cloneNode(true) as HTMLElement;
         const wrapper = document.createElement('div');
         wrapper.appendChild(target);
         let description = JSON.stringify(
@@ -187,17 +234,23 @@ export default class FactWriter extends React.Component<{}> {
             description: description
         };
 
+        let headers = new Headers();
+
+        if (authHeader) {
+            headers.append('Authorization', authHeader);
+        }
+
+        headers.append('Content-Type', 'application/json');
+
         return fetchApi('api/posts', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: headers,
             body: JSON.stringify(requestBodyPost)
         })
             .then(response => {
                 if (response && response.ok) {
                     response
-                        .json()
+                        .text()
                         .then((data: any) => {
                             if (data !== null) {
                                 //post saved
@@ -212,12 +265,14 @@ export default class FactWriter extends React.Component<{}> {
                         .catch(error => {
                             console.log(error);
                         });
+                } else if (response.status === 401) {
+                    //user is not authenticated
+                    showModal(this.authenticationWindow(typeof authHeader !== 'undefined'));
                 } else {
+                    console.log(response.status);
                     console.log(response.statusText + ', ' + response.body);
                     this.revertImageSrcChange();
-                    this.showErrorMessage(
-                        'Wystąpił błąd serwera. Nie udało się zapisać postu.'
-                    );
+                    this.showErrorMessage('Wystąpił błąd serwera. Nie udało się zapisać postu.');
                 }
             })
             .catch(error => {
@@ -233,10 +288,7 @@ export default class FactWriter extends React.Component<{}> {
         showModal(
             <div>
                 <p className="dialogMessage">Pomyślnie zapisano ciekawostkę</p>
-                <button
-                    className="button is-primary"
-                    style={{ float: 'right' }}
-                    onClick={this.reloadPage}>
+                <button className="button is-primary" style={{ float: 'right' }} onClick={this.reloadPage}>
                     Ok
                 </button>
             </div>
@@ -247,14 +299,23 @@ export default class FactWriter extends React.Component<{}> {
         showModal(
             <div>
                 <p className="dialogMessage">{errorMessage}</p>
-                <button
-                    className="button is-primary"
-                    style={{ float: 'right' }}
-                    onClick={this.closeModalAndShowEditor}>
+                <button className="button is-primary" style={{ float: 'right' }} onClick={this.closeModalAndShowEditor}>
                     Ok
                 </button>
             </div>
         );
+    }
+
+    private handleLoginClick() {
+        const loginValid = this.validateField(this.loginInput.current);
+        const passwordValid = this.validateField(this.passwordInput.current);
+        if (!(loginValid && passwordValid)) {
+            return;
+        }
+        const authHeader =
+            'Basic ' + window.btoa(this.loginInput.current.value + ':' + this.passwordInput.current.value);
+        showModal(<LoadingIndicator />);
+        this.sendPostToBackend(authHeader);
     }
 
     private closeModalAndShowEditor() {
@@ -307,9 +368,7 @@ export default class FactWriter extends React.Component<{}> {
                 <section className="container is-fluid">
                     <TopImage />
                     <div style={{ color: 'white', margin: '10px 0 10px 0' }}>
-                        <label htmlFor="titleInput">
-                            Dodaj tytuł do ciekawostki:{' '}
-                        </label>
+                        <label htmlFor="titleInput">Dodaj tytuł do ciekawostki: </label>
                         <input
                             style={{ marginTop: '10px' }}
                             id="titleInput"
