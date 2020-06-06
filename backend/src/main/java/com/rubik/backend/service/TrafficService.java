@@ -48,15 +48,12 @@ public class TrafficService {
 
     public void addViewsForPost(String postId, Long views) {
         DocumentReference document = firestore.collection(POSTS_COLLECTION).document(postId);
-        try {
-            DocumentSnapshot snapshot = document.get().get();
-            if (snapshot.exists()) {
-                long newViews = snapshot.getLong("views") + views;
-                document.update("views", newViews);
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+
+        firestore.runTransaction(transaction -> {
+            DocumentSnapshot snapshot = transaction.get(document).get();
+            transaction.update(document, "views", snapshot.getLong("views") + views);
+            return null;
+        });
     }
 
     public Long getViewsForPost(String postId) {
