@@ -21,8 +21,11 @@ export default {
             "Innymi moimi zainteresowaniami są wędkarstwo, piłka nożna, pływanie czy jazda na rowerze."
         },
         {
-            imageURL: "sampleProfile.png",
-            description: "Imię nazwisko\nZajmuje się meteo od 5 lat. Jest pasjonatem ekstremalnych zjawisk pogodowych"
+            imageURL: "SylwiaL.jpg",
+            description: "Sylwia Leśniczuk.\n" +
+            "Na stronie Pogoda24/7 zajmuję się odpowiadaniem na Wasze  pytania." +
+            " Interesuje się pogodą i uwielbiam czytać. Gdyby płacili za czytanie byłabym milionerką😂" +
+            "Pracuję zawodowo, poza tym zajmuję się domem i ogrodem."
         },
         {
             imageURL: "sampleProfile.png",
