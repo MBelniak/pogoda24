@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoImg from '../img/logo-wHalo.png';
+import logoImg from '../img/PogodaLogoHalo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBolt } from '@fortawesome/free-solid-svg-icons'
 import { faCloudSun } from '@fortawesome/free-solid-svg-icons'
