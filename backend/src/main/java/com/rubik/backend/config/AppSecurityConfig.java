@@ -33,7 +33,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .passwordEncoder(new BCryptPasswordEncoder(10))
                 .withUser("Pogoda24")
-                .password("$2a$10$wmUD40dcQ.t/.vFIRmD8suiATUMvbNuzIXA.FJpLpEB.09XujKs9.")
+                .password("$2a$10$9AL7fFHZPNJrGmOIKIwXh.amHWa8uaARWBRmewuESyfoG81NI6mn2")
                 .roles("ADMIN");
     }
 
