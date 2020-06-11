@@ -10,8 +10,11 @@ const customStyles = {
         bottom: 'auto',
         marginRight: '-50%',
         transform: 'translate(-50%, -50%)',
-        maxHeight: '80%',
-        maxWidth: '80%'
+        maxHeight: '90%',
+        maxWidth: '90%'
+    },
+    overlay: {
+        zIndex: 100
     }
 };
 

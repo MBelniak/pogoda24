@@ -14,10 +14,18 @@ export class ForecastMapList extends React.Component<{
     }
 
     componentDidMount() {
+        const body = document.getElementsByTagName("body")[0];
+        body.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
         if (this.props.imagesPublicIds) {
             const images = document.querySelectorAll(".forecastMapImage img");
             images.forEach(img => {
                 img.addEventListener("click", event => {
+                    event.stopPropagation();
                     showModal(
                         <div
                             style={{
@@ -29,6 +37,10 @@ export class ForecastMapList extends React.Component<{
                             <img src={img.getAttribute("src")!!}/>
                         </div>
                     );
+                    const clickListener = () => closeModal();
+
+                    body.addEventListener('click', clickListener);
+                    body.addEventListener('click', () => body.removeEventListener('click', clickListener));
                 })
             });
         }
