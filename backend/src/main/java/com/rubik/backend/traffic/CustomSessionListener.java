@@ -22,4 +22,9 @@ public class CustomSessionListener implements HttpSessionListener {
     public void sessionCreated(HttpSessionEvent se) {
         trafficService.incrementSiteViewsForToday();
     }
+
+    @Override
+    public void sessionDestroyed(HttpSessionEvent se) {
+
+    }
 }
