@@ -29,7 +29,11 @@ export default {
         },
         {
             imageURL: "sampleProfile.png",
-            description: "Imię nazwisko\nZajmuje się meteo od 5 lat. Jest pasjonatem ekstremalnych zjawisk pogodowych"
+            description: "Filip Szymanek.\n" +
+            "Cześć! Jestem Filip i mam 17 lat. Meteorologią pasjonuję się od dzieciństwa, ale tak na poważnie od 4 lat. " +
+            "Zaczynałem obserwując cumulusy i codziennie sprawdzając prognozę pogody. " +
+            "Do Pogody24/7 przybyłem na początku 2020 roku. Poza meteorologią, interesuję się także geografią i jazdą na rowerze. " +
+            "W wolnym czasie lubię też poczytać dobrą książkę i wyjść w góry."
         },
         {
             imageURL: "sampleProfile.png",
