@@ -17,7 +17,9 @@
 .ekipaImg {
   margin: 0.7rem;
   width: 6.5rem;
+  min-width: 6.5rem;
   height: 6.5rem;
+  min-height: 6.5rem;
 }
 
 .ekipaPersonDescription {
@@ -28,6 +30,8 @@
 @media all and (max-width: 640px) {
   .ekipaImg {
     width: 16.25vw;
+    min-width: 16.25vw;
     height: 16.25vw;
+    min-height: 16.25vw;
   }
 }

@@ -5,11 +5,10 @@ export default {
     api_secret: process.env.API_SECRET,
     staff: [
         {
-            imageURL: "sampleProfile.png",
             description: "Michał Belniak\n" +
             "Przygodę z meteorologią rozpocząłem w wieku 6 lat, gdy rodzice kupili mi pierwszą książkę o pogodzie. " +
             "Od tamtego momentu nie ma dnia, w którym nie sprawdziłbym prognozy pogody. " +
-            "Na początku 2018 roku poznałem Krzyśka, który zaciągnął mnie do zespołu Pogoda 24/7. \n" +
+            "Na początku 2018 roku poznałem Krzyśka, który zaciągnął mnie do zespołu Pogoda24/7. \n" +
             "Jestem odpowiedzialny nie tylko za wiele prognoz i ostrzeżeń, ale także za obecną stronę internetową.\n" +
             "Poza tym, windsurfer, basista, programista i fan kawy alternatywnej.\n"
         },
@@ -28,7 +27,7 @@ export default {
             "Pracuję zawodowo, poza tym zajmuję się domem i ogrodem."
         },
         {
-            imageURL: "sampleProfile.png",
+            imageURL: "FilipS.jpg",
             description: "Filip Szymanek.\n" +
             "Cześć! Jestem Filip i mam 17 lat. Meteorologią pasjonuję się od dzieciństwa, ale tak na poważnie od 4 lat. " +
             "Zaczynałem obserwując cumulusy i codziennie sprawdzając prognozę pogody. " +
@@ -36,8 +35,25 @@ export default {
             "W wolnym czasie lubię też poczytać dobrą książkę i wyjść w góry."
         },
         {
-            imageURL: "sampleProfile.png",
-            description: "Imię nazwisko\nZajmuje się meteo od 5 lat. Jest pasjonatem ekstremalnych zjawisk pogodowych"
+            imageURL: "KrzysztofM.jpg",
+            description: "Krzysztof Mróz.\n" +
+            "Meteorologią i synoptyką interesuję się odkąd miałem 8 lat - ciekawiły mnie zwłaszcza prognozy pogody " +
+            "oraz statystyki z nią związane. Jednak dopiero w wieku 20 lat, w 2018 roku, trafiłem na grupy pogodowe, " +
+            "gdzie inni pasjonaci zarazili mnie również miłością do burz, oraz obserwacji chmur na niebie. " +
+            "Od maja 2018 jestem tutaj z Wami, a od października 2019 jestem członkiem zarządu strony.\n" +
+            "Poza tym, interesuje się turystyką górską i ogólnie mapami, zarówno tymi historycznymi, " +
+            "jak i współczesnymi. Lubię rownież piłkę nożną, zarówno granie, jak i oglądanie. Lubię też jazdę na rowerze i pływanie." +
+            "Studiuje informatykę na Politechnice Warszawskiej."
+        },
+        {
+            description: "Marcin Borek.\n" +
+            "Mam 19 lat, mieszkam w gminie Rzeczniów. W Pogoda24/7 zajmuję się prognozami pogody i ostrzeżeniami." +
+            "Moja pasja to obserwacja i fotografia zjawisk atmosferycznych."
+        },
+        {
+            description: "Adrian Wojtaszewski.\n" +
+            "Mam 20 lat, a meteorologią i klimatologią interesuje się od 2009 roku. Lubię też czytać o różnych ciekawych rzeczach. " +
+            "Jestem tegorocznym maturzystą i planuję iść na studia związane z geografią lub historią."
         },
     ],
     nonExpandedPostLength: 120
