@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoImg from '../img/PogodaLogoHalo.png';
+import logoImg from '../../img/PogodaLogoHalo.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBolt } from '@fortawesome/free-solid-svg-icons';
 import { faCloudSun } from '@fortawesome/free-solid-svg-icons';
 import { faNewspaper } from '@fortawesome/free-solid-svg-icons';
 import { faSmileBeam } from '@fortawesome/free-solid-svg-icons';
-import '../sass/main.scss';
+import '../../sass/main.scss';
 
 export class TopBar extends React.Component {
     componentDidMount() {

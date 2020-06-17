@@ -306,3 +306,24 @@ $footer-padding: 3rem 1.5rem 3rem;
 .copyright * {
     color: white;
 }
+
+.pagingBar li {
+    box-shadow: 0 0 3px $secondary-color;
+}
+
+.pagingBar li a {
+    color: white;
+}
+
+.pagingBar li:hover a {
+    color: $secondary-color;
+}
+
+.pagingBar .active {
+    background-color: $secondary-color;
+    box-shadow: 0 0 5px $secondary-color;
+}
+
+.pagingBar li.active:hover, .pagingBar li.active:hover a {
+    color: black;
+}

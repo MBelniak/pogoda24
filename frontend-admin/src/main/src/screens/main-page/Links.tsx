@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import generatorImg from './img/poland.png';
-import newImg from './img/add.png';
-import newFact from './img/addFact.png';
-import elistImg from './img/list.png';
-import trafficImg from './img/statistics.png';
-import logoutImg from './img/logout.png';
+import generatorImg from '../../img/poland.png';
+import newImg from '../../img/add.png';
+import newFact from '../../img/addFact.png';
+import elistImg from '../../img/list.png';
+import trafficImg from '../../img/statistics.png';
+import logoutImg from '../../img/logout.png';
 
 export class Links extends React.Component {
     render() {

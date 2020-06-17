@@ -1,9 +1,9 @@
 import React from 'react';
-import Post, { PostType } from '../model/Post';
+import Post, { PostType } from '../../model/Post';
 import { Link } from 'react-router-dom';
 import { ForecastMapList } from './ForecastMapList';
-import config from '../config/config';
-import '../sass/main.scss';
+import config from '../../config/config';
+import '../../sass/main.scss';
 import 'suneditor/dist/css/suneditor.min.css';
 
 const { nonExpandedPostLength } = config;
@@ -17,11 +17,7 @@ interface PostsItemState {
     isExpanded: boolean;
 }
 
-export default class PostsListItem extends React.Component<
-    PostsItemProps,
-    PostsItemState
-> {
-
+export default class PostsListItem extends React.Component<PostsItemProps, PostsItemState> {
     private postHref;
     constructor(props) {
         super(props);
@@ -29,20 +25,17 @@ export default class PostsListItem extends React.Component<
         this.state = {
             isExpanded: this.isExpandedByDefault()
         };
-        this.postHref = "posts/" + this.props.post.id;
+        this.postHref = 'posts/' + this.props.post.id;
     }
 
     private isExpandedByDefault() {
         let description;
-        if (this.props.post.postType === "FACT") {
+        if (this.props.post.postType === 'FACT') {
             description = this.getDescriptionForFact();
         } else {
             description = this.props.post.description;
         }
-        return (
-            description.length <= nonExpandedPostLength &&
-            description.split(/[(\r\n)(\n)]/g).length <= 2
-        );
+        return description.length <= nonExpandedPostLength && description.split(/[(\r\n)(\n)]/g).length <= 2;
     }
 
     private processDate() {
@@ -68,10 +61,11 @@ export default class PostsListItem extends React.Component<
                     }}
                     style={{ wordWrap: 'break-word' }}
                 />
-                {this.state.isExpanded ? null :
-                    this.props.post.postType === PostType.FACT ? <Link to={"/posts/" + this.props.post.id} className="postLink">
+                {this.state.isExpanded ? null : this.props.post.postType === PostType.FACT ? (
+                    <Link to={'/posts/' + this.props.post.id} className="postLink">
                         więcej
-                    </Link>: (
+                    </Link>
+                ) : (
                     <a className="postLink" onClick={this.expandPost}>
                         więcej
                     </a>
@@ -105,9 +99,7 @@ export default class PostsListItem extends React.Component<
             }
         }
 
-        description = description
-            .replace(/\r\n/g, '<br/>')
-            .replace(/\n/g, '<br/>');
+        description = description.replace(/\r\n/g, '<br/>').replace(/\n/g, '<br/>');
 
         return description;
     }
@@ -115,8 +107,7 @@ export default class PostsListItem extends React.Component<
     private getDescriptionForFact(): string {
         const dummyDomEl = document.createElement('html');
         dummyDomEl.innerHTML = this.props.post.description.replace(/\\"/g, '"');
-        const description: string = dummyDomEl.textContent ? dummyDomEl.textContent : '';
-        return description;
+        return dummyDomEl.textContent ? dummyDomEl.textContent : '';
     }
 
     render() {
@@ -125,18 +116,14 @@ export default class PostsListItem extends React.Component<
                 <div className="postDate fontSizeSmall">{this.processDate()}</div>
                 <br />
                 <div className="postTitle fontSizeLarge">
-                    <a href={this.postHref} className="basicLink" style={{textDecoration: "none"}}>{this.props.post.title}</a>
+                    <a href={this.postHref} className="basicLink" style={{ textDecoration: 'none' }}>
+                        {this.props.post.title}
+                    </a>
                 </div>
-                <div className="postDescription fontSizeSmall">
-                    {this.createDescription()}
-                </div>
-                <div
-                    className="is-divider"
-                />
+                <div className="postDescription fontSizeSmall">{this.createDescription()}</div>
+                <div className="is-divider" />
                 <div style={{ textAlign: 'center' }}>
-                    <ForecastMapList
-                        imagesPublicIds={this.props.post.imagesPublicIds}
-                    />
+                    <ForecastMapList imagesPublicIds={this.props.post.imagesPublicIds} />
                 </div>
             </div>
         );

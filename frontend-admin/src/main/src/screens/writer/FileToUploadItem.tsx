@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
-import { FileToUpload } from './Writer';
+import { FileToUpload } from '../../model/FileToUpload';
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
 

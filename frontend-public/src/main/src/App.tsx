@@ -1,13 +1,13 @@
 import React from 'react';
 import { Switch, Route } from 'react-router';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { MainPage } from './screens/MainPage/MainPage';
-import { ONas } from './screens/About/ONas';
+import { MainPage } from './screens/main-page/MainPage';
+import { ONas } from './screens/about/ONas';
 import { CloudinaryContext } from 'cloudinary-react';
 import './sass/main.scss';
-import { TopBar } from './components/TopBar';
-import PostView from './screens/PostView/PostView';
-import { Posts } from './components/Posts';
+import { TopBar } from './screens/components/TopBar';
+import PostView from './screens/post-view/PostView';
+import { Posts } from './screens/components/Posts';
 import { PostType } from './model/Post';
 const Copyright = require('shared24').Copyright;
 

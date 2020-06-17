@@ -12,7 +12,7 @@ public class SiteTraffic {
     private String id;
 
     @NotNull(message = "Property 'date' cannot be null.")
-    @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
 
     private Long views;

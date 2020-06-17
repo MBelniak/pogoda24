@@ -1,11 +1,6 @@
 import React from 'react';
-const Copyright = require('shared24').Copyright;
-const TopImage = require('shared24').TopImage;
 import * as fns from 'date-fns';
 import suneditor from 'suneditor';
-const showModal = require('shared24').showModal;
-const closeModal = require('shared24').closeModal;
-const LoadingIndicator = require('shared24').LoadingIndicator;
 import {
     font,
     fontSize,
@@ -22,12 +17,17 @@ import {
     link
 } from 'suneditor/src/plugins';
 
-import { uploadImages } from './helpers/CloudinaryHelper';
-import { FileToUpload } from './Writer';
+import { uploadImages } from '../../helpers/CloudinaryHelper';
+import { FileToUpload } from '../../model/FileToUpload';
 import { ButtonListItem } from 'suneditor/src/options';
-import { fetchApi } from './helpers/fetchHelper';
-import { PostType } from './Post';
-import config from './config/config';
+import { fetchApi } from '../../helpers/fetchHelper';
+import { default as Post, PostType } from '../../model/Post';
+import config from '../../config/config';
+const Copyright = require('shared24').Copyright;
+const TopImage = require('shared24').TopImage;
+const showModal = require('shared24').showModal;
+const closeModal = require('shared24').closeModal;
+const LoadingIndicator = require('shared24').LoadingIndicator;
 const { BACKEND_DATE_FORMAT } = config;
 
 function findIndex(array: Image[], index) {
@@ -50,7 +50,7 @@ interface Image {
     fileExtension: string;
 }
 
-export default class FactWriter extends React.Component<{}> {
+export default class FactWriter extends React.Component<{postToEdit?: Post}> {
     private editor;
     private imagesList: Image[] = [];
     private imagesSrcQueue: string[] = [];
@@ -75,7 +75,11 @@ export default class FactWriter extends React.Component<{}> {
         this.validateField = this.validateField.bind(this);
         this.closeModalAndShowEditor = this.closeModalAndShowEditor.bind(this);
         this.handleLoginClick = this.handleLoginClick.bind(this);
-        this.authenticationWindow = (authFailed?: boolean) => (
+        this.authenticationWindow = this.getAuthWindow();
+    }
+
+    private getAuthWindow(): (authFailed?: boolean) => JSX.Element {
+        return (authFailed?: boolean) => (
             <div className="container mainLoginWindow">
                 <span className="loginTitle">Pogoda 24/7</span>
                 <span style={{ margin: '5px 0', fontSize: '18px' }}>Zaloguj się, aby zapisać post</span>
@@ -114,6 +118,11 @@ export default class FactWriter extends React.Component<{}> {
                 </div>
             </div>
         );
+    }
+
+    private initializeEditor(post: Post) {
+        let target = document.getElementsByClassName('se-wrapper')[0];
+        target.innerHTML = post.description.replace(/\\"/g, '"');
     }
 
     private validateField(htmlInput, additionalConstraint?: (value) => boolean) {
@@ -217,15 +226,10 @@ export default class FactWriter extends React.Component<{}> {
     }
 
     private sendPostToBackend(authHeader?: string) {
-        let target = document
-            .getElementsByClassName('se-wrapper-inner se-wrapper-wysiwyg sun-editor-editable')[0]
+        const target = document
+            .getElementsByClassName('se-wrapper')[0]
             .cloneNode(true) as HTMLElement;
-        const wrapper = document.createElement('div');
-        wrapper.appendChild(target);
-        let description = JSON.stringify(
-            //editor.getContents() returns 716 000 characters  ¯\_(ツ)_/¯
-            wrapper.innerHTML
-        );
+        let description = JSON.stringify(target.innerHTML);
         description = description.substr(1, description.length - 2);
         const requestBodyPost = {
             postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
@@ -356,6 +360,9 @@ export default class FactWriter extends React.Component<{}> {
         });
         this.editor.onImageUpload = this.handleImageUpload;
         this.editor.onImageUploadBefore = this.handleImageUploadBefore;
+        if (this.props.postToEdit) {
+            this.initializeEditor(this.props.postToEdit);
+        }
     }
 
     componentWillUnmount() {

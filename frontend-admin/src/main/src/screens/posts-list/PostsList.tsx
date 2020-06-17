@@ -1,8 +1,9 @@
 import React from 'react';
 import PostsListItem from './PostsListItem';
-import Post, { PostDTO, postDTOToPost } from './Post';
-import PostEdition from './PostEdition';
-import { fetchApi } from './helpers/fetchHelper';
+import Post, { PostDTO, postDTOToPost } from '../../model/Post';
+import { fetchApi } from '../../helpers/fetchHelper';
+import Writer from '../writer/Writer';
+import FactWriter from '../fact-writer/FactWriter';
 const Copyright = require('shared24').Copyright;
 const TopImage = require('shared24').TopImage;
 const showModal = require('shared24').showModal;
@@ -14,7 +15,6 @@ interface State {
     posts: Post[] | undefined;
     totalPostsCount: number;
     currentPage: number;
-    postEdition: boolean;
     postToEdit?: Post;
 }
 
@@ -26,7 +26,6 @@ export default class PostsList extends React.Component<{}, State> {
         posts: [],
         totalPostsCount: 0,
         currentPage: 0,
-        postEdition: false,
         postToEdit: undefined
     };
 
@@ -39,14 +38,13 @@ export default class PostsList extends React.Component<{}, State> {
     }
 
     private initiatePostEdit(post: Post) {
-        this.setState({ postEdition: true, postToEdit: post });
+        this.setState({ postToEdit: post });
     }
 
     private onFinishEditing() {
         showModal(<LoadingIndicator />);
-        this.setState({ postEdition: false, postToEdit: undefined });
-        this.fetchPostsFromApi(0);
-        closeModal();
+        this.setState({ postToEdit: undefined });
+        this.fetchPostsFromApi(0).finally(closeModal);
     }
 
     private fetchPostsFromApi(page: number): Promise<void> {
@@ -109,20 +107,20 @@ export default class PostsList extends React.Component<{}, State> {
 
     render() {
         return (
-            <div className="main">
-                <section className="container is-fluid">
-                    <TopImage />
-                    {this.state.postEdition ? (
-                        <PostEdition
-                            post={this.state.postToEdit!!}
-                            onFinishEditing={this.onFinishEditing}
-                        />
+            <>
+                {this.state.postToEdit ? (
+                    this.state.postToEdit.postType === 'FACT' ? (
+                        <FactWriter postToEdit={this.state.postToEdit} />
                     ) : (
-                        <>
+                        <Writer postToEdit={this.state.postToEdit} onFinishEditing={this.onFinishEditing} />
+                    )
+                ) : (
+                    <div className="main">
+                        <section className="container is-fluid">
+                            <TopImage />
                             <h2 className="title">Lista postów: </h2>
                             <div className="container">
-                                {!this.state.posts ? null : this.state.posts
-                                      .length === 0 ? (
+                                {!this.state.posts ? null : this.state.posts.length === 0 ? (
                                     <div
                                         style={{
                                             textAlign: 'center',
@@ -136,30 +134,23 @@ export default class PostsList extends React.Component<{}, State> {
                                             <PostsListItem
                                                 key={i}
                                                 post={post}
-                                                initiatePostEdit={
-                                                    this.initiatePostEdit
-                                                }
+                                                initiatePostEdit={this.initiatePostEdit}
                                             />
                                         ))}
                                     </div>
                                 )}
                             </div>
-                            {this.state.totalPostsCount <=
-                            this.postsPerPage ? null : (
+                            {this.state.totalPostsCount <= this.postsPerPage ? null : (
                                 <PagingBar
-                                    pages={Math.ceil(
-                                        this.state.totalPostsCount /
-                                            this.postsPerPage
-                                    )}
+                                    pages={Math.ceil(this.state.totalPostsCount / this.postsPerPage)}
                                     handlePageClick={this.handlePageClick}
                                     currentPage={this.state.currentPage}
                                 />
                             )}
-                        </>
-                    )}
-                </section>
-                <Copyright />
-            </div>
+                        </section>
+                    </div>
+                )}
+            </>
         );
     }
 }
