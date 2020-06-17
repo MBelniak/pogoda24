@@ -1,7 +1,7 @@
 import React from 'react';
 import { PostsList } from './PostsList';
-import Post, { postDTOToPost, PostType } from '../model/Post';
-import { fetchApi } from '../helpers/fetchHelper';
+import Post, { postDTOToPost, PostType } from '../../model/Post';
+import { fetchApi } from '../../helpers/fetchHelper';
 import CustomLinearProgress from './LinearProgress';
 import './Posts.scss';
 const PagingBar = require('shared24').PagingBar;

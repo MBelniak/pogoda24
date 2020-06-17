@@ -1,7 +1,7 @@
 import React from 'react';
 import Post, { postDTOToPost, PostType } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
-import { ForecastMapList } from '../../components/ForecastMapList';
+import { ForecastMapList } from '../components/ForecastMapList';
 import '../../sass/main.scss';
 
 interface State {

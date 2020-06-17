@@ -1,11 +1,14 @@
 import React from 'react';
-import config from './config/config';
+import config from '../../config/config';
 import * as fns from 'date-fns';
-import FileDropper from './FileDropper';
+import FileDropper from '../components/FileDropper';
 import FileToUploadItem from './FileToUploadItem';
-import { PostType } from './Post';
-import { uploadImages } from './helpers/CloudinaryHelper';
-import { fetchApi } from './helpers/fetchHelper';
+import { default as Post, PostType } from '../../model/Post';
+import { uploadImages } from '../../helpers/CloudinaryHelper';
+import { fetchApi } from '../../helpers/fetchHelper';
+import * as fnstz from 'date-fns-tz';
+import { FileToUpload } from '../../model/FileToUpload';
+import { AuthenticationModal } from './AuthenticationModal';
 const Copyright = require('shared24').Copyright;
 const TopImage = require('shared24').TopImage;
 const LoadingIndicator = require('shared24').LoadingIndicator;
@@ -13,35 +16,21 @@ const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
 const { MAX_IMAGES_PER_POST, BACKEND_DATE_FORMAT } = config;
 
-export interface FileToUpload {
-    id: number;
-    file: File | null;
-    publicId: string;
-    timestamp: string;
+interface WriterProps {
+    postToEdit?: Post;
+    onFinishEditing?: () => void;
 }
 
 interface State {
     postType: PostType;
-    postTypeText: PostTypeText;
     filesToUpload: FileToUpload[];
-}
-
-enum PostTypeText {
-    Prognoza = 'prognozy',
-    Ostrzezenie = 'ostrzeżenia'
 }
 
 const daysValidInputConstraint = (text: string): boolean => {
     return parseInt(text) >= 0 && parseInt(text) <= 14;
 };
 
-export default class Writer extends React.Component<{}, State> {
-    state: State = {
-        postType: PostType.FORECAST,
-        postTypeText: PostTypeText.Prognoza,
-        filesToUpload: []
-    };
-
+export default class Writer extends React.Component<WriterProps, State> {
     private fileId: number;
     private fileInput;
     private postDescriptionTextArea;
@@ -52,8 +41,6 @@ export default class Writer extends React.Component<{}, State> {
     private savedPostId;
     private loginInput;
     private passwordInput;
-
-    private authenticationWindow: (authFailed?: boolean) => JSX.Element;
 
     constructor(props) {
         super(props);
@@ -75,45 +62,26 @@ export default class Writer extends React.Component<{}, State> {
         this.onMoveForward = this.onMoveForward.bind(this);
         this.onMoveBackward = this.onMoveBackward.bind(this);
         this.handleLoginClick = this.handleLoginClick.bind(this);
-        this.authenticationWindow = (authFailed?: boolean) => (
-            <div className="container mainLoginWindow">
-                <span className="loginTitle">Pogoda 24/7</span>
-                <span style={{ margin: '5px 0', fontSize: '18px' }}>Zaloguj się, aby zapisać post</span>
-                <div className="mainForm" id="mainForm">
-                    {authFailed ? <p className="loginFailMessage">Nieprawidłowe dane logowania</p> : null}
-                    <label className="label">Login: </label>
-                    <input
-                        className="input"
-                        ref={this.loginInput}
-                        type="text"
-                        placeholder="Login"
-                        autoFocus={true}
-                        maxLength={100}
-                        onKeyUp={e => this.validateField(e.target)}
-                        onBlur={e => this.validateField(e.target)}
-                    />
-                    <br />
-                    <label className="label">Hasło:</label>
-                    <input
-                        className="input"
-                        ref={this.passwordInput}
-                        type="password"
-                        placeholder="Hasło"
-                        maxLength={100}
-                        onKeyUp={e => this.validateField(e.target)}
-                        onBlur={e => this.validateField(e.target)}
-                    />
-                    <br />
-                    <input
-                        className="button is-primary"
-                        style={{ marginTop: '10px' }}
-                        type="submit"
-                        value="Zaloguj"
-                        onClick={this.handleLoginClick}
-                    />
-                </div>
-            </div>
-        );
+        this.state = {
+            postType: this.props.postToEdit ? this.props.postToEdit.postType : PostType.FORECAST,
+            filesToUpload: []
+        };
+    }
+
+    private registerImagesPresentAtCloudinary(post: Post) {
+        const filesToUpload: FileToUpload[] = [];
+        if (post.imagesPublicIds) {
+            for (let i = 0; i < post.imagesPublicIds.length; ++i) {
+                //only publicId and file as null are used
+                filesToUpload.push({
+                    id: this.fileId++,
+                    publicId: post.imagesPublicIds[i],
+                    file: null,
+                    timestamp: ''
+                });
+            }
+        }
+        this.setState({ filesToUpload: filesToUpload });
     }
 
     private onFilesAdded(files: File[]) {
@@ -176,9 +144,17 @@ export default class Writer extends React.Component<{}, State> {
                 if (response && response.status === 201) {
                     response
                         .text()
-                        .then((data: any) => {
-                            if (data !== null) {
-                                this.savedPostId = data;
+                        .then((postIdOrPostHash: any) => {
+                            if (this.props.postToEdit) {
+                                if (postIdOrPostHash !== null) {
+                                    this.saveImagesToCloudinary(postIdOrPostHash);
+                                } else {
+                                    this.showErrorMessage(
+                                        'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
+                                    );
+                                }
+                            } else if (postIdOrPostHash !== null) {
+                                this.savedPostId = postIdOrPostHash;
                                 //post saved, send images to cloudinary
                                 this.saveImagesToCloudinary();
                             } else {
@@ -192,7 +168,14 @@ export default class Writer extends React.Component<{}, State> {
                         });
                 } else if (response.status === 401) {
                     //user is not authenticated
-                    showModal(this.authenticationWindow(typeof authHeader !== 'undefined'));
+                    showModal(
+                        <AuthenticationModal
+                            handleLoginClick={this.handleLoginClick}
+                            loginInputRef={this.loginInput}
+                            passwordInputRef={this.passwordInput}
+                            authFailed={typeof authHeader !== 'undefined'}
+                        />
+                    );
                 } else {
                     response.text().then(text => {
                         console.log(text);
@@ -213,8 +196,10 @@ export default class Writer extends React.Component<{}, State> {
             );
         }
 
+        const post = this.props.postToEdit;
+
         const requestBody = {
-            postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
+            postDate: fns.format(post ? post.postDate : new Date(), BACKEND_DATE_FORMAT),
             postType: this.state.postType.toString(),
             title: this.titleTextArea.current.value,
             description: this.postDescriptionTextArea.current.value,
@@ -225,6 +210,10 @@ export default class Writer extends React.Component<{}, State> {
                     : null,
             shortDescription: this.state.postType === PostType.WARNING ? this.warningShortInput.current.value : null
         };
+
+        if (this.props.postToEdit) {
+            requestBody['id'] = this.props.postToEdit.id;
+        }
 
         const uploadedFilesIdsOrdered: string[] = [];
         for (let i = 0; i < this.state.filesToUpload.length; ++i) {
@@ -241,29 +230,64 @@ export default class Writer extends React.Component<{}, State> {
         headers.append('Content-Type', 'application/json');
 
         return fetchApi('api/posts', {
-            method: 'POST',
+            method: post ? 'PUT' : 'POST',
             headers: headers,
             body: JSON.stringify(requestBody)
         });
     }
 
-    private saveImagesToCloudinary() {
+    private saveImagesToCloudinary(postHash?: string) {
         const uploadPromises: Promise<Response>[] = uploadImages(this.state.filesToUpload, this.abortController.signal);
         Promise.all(uploadPromises)
             .then(responses => {
                 if (responses.every(response => response && response.ok)) {
                     //all images uploaded successfully
-                    this.showSuccessMessage();
+                    if (postHash) {
+                        this.continueSavingPostToBackend(postHash);
+                    } else {
+                        this.showSuccessMessage();
+                    }
                 } else {
                     responses = responses.filter(response => !response || !response.ok);
                     console.log(responses.toString());
                     this.showErrorMessage('Nie udało się wysłać wszystkich plików. Post nie został zapisany.');
-                    this.removePostFromBackend(this.savedPostId);
+                    postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
                 }
             })
             .catch(error => {
                 console.log(error);
-                this.removePostFromBackend(this.savedPostId);
+                postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
+            });
+    }
+
+    //Remove post changes, that are temporarily saved in backend
+    private abortPostUpdate(hash: string) {
+        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=false')
+            .then(response => {
+                if (response && response.ok) {
+                    console.log('Post update aborted.');
+                } else {
+                    console.log('Cannot abort. Hash: ' + hash + '. Server response: ' + response);
+                }
+            })
+            .catch(error => {
+                console.log('Error while aborting update. Error message: ' + error);
+            });
+    }
+
+    //Save temporarily saved changes to the database
+    private continueSavingPostToBackend(hash: string) {
+        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=true')
+            .then(response => {
+                if (response && response.ok) {
+                    this.showSuccessMessage();
+                } else {
+                    console.log(response.statusText + ', ' + response.body);
+                    this.showErrorMessage('Wystąpił błąd przy zapisywaniu posta.');
+                }
+            })
+            .catch(error => {
+                console.log(error);
             });
     }
 
@@ -298,7 +322,10 @@ export default class Writer extends React.Component<{}, State> {
         showModal(
             <div>
                 <p className="dialogMessage">Pomyślnie zapisano {postType}</p>
-                <button className="button is-primary" style={{ float: 'right' }} onClick={this.clearEverything}>
+                <button
+                    className="button is-primary"
+                    style={{ float: 'right' }}
+                    onClick={this.props.postToEdit ? this.props.onFinishEditing : this.clearEverything}>
                     Ok
                 </button>
                 <button className="button is-secondary" style={{ float: 'right' }} onClick={this.goToPost}>
@@ -333,7 +360,6 @@ export default class Writer extends React.Component<{}, State> {
 
     private clearEverything() {
         this.setState({
-            postTypeText: PostTypeText.Prognoza,
             postType: PostType.FORECAST,
             filesToUpload: []
         });
@@ -393,6 +419,16 @@ export default class Writer extends React.Component<{}, State> {
                         ref={this.daysValidInput}
                         min="0"
                         max="14"
+                        defaultValue={
+                            this.props.postToEdit
+                                ? this.props.postToEdit.dueDate
+                                    ? fns.differenceInCalendarDays(
+                                          fnstz.zonedTimeToUtc(this.props.postToEdit.dueDate, 'Europe/Warsaw'),
+                                          this.props.postToEdit.postDate
+                                      ) - 1
+                                    : ''
+                                : ''
+                        }
                         onInput={e => {
                             if (this.daysValidInput.current.value.length > 2)
                                 this.daysValidInput.current.value = this.daysValidInput.current.value.slice(0, 2);
@@ -414,6 +450,7 @@ export default class Writer extends React.Component<{}, State> {
                         required={true}
                         maxLength={80}
                         ref={this.warningShortInput}
+                        defaultValue={this.props.postToEdit ? this.props.postToEdit.shortDescription : ''}
                         onKeyUp={e => this.validateField(e.target)}
                         onBlur={e => this.validateField(e.target)}
                     />
@@ -421,6 +458,13 @@ export default class Writer extends React.Component<{}, State> {
                 <div className="column is-half" />
             </div>
         );
+    }
+
+    componentDidMount() {
+        if (this.props.postToEdit) {
+            //images coming from cloudinary let's add to state. They will be recognized by null file
+            this.registerImagesPresentAtCloudinary(this.props.postToEdit);
+        }
     }
 
     componentWillUnmount() {
@@ -432,28 +476,36 @@ export default class Writer extends React.Component<{}, State> {
             <div className="main">
                 <section className="container is-fluid">
                     <TopImage />
-                    <h2 className="title">Witaj w edytorze wpisów.</h2>
-                    <h2 className="title is-5">Możesz tutaj tworzyć nowe posty do umieszczenia na stronie.</h2>
+                    {this.props.postToEdit ? (
+                        <h2 className="title">Edytuj post.</h2>
+                    ) : (
+                        <>
+                            <h2 className="title">Witaj w edytorze wpisów.</h2>
+                            <h2 className="title is-5">Możesz tutaj tworzyć nowe posty do umieszczenia na stronie.</h2>
+                        </>
+                    )}
                     <div className="writerForm">
                         <div className="columns">
                             <div className="column">
-                                <p>Dodaj tytuł do {this.state.postTypeText.toString()}: </p>
+                                <p>Tytuł: </p>
                                 <input
                                     required={true}
                                     maxLength={100}
                                     placeholder="Tytuł"
                                     ref={this.titleTextArea}
+                                    defaultValue={this.props.postToEdit ? this.props.postToEdit.title : ''}
                                     className="input"
                                     onKeyUp={e => this.validateField(e.target)}
                                     onBlur={e => this.validateField(e.target)}
                                 />
-                                <p>Dodaj opis do {this.state.postTypeText.toString()}: </p>
+                                <p>Opis: </p>
                                 <textarea
                                     required={true}
                                     cols={100}
                                     rows={10}
                                     placeholder="Treść posta..."
                                     ref={this.postDescriptionTextArea}
+                                    defaultValue={this.props.postToEdit ? this.props.postToEdit.description : ''}
                                     className="textarea"
                                 />
                             </div>
@@ -467,8 +519,7 @@ export default class Writer extends React.Component<{}, State> {
                                     checked={this.state.postType === PostType.FORECAST}
                                     onChange={() =>
                                         this.setState({
-                                            postType: PostType.FORECAST,
-                                            postTypeText: PostTypeText.Prognoza
+                                            postType: PostType.FORECAST
                                         })
                                     }
                                 />
@@ -482,8 +533,7 @@ export default class Writer extends React.Component<{}, State> {
                                     checked={this.state.postType === PostType.WARNING}
                                     onChange={() =>
                                         this.setState({
-                                            postType: PostType.WARNING,
-                                            postTypeText: PostTypeText.Ostrzezenie
+                                            postType: PostType.WARNING
                                         })
                                     }
                                 />

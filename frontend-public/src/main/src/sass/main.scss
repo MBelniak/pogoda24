@@ -228,6 +228,27 @@ body {
     outline: none;
 }
 
+.pagingBar li {
+    box-shadow: 0 0 3px $primary-color;
+}
+
+.pagingBar li a {
+    color: black;
+}
+
+.pagingBar li:hover a {
+    color: $secondary-color;
+}
+
+.pagingBar .active {
+    background-color: $secondary-color;
+    box-shadow: 0 0 5px $secondary-color;
+}
+
+.pagingBar li.active:hover, .pagingBar li.active:hover a {
+    color: black;
+}
+
 /* Wrapper */
 .icon-button {
     background-color: white;

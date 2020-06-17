@@ -1,10 +1,10 @@
 import React from 'react';
-import { PostsList } from '../../components/PostsList';
+import { PostsList } from '../components/PostsList';
 import { ExternalApi } from './ExternalApi';
 import Post, { postDTOToPost } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
 import * as fnstz from 'date-fns-tz';
-import CustomLinearProgress from '../../components/LinearProgress';
+import CustomLinearProgress from '../components/LinearProgress';
 import { CurrentWarnings } from './CurrentWarnings';
 import '../../sass/main.scss';
 

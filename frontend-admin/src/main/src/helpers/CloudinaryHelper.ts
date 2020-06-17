@@ -1,5 +1,5 @@
 import config from '../config/config';
-import { FileToUpload } from '../Writer';
+import { FileToUpload } from '../model/FileToUpload';
 
 const { cloud_name, upload_preset, api_key, api_secret } = config;
 export const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloud_name}/upload`;

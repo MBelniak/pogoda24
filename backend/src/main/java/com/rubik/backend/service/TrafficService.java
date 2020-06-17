@@ -4,6 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.rubik.backend.entity.Post;
 import com.rubik.backend.entity.SiteTraffic;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,8 @@ public class TrafficService {
 
     public void incrementSiteViewsForToday() {
         LocalDate localDate = new LocalDate();
-        Date today = localDate.toDate();
+        Date today = localDate.toDateTimeAtStartOfDay().toDate();
+        System.out.println(today.toString());
         CollectionReference collectionReference = firestore.collection(SITE_TRAFFIC);
 
         Query query = collectionReference.whereEqualTo("date", today);

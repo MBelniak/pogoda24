@@ -1,7 +1,7 @@
 import React from 'react';
-import { fetchApi } from './helpers/fetchHelper';
+import { fetchApi } from '../../helpers/fetchHelper';
 import * as fns from 'date-fns';
-import { SiteViewsChart } from './charts/SiteViewsChart';
+import { SiteViewsChart } from '../../charts/SiteViewsChart';
 const Copyright = require('shared24').Copyright;
 const TopImage = require('shared24').TopImage;
 

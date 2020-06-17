@@ -27,14 +27,12 @@ $footer-background-color: transparent;
 }
 
 .pagingBar li {
-    box-shadow: 0 0 3px $primary-color;
     border-radius: 0.3rem;
 }
 
 .pagingBar li a {
     margin: 0.5rem;
     padding: 5px;
-    color: black;
     transition: 0.3s;
 }
 
@@ -43,7 +41,6 @@ $footer-background-color: transparent;
 }
 
 .pagingBar li:hover a {
-    color: $secondary-color;
     transition: 0.3s;
 }
 
@@ -51,13 +48,11 @@ $footer-background-color: transparent;
     display: none;
 }
 
-.pagingBar .active {
-    background-color: $secondary-color;
-    box-shadow: 0 0 5px $secondary-color;
-    color: $white;
+.pagingBar li.active a {
+    color: black;
 }
 
-.pagingBar li:hover.active, .pagingBar li.active a:hover {
+.pagingBar li.active:hover, .pagingBar li.active:hover a {
     cursor: default;
 }
 

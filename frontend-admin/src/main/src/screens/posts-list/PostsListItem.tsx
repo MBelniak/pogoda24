@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
-import Post, { PostType } from './Post';
-import { fetchApi } from './helpers/fetchHelper';
+import Post, { PostType } from '../../model/Post';
+import { fetchApi } from '../../helpers/fetchHelper';
 const showModal = require('shared24').showModal;
 const closeModal = require('shared24').closeModal;
 const LoadingIndicator = require('shared24').LoadingIndicator;
@@ -26,19 +26,11 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
     private handleDeleteClick() {
         showModal(
             <div>
-                <p className="dialogMessage">
-                    Czy na pewno chcesz usunąć ten post?
-                </p>
-                <button
-                    className="button is-secondary"
-                    style={{ float: 'right' }}
-                    onClick={closeModal}>
+                <p className="dialogMessage">Czy na pewno chcesz usunąć ten post?</p>
+                <button className="button is-secondary" style={{ float: 'right' }} onClick={closeModal}>
                     Nie
                 </button>
-                <button
-                    className="button is-primary"
-                    style={{ float: 'right' }}
-                    onClick={this.deletePost}>
+                <button className="button is-primary" style={{ float: 'right' }} onClick={this.deletePost}>
                     Tak
                 </button>
             </div>
@@ -57,13 +49,8 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
                     console.log(response);
                     showModal(
                         <div>
-                            <p className="dialogMessage">
-                                Wystąpił błąd podczas usuwania posta.
-                            </p>
-                            <button
-                                className="button is-primary"
-                                style={{ float: 'right' }}
-                                onClick={closeModal}>
+                            <p className="dialogMessage">Wystąpił błąd podczas usuwania posta.</p>
+                            <button className="button is-primary" style={{ float: 'right' }} onClick={closeModal}>
                                 Ok
                             </button>
                         </div>
@@ -74,13 +61,8 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
                 console.log(error);
                 showModal(
                     <div>
-                        <p className="dialogMessage">
-                            Wystąpił błąd podczas usuwania posta.
-                        </p>
-                        <button
-                            className="button is-primary"
-                            style={{ float: 'right' }}
-                            onClick={closeModal}>
+                        <p className="dialogMessage">Wystąpił błąd podczas usuwania posta.</p>
+                        <button className="button is-primary" style={{ float: 'right' }} onClick={closeModal}>
                             Ok
                         </button>
                     </div>
@@ -89,7 +71,8 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
     }
 
     private processDescription() {
-        let description = this.props.post.description;
+        let description =
+            this.props.post.postType === 'FACT' ? this.getDescriptionForFact() : this.props.post.description;
         description = description.substr(0, 70);
         const regex = /^.*\s/g;
         const match = description.match(regex);
@@ -102,6 +85,12 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
         }
 
         return description;
+    }
+
+    private getDescriptionForFact(): string {
+        const dummyDomEl = document.createElement('html');
+        dummyDomEl.innerHTML = this.props.post.description.replace(/\\"/g, '"');
+        return dummyDomEl.textContent ? dummyDomEl.textContent : '';
     }
 
     private processDate(date?: Date) {
@@ -131,57 +120,31 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
         return (
             <div className="postsListItem columns">
                 <div className="column is-half">
-                    <p>
-                        Data dodania:{' '}
-                        {this.processDate(this.props.post.postDate)}
-                    </p>
+                    <p>Data dodania: {this.processDate(this.props.post.postDate)}</p>
                     <p>Tytuł: {this.props.post.title}</p>
                     <p>Opis: {this.processDescription()}</p>
-                    <p>
-                        Liczba wyświetleń:{' '}
-                        {this.props.post.views === null
-                            ? 0
-                            : this.props.post.views}
-                    </p>
+                    <p>Liczba wyświetleń: {this.props.post.views === null ? 0 : this.props.post.views}</p>
                     <p>Rodzaj postu: {this.processPostType()}</p>
                     {this.props.post.postType === PostType.WARNING ? (
-                        <p>
-                            Ważne do:{' '}
-                            {this.processDate(this.props.post.dueDate)}
-                        </p>
+                        <p>Ważne do: {this.processDate(this.props.post.dueDate)}</p>
                     ) : null}
                     <input
                         type="button"
                         className="button"
                         value="Edytuj"
-                        onClick={() =>
-                            this.props.initiatePostEdit(this.props.post)
-                        }
+                        onClick={() => this.props.initiatePostEdit(this.props.post)}
                     />
-                    <input
-                        type="button"
-                        className="button"
-                        value="Usuń"
-                        onClick={this.handleDeleteClick}
-                    />
+                    <input type="button" className="button" value="Usuń" onClick={this.handleDeleteClick} />
                 </div>
                 <div className="postIconList">
                     {this.props.post.imagesPublicIds
-                        ? this.props.post.imagesPublicIds.map(
-                              (imagePublicId, i) => (
-                                  <div key={i} className="postIconListItem">
-                                      <Image
-                                          publicId={imagePublicId}
-                                          format="png"
-                                          quality="auto">
-                                          <Transformation
-                                              crop="fill"
-                                              gravity="faces"
-                                          />
-                                      </Image>
-                                  </div>
-                              )
-                          )
+                        ? this.props.post.imagesPublicIds.map((imagePublicId, i) => (
+                              <div key={i} className="postIconListItem">
+                                  <Image publicId={imagePublicId} format="png" quality="auto">
+                                      <Transformation crop="fill" gravity="faces" />
+                                  </Image>
+                              </div>
+                          ))
                         : null}
                 </div>
             </div>

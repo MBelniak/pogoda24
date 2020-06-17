@@ -1,11 +1,11 @@
 import React from 'react';
 import { Switch, Route } from 'react-router';
 import { BrowserRouter as Router } from 'react-router-dom';
-import Traffic from './Traffic';
-import MainPage from './MainPage';
-import PostsList from './PostsList';
-import Writer from './Writer';
-import FactWriter from './FactWriter';
+import Traffic from './screens/traffic/Traffic';
+import MainPage from './screens/main-page/MainPage';
+import PostsList from './screens/posts-list/PostsList';
+import Writer from './screens/writer/Writer';
+import FactWriter from './screens/fact-writer/FactWriter';
 
 export default class App extends React.Component {
     render() {

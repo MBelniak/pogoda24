@@ -1,8 +1,8 @@
 import React from 'react';
-import Post from '../model/Post';
-import { fetchApi } from '../helpers/fetchHelper';
+import Post from '../../model/Post';
+import { fetchApi } from '../../helpers/fetchHelper';
 import PostsListItem from './PostsListItem';
-import config from '../config/config';
+import config from '../../config/config';
 
 const { nonExpandedPostLength } = config;
 
