@@ -31,7 +31,6 @@ public class TrafficService {
     public void incrementSiteViewsForToday() {
         LocalDate localDate = new LocalDate();
         Date today = localDate.toDateTimeAtStartOfDay().toDate();
-        System.out.println(today.toString());
         CollectionReference collectionReference = firestore.collection(SITE_TRAFFIC);
 
         Query query = collectionReference.whereEqualTo("date", today);
