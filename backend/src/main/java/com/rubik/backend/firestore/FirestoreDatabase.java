@@ -17,8 +17,8 @@ public class FirestoreDatabase {
         FirestoreOptions firestoreOptions =
                 FirestoreOptions.getDefaultInstance()
                         .toBuilder()
-                        .setCredentials(ServiceAccountCredentials.fromStream(getClass().getClassLoader().getResourceAsStream("MyFirstProject-b915277d3604.json")))
-                        .setProjectId("orbital-voyage-235912")
+                        .setCredentials(ServiceAccountCredentials.fromStream(getClass().getClassLoader().getResourceAsStream("pogoda-24-7-service-account.json")))
+                        .setProjectId("pogoda-24-7")
                         .build();
         return firestoreOptions.getService();
     }
