@@ -105,6 +105,7 @@
     </dependencies>
 
     <build>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
             <artifactId>maven-dependency-plugin</artifactId>
