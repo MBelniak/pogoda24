@@ -229,7 +229,7 @@ export default class Writer extends React.Component<WriterProps, State> {
 
         headers.append('Content-Type', 'application/json');
 
-        return fetchApi('api/posts', {
+        return fetchApi('api/posts' + post ? '?temporary=true' : '', {
             method: post ? 'PUT' : 'POST',
             headers: headers,
             body: JSON.stringify(requestBody)

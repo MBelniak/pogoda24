@@ -93,7 +93,7 @@ public class PostControllerImpl implements PostController {
                 return new ResponseEntity<>(pseudoHash, HttpStatus.OK);
             }
             postService.savePost(post);
-            return new ResponseEntity(HttpStatus.OK);
+            return new ResponseEntity(HttpStatus.CREATED);
         } else {
             throw new BindException(bindingResult);
         }
@@ -109,7 +109,7 @@ public class PostControllerImpl implements PostController {
             postService.savePost(postToSave);
         }
         hashToPostMap.remove(hash);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
     @Override
