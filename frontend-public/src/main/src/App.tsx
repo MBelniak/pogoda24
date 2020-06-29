@@ -9,7 +9,7 @@ import { TopBar } from './screens/components/TopBar';
 import PostView from './screens/post-view/PostView';
 import { Posts } from './screens/components/Posts';
 import { PostType } from './model/Post';
-const Copyright = require('shared24').Copyright;
+import { Copyright } from './screens/components/Copyright';
 
 export default class App extends React.Component {
 

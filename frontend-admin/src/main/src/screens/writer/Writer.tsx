@@ -9,11 +9,10 @@ import { fetchApi } from '../../helpers/fetchHelper';
 import * as fnstz from 'date-fns-tz';
 import { FileToUpload } from '../../model/FileToUpload';
 import { AuthenticationModal } from './AuthenticationModal';
-const Copyright = require('shared24').Copyright;
-const TopImage = require('shared24').TopImage;
-const LoadingIndicator = require('shared24').LoadingIndicator;
-const showModal = require('shared24').showModal;
-const closeModal = require('shared24').closeModal;
+import { closeModal, showModal } from '../components/ModalWindow';
+import { LoadingIndicator } from '../components/LoadingIndicator';
+import { Copyright } from '../components/Copyright';
+import { TopImage } from '../components/TopImage';
 const { MAX_IMAGES_PER_POST, BACKEND_DATE_FORMAT } = config;
 
 interface WriterProps {

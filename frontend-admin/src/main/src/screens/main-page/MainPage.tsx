@@ -1,7 +1,7 @@
 import React from 'react';
 import { Links } from './Links';
-const Copyright = require('shared24').Copyright;
-const TopImage = require('shared24').TopImage;
+import { TopImage } from '../components/TopImage';
+import { Copyright } from '../components/Copyright';
 
 export default class MainPage extends React.Component {
     constructor(props) {

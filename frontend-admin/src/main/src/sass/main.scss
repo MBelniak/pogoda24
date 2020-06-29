@@ -307,16 +307,53 @@ $footer-padding: 3rem 1.5rem 3rem;
     color: white;
 }
 
+.pagingBar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 2rem 0 0.7rem 0;
+}
+
+.pagingBar * {
+    margin: 0.6rem;
+}
+
+
 .pagingBar li {
     box-shadow: 0 0 3px $secondary-color;
 }
 
-.pagingBar li a {
-    color: white;
+.pagingBar li:hover {
+    cursor: pointer;
 }
 
 .pagingBar li:hover a {
     color: $secondary-color;
+    transition: 0.3s;
+}
+
+.pagingBar li a {
+    color: white;
+    margin: 0.5rem;
+    padding: 5px;
+    transition: 0.3s;
+}
+
+.pagingBar li.active a {
+    color: black;
+}
+
+.pagingBar li.active:hover, .pagingBar li.active:hover a {
+    color: black;
+    cursor: default;
+}
+
+.previous.disabled, .next.disabled {
+    display: none;
+}
+
+.pagination {
+    text-align: center;
 }
 
 .pagingBar .active {
@@ -324,6 +361,3 @@ $footer-padding: 3rem 1.5rem 3rem;
     box-shadow: 0 0 5px $secondary-color;
 }
 
-.pagingBar li.active:hover, .pagingBar li.active:hover a {
-    color: black;
-}

@@ -2,8 +2,8 @@ import React from 'react';
 import { fetchApi } from '../../helpers/fetchHelper';
 import * as fns from 'date-fns';
 import { SiteViewsChart } from '../../charts/SiteViewsChart';
-const Copyright = require('shared24').Copyright;
-const TopImage = require('shared24').TopImage;
+import { TopImage } from '../components/TopImage';
+import { Copyright } from '../components/Copyright';
 
 const daysBackInputConstraint = (text: string): boolean => {
     return parseInt(text) >= 0 && parseInt(text) <= 9999;

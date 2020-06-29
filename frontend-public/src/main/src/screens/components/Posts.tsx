@@ -4,7 +4,7 @@ import Post, { postDTOToPost, PostType } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
 import CustomLinearProgress from './LinearProgress';
 import './Posts.scss';
-const PagingBar = require('shared24').PagingBar;
+import { PagingBar } from './PagingBar';
 
 interface State {
     posts: Post[] | undefined;

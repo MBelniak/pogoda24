@@ -1,0 +1,44 @@
+.pagingBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 2rem 0 0.7rem 0;
+}
+
+.pagingBar * {
+  margin: 0.6rem;
+}
+
+.pagingBar li {
+  border-radius: 0.3rem;
+}
+
+.pagingBar li a {
+  margin: 0.5rem;
+  padding: 5px;
+  transition: 0.3s;
+}
+
+.pagingBar li:hover {
+  cursor: pointer;
+}
+
+.pagingBar li:hover a {
+  transition: 0.3s;
+}
+
+.previous.disabled, .next.disabled {
+  display: none;
+}
+
+.pagingBar li.active a {
+  color: black;
+}
+
+.pagingBar li.active:hover, .pagingBar li.active:hover a {
+  cursor: default;
+}
+
+.pagination {
+  text-align: center;
+}

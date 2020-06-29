@@ -14,7 +14,6 @@
 		<module>backend</module>
 		<module>frontend-public</module>
         <module>frontend-admin</module>
-		<module>shared</module>
 	</modules>
 
 	<properties>
@@ -126,18 +125,7 @@
 				<configuration>
 					<installDirectory>node</installDirectory>
 				</configuration>
-				<executions>
-					<execution>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-						<configuration>
-							<nodeVersion>v11.10.1</nodeVersion>
-							<npmVersion>6.9.1-next.0</npmVersion>
-						</configuration>
-					</execution>
-				</executions>
+
 			</plugin>
 		</plugins>
 	</build>

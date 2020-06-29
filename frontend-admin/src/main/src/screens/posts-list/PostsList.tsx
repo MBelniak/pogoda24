@@ -4,12 +4,11 @@ import Post, { PostDTO, postDTOToPost } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
 import Writer from '../writer/Writer';
 import FactWriter from '../fact-writer/FactWriter';
-const Copyright = require('shared24').Copyright;
-const TopImage = require('shared24').TopImage;
-const showModal = require('shared24').showModal;
-const closeModal = require('shared24').closeModal;
-const PagingBar = require('shared24').PagingBar;
-const LoadingIndicator = require('shared24').LoadingIndicator;
+import { closeModal, showModal } from '../components/ModalWindow';
+import { LoadingIndicator } from '../components/LoadingIndicator';
+import { TopImage } from '../components/TopImage';
+import { PagingBar } from '../components/PagingBar';
+import { Copyright } from '../components/Copyright';
 
 interface State {
     posts: Post[] | undefined;
@@ -148,6 +147,7 @@ export default class PostsList extends React.Component<{}, State> {
                                 />
                             )}
                         </section>
+                        <Copyright />
                     </div>
                 )}
             </>

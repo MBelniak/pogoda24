@@ -1,4 +1,5 @@
 import React from 'react';
+import './Copyright.scss';
 
 interface CopyrightProps {
     additionalRender: () => JSX.Element | undefined;

@@ -9,10 +9,13 @@
     "@types/react": "^16.9.23",
     "@types/react-bootstrap": "0.0.50",
     "@types/react-dom": "^16.9.5",
+    "@types/react-loader-spinner": "3.1.0",
+    "@types/react-modal": "3.10.5",
     "@types/react-redux": "7.1.7",
     "@types/react-router": "5.1.2",
     "@types/react-router-dom": "5.1.2",
     "babel-loader": "8.0.6",
+    "babel-preset-react": "^6.24.1",
     "blueimp-file-upload": "^10.9.0",
     "chart.js": "^2.9.3",
     "cloudinary-jquery-file-upload": "^2.8.2",
@@ -25,7 +28,10 @@
     "react-chartjs-2": "2.9.0",
     "react-dom": "16.13.1",
     "react-dropzone": "^10.2.2",
+    "react-loader-spinner": "3.1.5",
+    "react-modal": "3.11.2",
     "react-redux": "^7.2.0",
+    "react-paginate": "^6.3.2",
     "react-router": "5.1.2",
     "react-router-dom": "5.1.2",
     "react-scripts": "3.4.0",
@@ -36,10 +42,10 @@
     "webpack": "4.41.5"
   },
   "scripts": {
-    "start": "npm link shared24 && cross-env NODE_ENV=development webpack-dev-server",
+    "start": "cross-env NODE_ENV=development webpack-dev-server",
     "eject": "react-scripts eject",
     "watch": "webpack --watch -d",
-    "build": "npm link shared24 && cross-env NODE_ENV=production webpack"
+    "build": "cross-env NODE_ENV=production webpack"
   },
   "eslintConfig": {
     "extends": "react-app"

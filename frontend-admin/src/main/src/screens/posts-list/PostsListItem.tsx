@@ -2,9 +2,8 @@ import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
 import Post, { PostType } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
-const showModal = require('shared24').showModal;
-const closeModal = require('shared24').closeModal;
-const LoadingIndicator = require('shared24').LoadingIndicator;
+import { closeModal, showModal } from '../components/ModalWindow';
+import { LoadingIndicator } from '../components/LoadingIndicator';
 
 interface PostListItemProps {
     post: Post;

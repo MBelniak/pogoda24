@@ -23,11 +23,10 @@ import { ButtonListItem } from 'suneditor/src/options';
 import { fetchApi } from '../../helpers/fetchHelper';
 import { default as Post, PostType } from '../../model/Post';
 import config from '../../config/config';
-const Copyright = require('shared24').Copyright;
-const TopImage = require('shared24').TopImage;
-const showModal = require('shared24').showModal;
-const closeModal = require('shared24').closeModal;
-const LoadingIndicator = require('shared24').LoadingIndicator;
+import { LoadingIndicator } from '../components/LoadingIndicator';
+import { closeModal, showModal } from '../components/ModalWindow';
+import { TopImage } from '../components/TopImage';
+import { Copyright } from '../components/Copyright';
 const { BACKEND_DATE_FORMAT } = config;
 
 function findIndex(array: Image[], index) {
