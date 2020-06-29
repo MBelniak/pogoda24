@@ -2,6 +2,7 @@ import React from 'react';
 import Post, { postDTOToPost, PostType } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
 import { ForecastMapList } from '../components/ForecastMapList';
+import CustomLinearProgress from '../components/LinearProgress';
 import '../../sass/main.scss';
 
 interface State {
@@ -87,7 +88,7 @@ export default class PostView extends React.Component<{}, State> {
             <section className="mainContent container is-fluid">
                 <div>
                     {this.state.loading ? (
-                        null
+                        <CustomLinearProgress />
                     ) : (
                         <div className="posts">
                             {this.post ? (

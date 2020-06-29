@@ -38,6 +38,7 @@ export default class Writer extends React.Component<WriterProps, State> {
     private warningShortInput;
     private abortController;
     private savedPostId;
+    private temporaryPostHash;
     private loginInput;
     private passwordInput;
 
@@ -52,6 +53,9 @@ export default class Writer extends React.Component<WriterProps, State> {
         this.loginInput = React.createRef();
         this.passwordInput = React.createRef();
         this.abortController = new AbortController();
+        if (this.props.postToEdit) {
+            this.savedPostId = this.props.postToEdit.id;
+        }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.onFilesAdded = this.onFilesAdded.bind(this);
         this.clearEverything = this.clearEverything.bind(this);
@@ -140,7 +144,7 @@ export default class Writer extends React.Component<WriterProps, State> {
     private savePost(authHeader?: string) {
         this.sendPostToBackend(authHeader)
             .then(response => {
-                if (response && response.status === 201) {
+                if (response && (response.status === 201 || response.status === 200)) {
                     response
                         .text()
                         .then((postIdOrPostHash: any) => {
@@ -228,7 +232,7 @@ export default class Writer extends React.Component<WriterProps, State> {
 
         headers.append('Content-Type', 'application/json');
 
-        return fetchApi('api/posts' + post ? '?temporary=true' : '', {
+        return fetchApi('api/posts' + (post ? '?temporary=true' : ''), {
             method: post ? 'PUT' : 'POST',
             headers: headers,
             body: JSON.stringify(requestBody)
