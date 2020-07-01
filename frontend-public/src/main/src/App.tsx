@@ -54,6 +54,7 @@ export default class App extends React.Component {
                             component={PostView}
                         />
                     </Switch>
+                    <div className="is-divider" style={{marginLeft: "4rem", marginRight: "4rem"}}/>
                     <Copyright additionalRender={this.renderSocialMedia} />
                 </div>
             </Router>

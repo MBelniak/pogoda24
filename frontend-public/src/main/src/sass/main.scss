@@ -19,6 +19,7 @@ $navbar-item-img-max-height: none;
 @import '../../node_modules/bulma/sass/elements/title.sass';
 @import '../../node_modules/bulma/sass/components/navbar.sass';
 @import '../../node_modules/bulma/sass/layout/section.sass';
+@import '../../node_modules/bulma/sass/layout/footer.sass';
 @import '../../node_modules/bulma/sass/grid/columns.sass';
 @import '../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass';
 
@@ -209,7 +210,8 @@ body {
 }
 
 .warnings {
-    padding: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .sun-editor-editable, .sun-editor-editable * {
