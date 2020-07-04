@@ -1,5 +1,5 @@
 import React from 'react';
-import './ONas.scss'
+import './ONas.scss';
 
 interface Person {
     imageURL?: string;
@@ -12,16 +12,15 @@ export default class StaffItem extends React.Component<{ person: Person }> {
     }
 
     private description() {
-        return this.props.person.description.replace(/\n/g, '<br/>');
+        const imgTag = this.props.person.imageURL
+            ? '<img src="' + require('img/onas/' + this.props.person.imageURL) + '" class="ekipaImg"/>'
+            : '<div class="ekipaImg"/>';
+        return imgTag + this.props.person.description.replace(/\n/g, '<br/>');
     }
 
     render() {
         return (
             <div className="ekipaItem">
-                {this.props.person.imageURL
-                    ? <img src={require('img/onas/' + this.props.person.imageURL)} className="ekipaImg"/>
-                    : <div className="ekipaImg"/>
-                }
                 <p
                     className="ekipaPersonDescription fontSizeSmall"
                     dangerouslySetInnerHTML={{ __html: this.description() }}

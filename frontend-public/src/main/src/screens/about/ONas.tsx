@@ -10,7 +10,7 @@ export class ONas extends React.Component {
 
     render() {
         return (
-            <section className="container is-fluid mainContent">
+            <section className="container is-widescreen mainContent">
                 <div className="post ekipa">
                     <p className="fontSizeMedium" style={{ margin: '15px', wordWrap: 'break-word' }}>
                         Dziękujemy, że zajrzałeś na naszą stronę.
