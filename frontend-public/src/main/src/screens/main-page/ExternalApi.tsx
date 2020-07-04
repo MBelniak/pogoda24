@@ -10,16 +10,16 @@ export class ExternalApi extends React.Component {
         return (
             <div className="externalApi">
                 <div className="externalApiItem">
-                    <h3>Wyładowania (blitzortung)</h3>
-                    <a href="http://pl.blitzortung.org/live_lightning_maps.php?map=15" target="_blank">
-                        <img src="http://images.blitzortung.org/Images/image_b_pl.png?t=25180377" alt="Wyładowania" />
+                    <h3>Wyładowania (PŁB)</h3>
+                    <a href="https://burze.dzis.net/?page=mapa&animacja=on">
+                        <img src="https://burze.dzis.net/img/mapa_burzowa_anim.gif" alt="Mapa burzowa Polski"/>
                     </a>
                 </div>
                 <div className="is-divider" />
                 <div className="externalApiItem">
                     <h3>Ostrzeżenia (PŁB)</h3>
-                    <a href="http://burze.dzis.net/?page=mapa_ostrzezen" target="_blank">
-                        <img src="http://burze.dzis.net/img/zagrozenia.gif" alt="Mapa ostrzeżeń dla Polski" />
+                    <a href="https://burze.dzis.net/?page=mapa_ostrzezen" target="_blank">
+                        <img src="https://burze.dzis.net/img/zagrozenia.gif" alt="Mapa ostrzeżeń dla Polski" />
                     </a>
                 </div>
                 <div className="is-divider" />
