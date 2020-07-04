@@ -46,11 +46,11 @@ export class ForecastMapList extends React.Component<{
 
     render() {
         return (
-            <div className="forecastMapList">
+            <div className="forecastMapList columns is-centered">
                 {this.props.imagesPublicIds
                     ? this.props.imagesPublicIds.map((imagePublicId, i) => (
                           <div
-                              className="forecastMapImage"
+                              className="forecastMapImage column is-half"
                               key={i}>
                               <Image
                                   publicId={imagePublicId}

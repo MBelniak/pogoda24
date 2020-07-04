@@ -123,7 +123,7 @@ body {
 }
 
 .topBarFontSizeMedium {
-    font-size: 16px;
+    font-size: 1rem;
 }
 
 .topBar .navbar-burger {
@@ -160,9 +160,6 @@ body {
 }
 
 @media all and (max-width: 640px) {
-    .topBarFontSizeMedium {
-        font-size: 2.5vw;
-    }
     .logoImg {
         height: 7.75vw;
         width: 8vw;
@@ -170,9 +167,6 @@ body {
 }
 
 @media all and (max-width: 500px) {
-    .topBarFontSizeMedium {
-        font-size: 12px;
-    }
     .logoImg {
         height: 39px;
         width: 40px;
@@ -196,18 +190,6 @@ body {
     }
 }
 
-
-@media all and (max-width: 640px) {
-    .fontSizeSmall {
-        font-size: 2.188vw;
-    }
-    .fontSizeMedium {
-        font-size: 2.5vw;
-    }
-    .fontSizeLarge {
-        font-size: 2.813vw;
-    }
-}
 
 .warnings {
     padding-left: 1rem;
