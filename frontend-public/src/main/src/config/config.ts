@@ -5,6 +5,7 @@ export default {
     api_secret: process.env.API_SECRET,
     staff: [
         {
+            imageURL: "noPhoto.jpg",
             description: "Michał Belniak\n" +
             "Przygodę z meteorologią rozpocząłem w wieku 6 lat, gdy rodzice kupili mi pierwszą książkę o pogodzie. " +
             "Od tamtego momentu nie ma dnia, w którym nie sprawdziłbym prognozy pogody. " +
@@ -46,11 +47,13 @@ export default {
             "Studiuje informatykę na Politechnice Warszawskiej."
         },
         {
+            imageURL: "noPhoto.jpg",
             description: "Marcin Borek.\n" +
             "Mam 19 lat, mieszkam w gminie Rzeczniów. W Pogoda24/7 zajmuję się prognozami pogody i ostrzeżeniami." +
             "Moja pasja to obserwacja i fotografia zjawisk atmosferycznych."
         },
         {
+            imageURL: "noPhoto.jpg",
             description: "Adrian Wojtaszewski.\n" +
             "Mam 20 lat, a meteorologią i klimatologią interesuje się od 2009 roku. Lubię też czytać o różnych ciekawych rzeczach. " +
             "Jestem tegorocznym maturzystą i planuję iść na studia związane z geografią lub historią."
