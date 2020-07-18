@@ -5,7 +5,7 @@ export default {
     api_secret: process.env.API_SECRET,
     staff: [
         {
-            imageURL: "noPhoto.jpg",
+            imageURL: "MichalB.jpg",
             description: "Michał Belniak\n" +
             "Przygodę z meteorologią rozpocząłem w wieku 6 lat, gdy rodzice kupili mi pierwszą książkę o pogodzie. " +
             "Od tamtego momentu nie ma dnia, w którym nie sprawdziłbym prognozy pogody. " +
