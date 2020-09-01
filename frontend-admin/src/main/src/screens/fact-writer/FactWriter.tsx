@@ -1,5 +1,5 @@
 import React from 'react';
-import * as fns from 'date-fns';
+import format from 'date-fns/format';
 import suneditor from 'suneditor';
 import {
     font,
@@ -231,7 +231,7 @@ export default class FactWriter extends React.Component<{postToEdit?: Post}> {
         let description = JSON.stringify(target.innerHTML);
         description = description.substr(1, description.length - 2);
         const requestBodyPost = {
-            postDate: fns.format(new Date(), BACKEND_DATE_FORMAT),
+            postDate: format(new Date(), BACKEND_DATE_FORMAT),
             postType: PostType.FACT,
             title: this.titleInput.current.value,
             description: description

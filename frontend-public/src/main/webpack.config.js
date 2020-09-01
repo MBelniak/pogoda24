@@ -11,6 +11,11 @@ module.exports = {
         filename: 'bundle.js',
         publicPath: '/'
     },
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+        },
+    },
     devServer: {
         proxy: {
             '/api/': 'http://localhost:8080'

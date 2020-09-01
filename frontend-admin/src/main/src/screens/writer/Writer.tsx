@@ -1,12 +1,13 @@
 import React from 'react';
 import config from '../../config/config';
-import * as fns from 'date-fns';
+import format from 'date-fns/format';
+import differenceInCalendarDays from 'date-fns/differenceInCalendarDays';
 import FileDropper from '../components/FileDropper';
 import FileToUploadItem from './FileToUploadItem';
 import { default as Post, PostType } from '../../model/Post';
 import { uploadImages } from '../../helpers/CloudinaryHelper';
 import { fetchApi } from '../../helpers/fetchHelper';
-import * as fnstz from 'date-fns-tz';
+import zonedTimeToUtc from 'date-fns-tz/zonedTimeToUtc';
 import { FileToUpload } from '../../model/FileToUpload';
 import { AuthenticationModal } from './AuthenticationModal';
 import { closeModal, showModal } from '../components/ModalWindow';
@@ -38,7 +39,6 @@ export default class Writer extends React.Component<WriterProps, State> {
     private warningShortInput;
     private abortController;
     private savedPostId;
-    private temporaryPostHash;
     private loginInput;
     private passwordInput;
 
@@ -193,7 +193,7 @@ export default class Writer extends React.Component<WriterProps, State> {
 
     private sendPostToBackend(authHeader?: string): Promise<Response> {
         function calculateDueDate(days: number): string {
-            return fns.format(
+            return format(
                 new Date(new Date().setHours(0, 0, 0, 0) + (days + 1) * 24 * 3600 * 1000),
                 BACKEND_DATE_FORMAT
             );
@@ -202,7 +202,7 @@ export default class Writer extends React.Component<WriterProps, State> {
         const post = this.props.postToEdit;
 
         const requestBody = {
-            postDate: fns.format(post ? post.postDate : new Date(), BACKEND_DATE_FORMAT),
+            postDate: format(post ? post.postDate : new Date(), BACKEND_DATE_FORMAT),
             postType: this.state.postType.toString(),
             title: this.titleTextArea.current.value,
             description: this.postDescriptionTextArea.current.value,
@@ -425,8 +425,8 @@ export default class Writer extends React.Component<WriterProps, State> {
                         defaultValue={
                             this.props.postToEdit
                                 ? this.props.postToEdit.dueDate
-                                    ? fns.differenceInCalendarDays(
-                                          fnstz.zonedTimeToUtc(this.props.postToEdit.dueDate, 'Europe/Warsaw'),
+                                    ? differenceInCalendarDays(
+                                          zonedTimeToUtc(this.props.postToEdit.dueDate, 'Europe/Warsaw'),
                                           this.props.postToEdit.postDate
                                       ) - 1
                                     : ''

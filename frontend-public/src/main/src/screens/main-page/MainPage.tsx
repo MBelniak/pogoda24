@@ -3,7 +3,7 @@ import { PostsList } from '../components/PostsList';
 import { ExternalApi } from './ExternalApi';
 import Post, { postDTOToPost } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
-import * as fnstz from 'date-fns-tz';
+import zonedTimeToUtc from 'date-fns-tz/zonedTimeToUtc';
 import CustomLinearProgress from '../components/LinearProgress';
 import { CurrentWarnings } from './CurrentWarnings';
 import '../../sass/main.scss';
@@ -67,7 +67,7 @@ export class MainPage extends React.Component<{}, State> {
                                     return {
                                         ...info,
                                         dueDate: warningInfo.dueDate
-                                            ? fnstz.zonedTimeToUtc(warningInfo.dueDate, 'Europe/Warsaw')
+                                            ? zonedTimeToUtc(warningInfo.dueDate, 'Europe/Warsaw')
                                             : undefined
                                     };
                                 })

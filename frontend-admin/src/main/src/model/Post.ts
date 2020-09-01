@@ -1,4 +1,4 @@
-import * as fnstz from 'date-fns-tz';
+import zonedTimeToUtc from 'date-fns-tz/zonedTimeToUtc';
 
 export default interface Post {
     id: string;
@@ -27,8 +27,8 @@ export interface PostDTO {
 export function postDTOToPost(postDTO: PostDTO): Post {
     return {
         ...postDTO,
-        postDate: fnstz.zonedTimeToUtc(postDTO.postDate, 'Europe/Warsaw'),
-        dueDate: postDTO.dueDate ? fnstz.zonedTimeToUtc(postDTO.dueDate, 'Europe/Warsaw') : undefined
+        postDate: zonedTimeToUtc(postDTO.postDate, 'Europe/Warsaw'),
+        dueDate: postDTO.dueDate ? zonedTimeToUtc(postDTO.dueDate, 'Europe/Warsaw') : undefined
     };
 }
 

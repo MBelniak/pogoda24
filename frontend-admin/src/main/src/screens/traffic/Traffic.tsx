@@ -1,6 +1,9 @@
 import React from 'react';
 import { fetchApi } from '../../helpers/fetchHelper';
-import * as fns from 'date-fns';
+import startOfDay from 'date-fns/startOfDay';
+import isSameDay from 'date-fns/isSameDay';
+import subDays from 'date-fns/subDays';
+import parseISO from 'date-fns/parseISO';
 import { SiteViewsChart } from '../../charts/SiteViewsChart';
 import { TopImage } from '../components/TopImage';
 import { Copyright } from '../components/Copyright';
@@ -103,16 +106,16 @@ export default class Traffic extends React.Component<{}, TrafficState> {
     }
 
     private siteViewsDataToChartData(siteViewsData: TrafficDTO[]) {
-        const today = fns.startOfDay(new Date());
+        const today = startOfDay(new Date());
         if (!siteViewsData) {
             siteViewsData = [];
         }
         const chartData: any[][] = [[], []];
         for (let chartLabel = 0, dataIndex = 0; chartLabel <= this.siteViewsDaysBack; ++chartLabel) {
-            const chartLabelDate = fns.subDays(today, this.siteViewsDaysBack - chartLabel);
+            const chartLabelDate = subDays(today, this.siteViewsDaysBack - chartLabel);
             if (
                 dataIndex < siteViewsData.length &&
-                fns.isSameDay(chartLabelDate, fns.parseISO(siteViewsData[dataIndex].date))
+                isSameDay(chartLabelDate, parseISO(siteViewsData[dataIndex].date))
             ) {
                 chartData[0].push(chartLabelDate);
                 chartData[1].push(siteViewsData[dataIndex].views);

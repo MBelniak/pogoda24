@@ -11,6 +11,11 @@ module.exports = {
         filename: 'bundle.js',
         publicPath: '/admin'
     },
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+        },
+    },
     devServer: {
         proxy: {
             '/api/': 'http://localhost:8080',
@@ -96,6 +101,8 @@ module.exports = {
             }),
         new webpack.DefinePlugin ({
             "process.env": JSON.stringify(dotenv.parsed)
-        })
+        }),
+        // Ignore all locale files of moment.js
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     ]
 };
