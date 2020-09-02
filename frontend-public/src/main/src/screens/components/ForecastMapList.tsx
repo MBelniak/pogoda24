@@ -46,7 +46,7 @@ export class ForecastMapList extends React.Component<{
 
     render() {
         return (
-            <div className="forecastMapList columns is-centered">
+            <div className="columns is-centered">
                 {this.props.imagesPublicIds
                     ? this.props.imagesPublicIds.map((imagePublicId, i) => (
                           <div

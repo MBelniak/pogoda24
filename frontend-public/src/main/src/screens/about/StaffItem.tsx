@@ -1,8 +1,11 @@
 import React from 'react';
 import './ONas.scss';
+import config from '../../config/config';
+
+const { cloud_name } = config;
 
 interface Person {
-    imageURL?: string;
+    imagePublicId: string;
     description: string;
 }
 
@@ -11,11 +14,12 @@ export default class StaffItem extends React.Component<{ person: Person }> {
         super(props);
     }
 
-    private description() {
-        const imgTag = this.props.person.imageURL
-            ? '<img src="' + require('img/onas/' + this.props.person.imageURL) + '" class="ekipaImg"/>'
-            : '<div class="ekipaImg"/>';
-        return imgTag + this.props.person.description.replace(/\n/g, '<br/>');
+    private getDescription() {
+        const imgTag = `<img
+                        src='http://res.cloudinary.com/${cloud_name}/image/upload/c_fill,g_faces/q_auto/${this.props.person.imagePublicId}'
+                        class="ekipaImg"
+                    />`;
+        return imgTag + this.props.person.description;
     }
 
     render() {
@@ -23,7 +27,7 @@ export default class StaffItem extends React.Component<{ person: Person }> {
             <div className="ekipaItem">
                 <p
                     className="ekipaPersonDescription fontSizeSmall"
-                    dangerouslySetInnerHTML={{ __html: this.description() }}
+                    dangerouslySetInnerHTML={{ __html: this.getDescription() }}
                 />
             </div>
         );

@@ -1,5 +1,8 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const webpack = require('webpack');
 const resolve = require('path').resolve;
 const dotenv = require('dotenv').config();
@@ -8,13 +11,15 @@ module.exports = {
     entry: "./src/index.tsx",
     output: {
         path: resolve('dist'),
-        filename: 'bundle.js',
+        filename: `bundle${process.env.NODE_ENV === 'production' ? '.min' : ''}.js`,
         publicPath: '/admin'
     },
     optimization: {
         splitChunks: {
             chunks: 'all',
         },
+        minimize: process.env.NODE_ENV === 'production',
+        minimizer: [new TerserPlugin()]
     },
     devServer: {
         proxy: {
@@ -33,7 +38,7 @@ module.exports = {
         contentBasePublicPath: '/'
     },
     mode: process.env.NODE_ENV,
-    devtool: 'inline-module-source-map',
+    devtool: process.env.NODE_ENV === 'production' ? false : 'eval-source-map',
     resolve: {
         modules: [
             'src',
@@ -74,7 +79,7 @@ module.exports = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            sourceMap: true
+                            sourceMap: process.env.NODE_ENV === 'production'
                         }
                     }
                 ],
@@ -104,5 +109,7 @@ module.exports = {
         }),
         // Ignore all locale files of moment.js
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new LodashModuleReplacementPlugin(),
+        // new BundleAnalyzerPlugin()
     ]
 };

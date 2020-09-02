@@ -6,7 +6,6 @@ import './sass/main.scss';
 import App from './App';
 
 const images = require.context('./img/', false, /\.(png|jpe?g|svg)$/);
-// const Navigation = require('shared24').Navigation;
 
 const { cloud_name, upload_preset, api_key, api_secret } = config;
 

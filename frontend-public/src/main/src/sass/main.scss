@@ -12,9 +12,7 @@ $tablet: 960px + (2 * $gap);
 $navbar-item-img-max-height: none;
 // Import only what you need from Bulma
 @import '../../node_modules/bulma/sass/utilities/_all.sass';
-@import '../../node_modules/bulma/sass/utilities/initial-variables.sass';
 @import '../../node_modules/bulma/sass/base/_all.sass';
-@import '../../node_modules/bulma/sass/elements/button.sass';
 @import '../../node_modules/bulma/sass/elements/container.sass';
 @import '../../node_modules/bulma/sass/elements/title.sass';
 @import '../../node_modules/bulma/sass/components/navbar.sass';

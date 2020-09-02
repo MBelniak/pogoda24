@@ -3,7 +3,6 @@ import { Switch, Route } from 'react-router';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { MainPage } from './screens/main-page/MainPage';
 import { ONas } from './screens/about/ONas';
-import { CloudinaryContext } from 'cloudinary-react';
 import './sass/main.scss';
 import { TopBar } from './screens/components/TopBar';
 import PostView from './screens/post-view/PostView';
