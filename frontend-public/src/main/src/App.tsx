@@ -17,14 +17,21 @@ export default class App extends React.Component {
             <div className="social-container">
                 <a href="https://www.facebook.com/Polska24nadobe"
                    target="_blank" className="icon-button facebook">
-                    <i className="icon-facebook" />
+                    <i className="fa fa-facebook"/>
                     <span />
                 </a>
                 <a
                     href="https://twitter.com/Pogoda24_7"
                     target="_blank"
                     className="icon-button twitter">
-                    <i className="icon-twitter" />
+                    <i className="fa fa-twitter"/>
+                    <span />
+                </a>
+                <a
+                    href="https://www.instagram.com/pogoda24_7"
+                    target="_blank"
+                    className="icon-button instagram">
+                    <i className="fa fa-instagram"/>
                     <span />
                 </a>
             </div>

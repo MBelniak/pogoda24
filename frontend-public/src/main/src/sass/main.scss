@@ -57,7 +57,7 @@ body {
 
 
 .fontSizeSmall {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
 }
 
 
@@ -210,27 +210,6 @@ body {
     outline: none;
 }
 
-.pagingBar li {
-    box-shadow: 0 0 3px $primary-color;
-}
-
-.pagingBar li a {
-    color: black;
-}
-
-.pagingBar li:hover a {
-    color: $secondary-color;
-}
-
-.pagingBar .active {
-    background-color: $secondary-color;
-    box-shadow: 0 0 5px $secondary-color;
-}
-
-.pagingBar li.active:hover, .pagingBar li.active:hover a {
-    color: black;
-}
-
 /* Wrapper */
 .icon-button {
     background-color: white;
@@ -277,6 +256,9 @@ body {
 .facebook span {
     background-color: #3B5998;
 }
+.instagram span {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
+}
 
 /* Icons */
 .icon-button i {
@@ -296,19 +278,17 @@ body {
     z-index: 10;
 }
 
-.icon-facebook:before {
-    content: "\f09a";
-}
-.icon-twitter:before {
-    content: "\f099";
-}
-.icon-button .icon-twitter {
+.icon-button .fa-twitter {
     color: #4099ff;
 }
-.icon-button .icon-facebook {
+.icon-button .fa-facebook {
     color: #3B5998;
 }
-.icon-button:hover .icon-twitter,
-.icon-button:hover .icon-facebook {
+.icon-button .fa-instagram {
+    color: #d6249f;
+}
+.icon-button:hover .fa-twitter,
+.icon-button:hover .fa-instagram,
+.icon-button:hover .fa-facebook {
     color: white;
 }

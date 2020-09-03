@@ -1,3 +1,5 @@
+@import "../../sass/main";
+
 .pagingBar {
   display: flex;
   flex-direction: row;
@@ -9,14 +11,23 @@
   margin: 0.6rem;
 }
 
+.pagingBar .active {
+  background-color: $secondary-color;
+  box-shadow: 0 0 5px $secondary-color;
+}
+
 .pagingBar li {
+  display: table;
+  box-shadow: 0 0 3px $primary-color;
   border-radius: 0.3rem;
 }
 
 .pagingBar li a {
-  margin: 0.5rem;
-  padding: 5px;
+  color: black;
+  padding: 5px 10px;
   transition: 0.3s;
+  display: table-cell;
+  vertical-align: middle;
 }
 
 .pagingBar li:hover {
@@ -24,7 +35,12 @@
 }
 
 .pagingBar li:hover a {
+  color: $secondary-color;
   transition: 0.3s;
+}
+
+.pagingBarPrevious i, .pagingBarNext i {
+  margin: 0 5px;
 }
 
 .previous.disabled, .next.disabled {
@@ -36,6 +52,7 @@
 }
 
 .pagingBar li.active:hover, .pagingBar li.active:hover a {
+  color: black;
   cursor: default;
 }
 

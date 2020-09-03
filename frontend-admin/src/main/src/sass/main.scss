@@ -320,6 +320,8 @@ $footer-padding: 3rem 1.5rem 3rem;
 
 
 .pagingBar li {
+    display: table;
+    border-radius: 0.3rem;
     box-shadow: 0 0 3px $secondary-color;
 }
 
@@ -334,9 +336,10 @@ $footer-padding: 3rem 1.5rem 3rem;
 
 .pagingBar li a {
     color: white;
-    margin: 0.5rem;
-    padding: 5px;
+    padding: 5px 10px;
     transition: 0.3s;
+    display: table-cell;
+    vertical-align: middle;
 }
 
 .pagingBar li.active a {
@@ -346,6 +349,10 @@ $footer-padding: 3rem 1.5rem 3rem;
 .pagingBar li.active:hover, .pagingBar li.active:hover a {
     color: black;
     cursor: default;
+}
+
+.pagingBarPrevious i, .pagingBarNext i {
+    margin: 0 5px;
 }
 
 .previous.disabled, .next.disabled {

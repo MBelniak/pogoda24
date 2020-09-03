@@ -1,35 +1,25 @@
 import config from '../config/config';
-import { FileToUpload } from '../model/FileToUpload';
+import { PostImage } from '../model/PostImage';
 
 const { cloud_name, upload_preset, api_key, api_secret } = config;
 export const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloud_name}/upload`;
 const sha1 = require('js-sha1');
 
-export function uploadImages(uploadedFiles: FileToUpload[], signal: AbortSignal) {
-    return uploadedFiles.map(uploadedFile => {
-        if (uploadedFile.file === null) {
-            return new Promise<Response>(resolve => {
-                resolve();
+export function uploadImages(postImages: PostImage[], signal: AbortSignal) {
+    return postImages
+        .filter(image => image.file !== null)
+        .map(image => {
+            const data = prepareDateForFileUpload(prepareSignature(image.file!.name, image.timestamp), image);
+
+            return fetch(cloudinaryUrl, {
+                method: 'POST',
+                body: data,
+                signal: signal
             });
-        }
-
-        const data = prepareDateForFileUpload(
-            prepareSignature(uploadedFile.file.name, uploadedFile.timestamp),
-            uploadedFile
-        );
-
-        return fetch(cloudinaryUrl, {
-            method: 'POST',
-            body: data,
-            signal: signal
         });
-    });
 }
 
-export function prepareDateForFileUpload(
-    signature: string,
-    uploadedFile: FileToUpload
-): FormData {
+export function prepareDateForFileUpload(signature: string, uploadedFile: PostImage): FormData {
     if (uploadedFile.file !== null) {
         const formData = new FormData();
         formData.append('upload_preset', upload_preset);
@@ -48,13 +38,7 @@ export function prepareSignature(fileName: string, timestamp: string): string {
     const publicId = fileName + timestamp;
     const hash = sha1.create();
     const stringToSign =
-        'public_id=' +
-        publicId +
-        '&timestamp=' +
-        timestamp +
-        '&upload_preset=' +
-        upload_preset +
-        api_secret;
+        'public_id=' + publicId + '&timestamp=' + timestamp + '&upload_preset=' + upload_preset + api_secret;
     hash.update(stringToSign);
     return hash;
 }

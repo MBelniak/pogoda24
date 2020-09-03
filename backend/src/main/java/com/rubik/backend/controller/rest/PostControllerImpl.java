@@ -107,9 +107,10 @@ public class PostControllerImpl implements PostController {
         }
         if (success) {
             postService.savePost(postToSave);
+            return new ResponseEntity(HttpStatus.CREATED);
         }
         hashToPostMap.remove(hash);
-        return new ResponseEntity(HttpStatus.CREATED);
+        return new ResponseEntity(HttpStatus.OK);
     }
 
     @Override

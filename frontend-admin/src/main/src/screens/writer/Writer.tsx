@@ -8,7 +8,7 @@ import { default as Post, PostType } from '../../model/Post';
 import { uploadImages } from '../../helpers/CloudinaryHelper';
 import { fetchApi } from '../../helpers/fetchHelper';
 import zonedTimeToUtc from 'date-fns-tz/zonedTimeToUtc';
-import { FileToUpload } from '../../model/FileToUpload';
+import { PostImage } from '../../model/PostImage';
 import { AuthenticationModal } from './AuthenticationModal';
 import { closeModal, showModal } from '../components/ModalWindow';
 import { LoadingIndicator } from '../components/LoadingIndicator';
@@ -23,7 +23,7 @@ interface WriterProps {
 
 interface State {
     postType: PostType;
-    filesToUpload: FileToUpload[];
+    postImages: PostImage[];
 }
 
 const daysValidInputConstraint = (text: string): boolean => {
@@ -67,16 +67,16 @@ export default class Writer extends React.Component<WriterProps, State> {
         this.handleLoginClick = this.handleLoginClick.bind(this);
         this.state = {
             postType: this.props.postToEdit ? this.props.postToEdit.postType : PostType.FORECAST,
-            filesToUpload: []
+            postImages: []
         };
     }
 
     private registerImagesPresentAtCloudinary(post: Post) {
-        const filesToUpload: FileToUpload[] = [];
+        const postImages: PostImage[] = [];
         if (post.imagesPublicIds) {
             for (let i = 0; i < post.imagesPublicIds.length; ++i) {
                 //only publicId and file as null are used
-                filesToUpload.push({
+                postImages.push({
                     id: this.fileId++,
                     publicId: post.imagesPublicIds[i],
                     file: null,
@@ -84,11 +84,11 @@ export default class Writer extends React.Component<WriterProps, State> {
                 });
             }
         }
-        this.setState({ filesToUpload: filesToUpload });
+        this.setState({ postImages: postImages });
     }
 
     private onFilesAdded(files: File[]) {
-        if (this.state.filesToUpload.length + files.length > MAX_IMAGES_PER_POST) {
+        if (this.state.postImages.length + files.length > MAX_IMAGES_PER_POST) {
             showModal(
                 <div>
                     <p className="dialogMessage">Do jednego postu możesz dodać tylko 6 plików!</p>
@@ -101,18 +101,18 @@ export default class Writer extends React.Component<WriterProps, State> {
             return;
         }
 
-        let filesToBePushed: FileToUpload[] = [];
+        let filesToBeAdded: PostImage[] = [];
         for (let file of files) {
             let timestamp = new Date().getTime().toString();
             timestamp = timestamp.substr(0, timestamp.length - 3);
-            filesToBePushed.push({
+            filesToBeAdded.push({
                 id: this.fileId++,
                 file: file,
                 publicId: file.name + timestamp,
                 timestamp: timestamp
             });
         }
-        this.setState({ filesToUpload: [...this.state.filesToUpload, ...filesToBePushed] });
+        this.setState({ postImages: [...this.state.postImages, ...filesToBeAdded] });
         this.fileInput.current.value = null;
     }
 
@@ -219,8 +219,8 @@ export default class Writer extends React.Component<WriterProps, State> {
         }
 
         const uploadedFilesIdsOrdered: string[] = [];
-        for (let i = 0; i < this.state.filesToUpload.length; ++i) {
-            uploadedFilesIdsOrdered.push(this.state.filesToUpload[i].publicId!!);
+        for (let i = 0; i < this.state.postImages.length; ++i) {
+            uploadedFilesIdsOrdered.push(this.state.postImages[i].publicId!!);
         }
         requestBody['imagesPublicIds'] = uploadedFilesIdsOrdered;
 
@@ -240,27 +240,33 @@ export default class Writer extends React.Component<WriterProps, State> {
     }
 
     private saveImagesToCloudinary(postHash?: string) {
-        const uploadPromises: Promise<Response>[] = uploadImages(this.state.filesToUpload, this.abortController.signal);
-        Promise.all(uploadPromises)
-            .then(responses => {
-                if (responses.every(response => response && response.ok)) {
-                    //all images uploaded successfully
-                    if (postHash) {
-                        this.continueSavingPostToBackend(postHash);
+        const uploadPromises: Promise<Response>[] = uploadImages(this.state.postImages, this.abortController.signal);
+        if (uploadPromises.length > 0) {
+            Promise.all(uploadPromises)
+                .then(responses => {
+                    if (responses.every(response => response && response.ok)) {
+                        //all images uploaded successfully
+                        if (postHash) {
+                            this.continueSavingPostToBackend(postHash);
+                        } else {
+                            this.showSuccessMessage();
+                        }
                     } else {
-                        this.showSuccessMessage();
+                        responses = responses.filter(response => !response || !response.ok);
+                        console.log(responses.toString());
+                        this.showErrorMessage('Nie udało się wysłać wszystkich plików. Post nie został zapisany.');
+                        postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
                     }
-                } else {
-                    responses = responses.filter(response => !response || !response.ok);
-                    console.log(responses.toString());
-                    this.showErrorMessage('Nie udało się wysłać wszystkich plików. Post nie został zapisany.');
+                })
+                .catch(error => {
+                    console.log(error);
                     postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
-            });
+                });
+        } else if (postHash) {
+            this.continueSavingPostToBackend(postHash);
+        } else {
+            this.showSuccessMessage();
+        }
     }
 
     //Remove post changes, that are temporarily saved in backend
@@ -364,7 +370,7 @@ export default class Writer extends React.Component<WriterProps, State> {
     private clearEverything() {
         this.setState({
             postType: PostType.FORECAST,
-            filesToUpload: []
+            postImages: []
         });
         this.fileInput.current.value = null;
         this.postDescriptionTextArea.current.value = null;
@@ -380,28 +386,28 @@ export default class Writer extends React.Component<WriterProps, State> {
 
     private onRemoveFile(fileId: number) {
         this.setState({
-            filesToUpload: this.state.filesToUpload.filter(file => file.id != fileId)
+            postImages: this.state.postImages.filter(file => file.id != fileId)
         });
     }
 
     private onMoveForward(idInList: number) {
-        const currentList = [...this.state.filesToUpload];
-        currentList.splice(idInList + 1, 0, currentList.splice(idInList, 1)[0]);
-        if (idInList < currentList.length - 1) {
+        const currentImagesList = [...this.state.postImages];
+        currentImagesList.splice(idInList + 1, 0, currentImagesList.splice(idInList, 1)[0]);
+        if (idInList < currentImagesList.length - 1) {
             this.setState({
-                filesToUpload: currentList
+                postImages: currentImagesList
             });
         }
     }
 
     private onMoveBackward(idInList: number) {
-        const currentList = [...this.state.filesToUpload];
+        const currentImagesList = [...this.state.postImages];
 
-        currentList.splice(idInList - 1, 0, currentList.splice(idInList, 1)[0]);
+        currentImagesList.splice(idInList - 1, 0, currentImagesList.splice(idInList, 1)[0]);
 
         if (idInList > 0) {
             this.setState({
-                filesToUpload: currentList
+                postImages: currentImagesList
             });
         }
     }
@@ -568,7 +574,7 @@ export default class Writer extends React.Component<WriterProps, State> {
                         <p>Pamiętaj, aby przed wysłaniem plików ustawić je w odpowiedniej kolejnośći!</p>
                         <p>Obecnie dodane pliki:</p>
                         <div className="columns is-multiline">
-                            {this.state.filesToUpload.map((file, key) => {
+                            {this.state.postImages.map((file, key) => {
                                 return (
                                     <div key={key} className="column is-one-quarter">
                                         <FileToUploadItem

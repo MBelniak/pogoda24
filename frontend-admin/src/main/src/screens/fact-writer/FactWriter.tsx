@@ -18,7 +18,7 @@ import {
 } from 'suneditor/src/plugins';
 
 import { uploadImages } from '../../helpers/CloudinaryHelper';
-import { FileToUpload } from '../../model/FileToUpload';
+import { PostImage } from '../../model/PostImage';
 import { ButtonListItem } from 'suneditor/src/options';
 import { fetchApi } from '../../helpers/fetchHelper';
 import { default as Post, PostType } from '../../model/Post';
@@ -33,7 +33,7 @@ function findIndex(array: Image[], index) {
     let idx = -1;
 
     array.some(function (image, i) {
-        if (image.fileToUpload.id === index) {
+        if (image.postImage.id === index) {
             idx = i;
             return true;
         }
@@ -45,11 +45,11 @@ function findIndex(array: Image[], index) {
 
 interface Image {
     htmlElement?: HTMLImageElement;
-    fileToUpload: FileToUpload;
+    postImage: PostImage;
     fileExtension: string;
 }
 
-export default class FactWriter extends React.Component<{postToEdit?: Post}> {
+export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
     private editor;
     private imagesList: Image[] = [];
     private imagesSrcQueue: string[] = [];
@@ -139,7 +139,7 @@ export default class FactWriter extends React.Component<{postToEdit?: Post}> {
             let timestamp = new Date().getTime().toString();
             timestamp = timestamp.substr(0, timestamp.length - 3);
             this.imagesList.push({
-                fileToUpload: {
+                postImage: {
                     id: this.nextImageId++,
                     file: file,
                     publicId: file.name + timestamp,
@@ -180,7 +180,7 @@ export default class FactWriter extends React.Component<{postToEdit?: Post}> {
         //In this case, we first send images to cloudinary, because we're gonna need the direct URL to the image
         Promise.all(
             uploadImages(
-                this.imagesList.map(image => image.fileToUpload),
+                this.imagesList.map(image => image.postImage),
                 this.abortController.signal
             )
         )
@@ -225,9 +225,7 @@ export default class FactWriter extends React.Component<{postToEdit?: Post}> {
     }
 
     private sendPostToBackend(authHeader?: string) {
-        const target = document
-            .getElementsByClassName('se-wrapper')[0]
-            .cloneNode(true) as HTMLElement;
+        const target = document.getElementsByClassName('se-wrapper')[0].cloneNode(true) as HTMLElement;
         let description = JSON.stringify(target.innerHTML);
         description = description.substr(1, description.length - 2);
         const requestBodyPost = {

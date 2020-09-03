@@ -1,10 +1,10 @@
 import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
-import { FileToUpload } from '../../model/FileToUpload';
+import { PostImage } from '../../model/PostImage';
 import { closeModal, showModal } from '../components/ModalWindow';
 
 interface UploadedFilesItemProps {
-    file: FileToUpload;
+    file: PostImage;
     listId: number;
     onRemoveFile: (id: number) => void;
     onMoveForward: (id: number) => void;
