@@ -33,28 +33,22 @@ public class TrafficService {
         Date today = localDate.toDateTimeAtStartOfDay().toDate();
         CollectionReference collectionReference = firestore.collection(SITE_TRAFFIC);
 
-        Query query = collectionReference.whereEqualTo("date", today);
+        ApiFuture<QuerySnapshot> query = collectionReference.whereEqualTo("date", today).get();
 
-        firestore.runTransaction(transaction -> {
-            List<QueryDocumentSnapshot> snapshot = transaction.get(query).get().getDocuments();
-            if (snapshot.isEmpty()) {
-                transaction.set(collectionReference.document(), new SiteTraffic(null, today, 1L));
+        try {
+            if (query.get().size() == 0) {
+                collectionReference.document().set(new SiteTraffic(null, today, 1L));
             } else {
-                DocumentSnapshot documentSnapshot = transaction.get(snapshot.get(0).getReference()).get();
-                transaction.update(snapshot.get(0).getReference(), "views", documentSnapshot.getLong("views") + 1);
+                query.get().getDocuments().get(0).getReference().update("vies", 1L);
             }
-            return null;
-        });
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addViewsForPost(String postId, Long views) {
         DocumentReference document = firestore.collection(POSTS_COLLECTION).document(postId);
-
-        firestore.runTransaction(transaction -> {
-            DocumentSnapshot snapshot = transaction.get(document).get();
-            transaction.update(document, "views", snapshot.getLong("views") + views);
-            return null;
-        });
+        document.update("views", FieldValue.increment(views));
     }
 
     public Long getViewsForPost(String postId) {
