@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "umd",
+    "module": "esnext",
     "target": "es6",
     "lib": [
       "dom",
