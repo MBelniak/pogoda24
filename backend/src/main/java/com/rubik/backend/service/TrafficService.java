@@ -39,7 +39,7 @@ public class TrafficService {
             if (query.get().size() == 0) {
                 collectionReference.document().set(new SiteTraffic(null, today, 1L));
             } else {
-                query.get().getDocuments().get(0).getReference().update("vies", 1L);
+                query.get().getDocuments().get(0).getReference().update("views", FieldValue.increment(1L));
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
