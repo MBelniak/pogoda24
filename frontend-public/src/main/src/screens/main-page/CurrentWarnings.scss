@@ -9,8 +9,7 @@
 }
 
 .currentWarningsNone {
-  margin-bottom: 0.5rem;
-  margin-top: 0.5rem;
+  padding: 0.5rem 0;
   text-align: center;
   word-wrap: break-word;
   color: $primary-font-color;
@@ -18,11 +17,4 @@
 
 .currentWarning {
   text-align: left;
-}
-
-@media screen and (max-width: $desktop) {
-  .warnings {
-    display: block;
-    width: 100%;
-  }
 }

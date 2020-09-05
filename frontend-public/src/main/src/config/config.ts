@@ -24,7 +24,7 @@ export default {
             imagePublicId: "SylwiaL_y9qf2b",
             description: "Sylwia Leśniczuk</br>" +
             "<i>Na stronie Pogoda24/7 zajmuję się odpowiadaniem na Wasze  pytania." +
-            " Interesuje się pogodą i uwielbiam czytać. Gdyby płacili za czytanie byłabym milionerką😂" +
+            " Interesuje się pogodą i uwielbiam czytać. Gdyby płacili za czytanie byłabym milionerką</i>😂<i>" +
             "Pracuję zawodowo, poza tym zajmuję się domem i ogrodem.</i>"
         },
         {

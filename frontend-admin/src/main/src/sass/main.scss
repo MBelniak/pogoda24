@@ -320,7 +320,7 @@ $footer-padding: 3rem 1.5rem 3rem;
 
 
 .pagingBar li {
-    display: table;
+    place-items: center;
     border-radius: 0.3rem;
     box-shadow: 0 0 3px $secondary-color;
 }
@@ -336,10 +336,8 @@ $footer-padding: 3rem 1.5rem 3rem;
 
 .pagingBar li a {
     color: white;
-    padding: 5px 10px;
+    padding: 5px;
     transition: 0.3s;
-    display: table-cell;
-    vertical-align: middle;
 }
 
 .pagingBar li.active a {
