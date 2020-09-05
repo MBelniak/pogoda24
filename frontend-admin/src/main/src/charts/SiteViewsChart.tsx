@@ -9,7 +9,8 @@ export const SiteViewsChart = (props: SiteViewsChartProps) => {
     return (
         <div
             style={{
-                height: '100%'
+                height: '100%',
+                minHeight: '350px'
             }}>
             <Line
                 data={{
@@ -39,6 +40,7 @@ export const SiteViewsChart = (props: SiteViewsChartProps) => {
                     ]
                 }}
                 options={{
+                    maintainAspectRatio: false,
                     legend: {
                         display: true,
                         labels: {
