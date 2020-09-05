@@ -29,7 +29,7 @@ public class TrafficService {
     }
 
     public void incrementSiteViewsForToday() {
-        LocalDate localDate = new LocalDate();
+        LocalDate localDate = new LocalDate(DateTimeZone.UTC);
         Date today = localDate.toDateTimeAtStartOfDay().toDate();
         CollectionReference collectionReference = firestore.collection(SITE_TRAFFIC);
 
