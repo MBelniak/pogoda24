@@ -29,8 +29,8 @@ public class TrafficService {
     }
 
     public void incrementSiteViewsForToday() {
-        LocalDate localDate = new LocalDate(DateTimeZone.UTC);
-        Date today = localDate.toDateTimeAtStartOfDay().toDate();
+        LocalDate localDate = new LocalDate();
+        Date today = localDate.toDateTimeAtStartOfDay(DateTimeZone.UTC).toDate();
         CollectionReference collectionReference = firestore.collection(SITE_TRAFFIC);
 
         ApiFuture<QuerySnapshot> query = collectionReference.whereEqualTo("date", today).get();
