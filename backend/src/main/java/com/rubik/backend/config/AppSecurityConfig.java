@@ -53,6 +53,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/onas", "/posts/**").permitAll()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+		.and().requiresChannel().anyRequest().requiresSecure()
                 .and()
                 .formLogin()
                 .loginPage("/login")

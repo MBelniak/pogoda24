@@ -10,7 +10,7 @@
 
     <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>backend</name>
     <description>Pogoda 24/7 Backend Module</description>
 
@@ -18,6 +18,8 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <tomcat.username>${tomcatUsername}</tomcat.username>
+        <tomcat.password>${tomcatPassword}</tomcat.password>
     </properties>
 
     <dependencies>
@@ -98,12 +100,13 @@
     </dependencies>
 
     <build>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
                 <execution>
-                    <id>unzip-webapp-admin</id>
+                    <id>unzip-frontend</id>
                     <phase>compile</phase>
                     <goals>
                         <goal>unpack</goal>
@@ -112,25 +115,7 @@
                         <artifactItems>
                             <artifactItem>
                                 <groupId>com.rubik</groupId>
-                                <artifactId>frontend-admin</artifactId>
-                                <version>${project.parent.version}</version>
-                                <type>zip</type>
-                            </artifactItem>
-                        </artifactItems>
-                        <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
-                    </configuration>
-                </execution>
-                <execution>
-                    <id>unzip-webapp-public</id>
-                    <phase>compile</phase>
-                    <goals>
-                        <goal>unpack</goal>
-                    </goals>
-                    <configuration>
-                        <artifactItems>
-                            <artifactItem>
-                                <groupId>com.rubik</groupId>
-                                <artifactId>frontend-public</artifactId>
+                                <artifactId>frontend</artifactId>
                                 <version>${project.parent.version}</version>
                                 <type>zip</type>
                             </artifactItem>
@@ -139,6 +124,26 @@
                     </configuration>
                 </execution>
             </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <url>http://localhost:8080/manager/text</url>
+                    <server>TomcatServer</server>
+                    <path>/</path>
+                    <username>${tomcat.username}</username>
+                    <password>${tomcat.password}</password>
+                    <update>true</update>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

@@ -1,0 +1,20 @@
+@import '../../sass/main';
+
+.currentWarnings {
+  background: white;
+  border-radius: 0.4rem;
+  box-shadow: 0 0 4px red;
+  text-align: center;
+  padding: 1rem;
+}
+
+.currentWarningsNone {
+  padding: 0.5rem 0;
+  text-align: center;
+  word-wrap: break-word;
+  color: $primary-font-color;
+}
+
+.currentWarning {
+  text-align: left;
+}

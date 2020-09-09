@@ -1,0 +1,294 @@
+@charset "utf-8";
+$primary-color: #23425f;
+$secondary-color: #25a5a5;
+$primary-font-color: #222;
+$secondary-font-color: #353535;
+$navbar-background-color: $secondary-color;
+$divider-background-color: $primary-color;
+$divider-thickness: 1px;
+$gap: 64px;
+$desktop: 960px + (2 * $gap);
+$tablet: 960px + (2 * $gap);
+$navbar-item-img-max-height: none;
+// Import only what you need from Bulma
+@import '../../../../node_modules/bulma/sass/utilities/_all.sass';
+@import '../../../../node_modules/bulma/sass/base/_all.sass';
+@import '../../../../node_modules/bulma/sass/elements/container.sass';
+@import '../../../../node_modules/bulma/sass/elements/title.sass';
+@import '../../../../node_modules/bulma/sass/components/navbar.sass';
+@import '../../../../node_modules/bulma/sass/layout/section.sass';
+@import '../../../../node_modules/bulma/sass/layout/footer.sass';
+@import '../../../../node_modules/bulma/sass/grid/columns.sass';
+@import '../../../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass';
+
+body {
+    background-color: rgba(#00B5F5, 0.05);
+    background-size: 100vw 100%;
+}
+
+.main {
+    min-width: 100%;
+    min-height: 100vh;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.mainContent {
+    padding: 2rem 1rem 2rem 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.copyright {
+    color: $primary-font-color;
+}
+
+.fontSizeLarge {
+    font-size: 1.2rem;
+}
+
+.fontSizeMedium {
+    font-size: 1rem;
+}
+
+
+.fontSizeSmall {
+    font-size: 0.9rem;
+}
+
+
+.is-divider {
+    margin: 15px 0 15px 0;
+}
+
+.basicLink {
+    color: $secondary-font-color;
+    transition: 0.3s;
+    text-decoration: underline;
+}
+
+.basicLink:hover {
+    transition: 0.3s;
+    color: $secondary-color;
+}
+
+.post {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.4rem;
+    box-shadow: 0 0 4px $primary-color;
+    text-align: center;
+}
+
+.postLink {
+    color: $primary-font-color;
+    transition: 0.3s;
+    text-decoration: underline;
+}
+
+.postLink:hover {
+    color: $secondary-color;
+    transition: 0.3s;
+}
+
+.postDate {
+    color: $primary-font-color;
+    cursor: default;
+    float: right;
+}
+
+.postTitle {
+    text-align: center;
+    margin-top: 0.35rem;
+    margin-bottom: 1rem;
+    word-wrap: break-word;
+    color: $primary-font-color;
+}
+
+.postDescription {
+    text-align: left;
+    color: $secondary-font-color;
+}
+.topBar {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.topBarFontSizeMedium {
+    font-size: 1rem;
+}
+
+.topBar .navbar-burger {
+    color: white;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.topBar .navbar-item, .topBar .navbar-brand {
+    color: white;
+    text-decoration: none;
+    margin: 0 0.3rem 0 0.3rem;
+    border-bottom: 2px solid $secondary-color;
+}
+
+.topBar .navbar-item svg {
+    margin: 0 0.4rem;
+}
+
+.topBar .navbar-brand a:hover {
+    color: white;
+    text-decoration: none;
+    border-bottom: 2px solid $secondary-color;
+}
+
+.topBar .navbar-brand {
+    margin-left: 0.8rem;
+}
+
+.logoImg {
+    display: block;
+    height: 3.1rem;
+    width: 3.2rem;
+}
+
+@media all and (max-width: 640px) {
+    .logoImg {
+        height: 7.75vw;
+        width: 8vw;
+    }
+}
+
+@media all and (max-width: 500px) {
+    .logoImg {
+        height: 39px;
+        width: 40px;
+    }
+}
+
+@media all and (max-width: $tablet) {
+    .topBar a:hover {
+        color: $primary-color;
+    }
+}
+
+@media all and (min-width: $tablet) {
+    .topBar a:hover {
+        color: white;
+        background-color: $secondary-color;
+        border-bottom: 2px solid white;
+    }
+    .topBar a.last {
+        margin-right: 0.8rem;
+    }
+}
+
+
+.warnings {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.sun-editor-editable, .sun-editor-editable * {
+    background-color: transparent;
+    font-family: $family-sans-serif;
+    font-size: 1em;
+}
+
+.sun-editor-editable figure figcaption {
+    background-color: transparent;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.sun-editor-editable[contenteditable=true] .se-component {
+    outline: none;
+}
+
+/* Wrapper */
+.icon-button {
+    background-color: white;
+    box-shadow: 0 0 3px $primary-color;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 2.0rem;
+    height: 2.7rem;
+    //line-height: 3rem;
+    margin: 0.5rem 5px;
+    position: relative;
+    text-align: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 2.7rem;
+}
+
+.icon-button span {
+    border-radius: 0;
+    display: block;
+    height: 0;
+    left: 50%;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+    width: 0;
+}
+.icon-button:hover span {
+    width: 2.7rem;
+    height: 2.7rem;
+    border-radius: 4px;
+    margin: -1.35rem;
+}
+.twitter span {
+    background-color: #4099ff;
+}
+.facebook span {
+    background-color: #3B5998;
+}
+.instagram span {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%);
+}
+
+/* Icons */
+.icon-button i {
+    font-size: 20px;
+    background: none;
+    color: white;
+    height: 2.7rem;
+    left: 0;
+    line-height: 3rem;
+    position: absolute;
+    top: 0;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+    width: 2.7rem;
+    z-index: 10;
+}
+
+.icon-button .fa-twitter {
+    color: #4099ff;
+}
+.icon-button .fa-facebook {
+    color: #3B5998;
+}
+.icon-button .fa-instagram {
+    color: #d6249f;
+}
+.icon-button:hover .fa-twitter,
+.icon-button:hover .fa-instagram,
+.icon-button:hover .fa-facebook {
+    color: white;
+}

@@ -1,0 +1,368 @@
+@charset "utf-8";
+$primary-color: #23425f;
+$secondary-color: #25afaf;
+$background: $primary-color;
+$body-background-color: $primary-color;
+$navbar-background-color: $secondary-color;
+$navbar-item-hover-color: $primary-color;
+$title-color: white;
+$divider-color: white;
+$footer-background-color: $primary-color;
+$footer-padding: 3rem 1.5rem 3rem;
+// Import only what you need from Bulma
+@import '../../../../node_modules/bulma/sass/utilities/_all.sass';
+@import '../../../../node_modules/bulma/sass/base/_all.sass';
+@import '../../../../node_modules/bulma/sass/elements/button.sass';
+@import '../../../../node_modules/bulma/sass/elements/container.sass';
+@import '../../../../node_modules/bulma/sass/elements/title.sass';
+@import '../../../../node_modules/bulma/sass/form/shared.sass';
+@import '../../../../node_modules/bulma/sass/form/input-textarea.sass';
+@import '../../../../node_modules/bulma/sass/components/navbar.sass';
+@import '../../../../node_modules/bulma/sass/layout/section.sass';
+@import '../../../../node_modules/bulma/sass/layout/footer.sass';
+@import '../../../../node_modules/bulma/sass/grid/columns.sass';
+@import '../../../../node_modules/bulma-extensions/bulma-divider/dist/css/bulma-divider.sass';
+
+.main {
+    min-width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.copyright {
+    color: white;
+}
+
+.fontSizeLarge {
+    font-size: 18px;
+}
+
+.fontSizeMedium {
+    font-size: 16px;
+}
+
+
+.fontSizeSmall {
+    font-size: 14px;
+}
+
+@media all and (max-width: 800px) {
+    .fontSizeSmall {
+        font-size: 1.75vw;
+    }
+    .fontSizeMedium {
+        font-size: 2vw;
+    }
+    .fontSizeLarge {
+        font-size: 2.25vw;
+    }
+}
+
+.container.is-fluid {
+    padding-left: 64px;
+    padding-right: 64px;
+}
+
+.button {
+    margin: 0.4rem 0.4rem 0.4rem 0;
+}
+
+.button.is-primary {
+    background-color: $primary-color;
+}
+
+.button.is-primary:hover {
+    background-color: $primary-color;
+}
+
+.button.is-primary:active {
+    background-color: $secondary-color;
+}
+
+.writerForm {
+    color: white;
+}
+
+.writerForm * {
+    margin-top: 0.7rem;
+    margin-bottom: 0.7rem;
+}
+
+.daysValidInput {
+    width: 4rem;
+}
+
+.charts {
+    color: white;
+}
+
+.dropzone {
+    border: 2px $secondary-color solid;
+    border-radius: 20px;
+    background: repeating-linear-gradient(
+    45deg,
+    $primary-color 1px,
+    $secondary-color 5px
+    );
+    cursor: default;
+}
+
+.title {
+    text-align: left;
+    margin-top: 0.7rem;
+}
+
+.subtitle {
+    color: white;
+    margin-top: 0.7rem;
+}
+
+.bgimg {
+    width: 100%;
+    height: 25rem;
+}
+
+.uploadedFilesItem {
+    border: 2px solid $secondary-color;
+    border-radius: 20px;
+    margin: 0.7rem 0.3rem 0.3rem 0.3rem;
+    position: relative;
+}
+.uploadedFilesItemContent {
+    margin: 0.3rem;
+    padding: 0.3rem;
+}
+.uploadedFilesItemOverlayWrapper {
+    display: none;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+.uploadedFilesItemOverlayWrapper * {
+    margin: 0;
+}
+.uploadedFilesItemOverlay {
+    background-color: $secondary-color;
+    border-radius: 20px;
+    opacity: 0.8;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+.uploadedFilesItemOverlayContent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: absolute;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.uploadedFilesItemDelete:hover {
+    cursor: pointer;
+}
+.uploadedFilesItemDelete:after {
+    height: 3rem;
+    width: 3rem;
+    border: 2px solid white;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    content: '\00D7';
+    color: white;
+    font-family: helvetica, arial, sans-serif;
+    font-size: 50px;
+}
+.centerVertically {
+    display: flex;
+    flex-direction: column;
+    //align-items: center;
+    justify-content: center;
+}
+.centerHorizontally {
+    text-align: center;
+}
+.arrowRight:hover,
+.arrowLeft:hover {
+    cursor: pointer;
+}
+.dialogMessage {
+    color: $primary-color;
+    margin-bottom: 0.7rem;
+}
+.postsListItem {
+    border: 2px solid $secondary-color;
+    border-radius: 10px;
+    margin: 0.7rem;
+    color: white;
+}
+
+.postIconList {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.postIconListItem {
+    max-width: 10rem;
+    min-width: 10rem;
+    margin: 0.5rem;
+}
+.charts {
+    width: 100%;
+}
+.input, .textarea {
+    border: 2px solid transparent;
+    border-radius: 4px;
+}
+
+.image-list {
+    color: white;
+}
+
+.attribution {
+    margin-top: 1rem;
+    color: white;
+}
+
+.attribution, .attribution * {
+    font-size: 10px;
+}
+
+.attribution a {
+    color: $secondary-color;
+}
+
+.attribution a:hover {
+    text-decoration: underline;
+}
+
+.mainLoginWindow {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    text-align: center;
+}
+
+.mainLoginWindow .button:hover {
+    background-color: $secondary-color;
+}
+
+.mainLoginWindow .input {
+    margin:  0.5rem 0;
+}
+
+.loginTitle {
+    font-size: 26px;
+    margin: 5px 5px 5px 10px;
+}
+
+.loginFailMessage {
+    color: red;
+    margin: 5px 0;
+}
+
+.mainPageLinks {
+    margin: 15px 0 20px 0;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.mainPageLinksItem {
+    border: 2px white solid;
+    border-radius: 10px;
+    box-sizing: border-box;
+    text-align: center;
+    width: 15%;
+}
+
+.mainPageLinksItem a {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.mainPageLinksItem img {
+    margin: 1rem;
+}
+
+.mainPageLinksItem span {
+    color: white;
+    box-sizing: initial;
+}
+
+.copyright * {
+    color: white;
+}
+
+.pagingBar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 2rem 0 0.7rem 0;
+}
+
+.pagingBar * {
+    margin: 0.6rem;
+}
+
+
+.pagingBar li {
+    place-items: center;
+    border-radius: 0.3rem;
+    box-shadow: 0 0 3px $secondary-color;
+}
+
+.pagingBar li:hover {
+    cursor: pointer;
+}
+
+.pagingBar li:hover a {
+    color: $secondary-color;
+    transition: 0.3s;
+}
+
+.pagingBar li a {
+    color: white;
+    padding: 5px;
+    transition: 0.3s;
+}
+
+.pagingBar li.active a {
+    color: black;
+}
+
+.pagingBar li.active:hover, .pagingBar li.active:hover a {
+    color: black;
+    cursor: default;
+}
+
+.pagingBarPrevious i, .pagingBarNext i {
+    margin: 0 5px;
+}
+
+.previous.disabled, .next.disabled {
+    display: none;
+}
+
+.pagination {
+    text-align: center;
+}
+
+.pagingBar .active {
+    background-color: $secondary-color;
+    box-shadow: 0 0 5px $secondary-color;
+}
+

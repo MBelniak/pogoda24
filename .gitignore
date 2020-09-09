@@ -31,6 +31,5 @@ build-public
 ### node ###
 node
 node_modules
-package-lock.json
 .env
 pogoda-24-7-service-account.json
