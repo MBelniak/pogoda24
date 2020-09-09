@@ -97,11 +97,6 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -111,7 +106,7 @@
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
                 <execution>
-                    <id>unzip-webapp-admin</id>
+                    <id>unzip-frontend</id>
                     <phase>compile</phase>
                     <goals>
                         <goal>unpack</goal>
@@ -120,25 +115,7 @@
                         <artifactItems>
                             <artifactItem>
                                 <groupId>com.rubik</groupId>
-                                <artifactId>frontend-admin</artifactId>
-                                <version>${project.parent.version}</version>
-                                <type>zip</type>
-                            </artifactItem>
-                        </artifactItems>
-                        <outputDirectory>${project.build.outputDirectory}/</outputDirectory>
-                    </configuration>
-                </execution>
-                <execution>
-                    <id>unzip-webapp-public</id>
-                    <phase>compile</phase>
-                    <goals>
-                        <goal>unpack</goal>
-                    </goals>
-                    <configuration>
-                        <artifactItems>
-                            <artifactItem>
-                                <groupId>com.rubik</groupId>
-                                <artifactId>frontend-public</artifactId>
+                                <artifactId>frontend</artifactId>
                                 <version>${project.parent.version}</version>
                                 <type>zip</type>
                             </artifactItem>

@@ -12,9 +12,8 @@
 
 	<modules>
 		<module>backend</module>
-		<module>frontend-public</module>
-        <module>frontend-admin</module>
-	</modules>
+        <module>frontend</module>
+    </modules>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -114,19 +113,4 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.6</version>
-				<inherited>false</inherited>
-				<configuration>
-					<installDirectory>node</installDirectory>
-				</configuration>
-
-			</plugin>
-		</plugins>
-	</build>
 </project>

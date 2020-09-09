@@ -8,7 +8,7 @@ public class MainPagesController {
 
     @RequestMapping(value = {"/write", "/writer", "/list", "/traffic", "/factwriter"})
     public String getWritePage() {
-        return "admin/index";
+        return "admin";
     }
 
     @RequestMapping(value = {"/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/onas", "/posts/**"})

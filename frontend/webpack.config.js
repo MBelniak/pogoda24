@@ -1,18 +1,21 @@
-const HtmlWebPackPlugin = require("html-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const webpack = require('webpack');
-const resolve = require('path').resolve;
+const path = require('path');
 const dotenv = require('dotenv').config();
 
 module.exports = {
-    entry: "./src/index.tsx",
+    entry: {
+        main: "./src/public/src/index.tsx",
+        admin: "./src/admin/src/index.tsx"
+    },
     output: {
-        path: resolve('dist'),
-        filename: `bundle${process.env.NODE_ENV === 'production' ? '.min' : ''}.js`,
-        publicPath: '/admin'
+        path: path.resolve('dist'),
+        filename: `[name].bundle${process.env.NODE_ENV === 'production' ? '.min' : ''}.js`,
+        publicPath: '/'
     },
     optimization: {
         splitChunks: {
@@ -22,18 +25,16 @@ module.exports = {
         minimizer: [new TerserPlugin()]
     },
     devServer: {
-        proxy: {
-            '/api/': 'http://localhost:8080',
-            '/login': 'http://localhost:8080',
-            '/admin/': {
-                    target: 'http://localhost:3001/',
-                    pathRewrite: { '^/admin': '' },
-                },
+        proxy: { '/api/': 'http://localhost:8080' },
+        port: 3000,
+        hot: true,
+        historyApiFallback: {
+            rewrites: [
+                { from: /^\/(writer?|traffic|factwriter|list)$/, to: 'admin.html'}
+            ]
         },
-        port: 3001,
-        historyApiFallback: true,
         watchContentBase: true,
-        contentBase: resolve('src'),
+        contentBase: path.resolve('dist'),
         publicPath: '/',
         contentBasePublicPath: '/'
     },
@@ -41,13 +42,14 @@ module.exports = {
     devtool: process.env.NODE_ENV === 'production' ? false : 'inline-module-source-map',
     resolve: {
         modules: [
-            'src',
+            'admin',
+            'public',
             'node_modules'
         ],
         symlinks: true,
         extensions: ['.ts', '.tsx', '.js', '.jsx', '.css'],
         alias: {
-            react: resolve('./node_modules/react')
+            react: path.resolve('./node_modules/react')
         }
     },
     module: {
@@ -88,22 +90,31 @@ module.exports = {
                 test: /\.(jpe?g|png|gif|svg)$/,
                 loader: "file-loader?name=/img/[name].[ext]",
                 options: {
-                    publicPath: '/admin'
+                    publicPath: '/'
                 }
             }
         ]
     },
     plugins: [
-        new HtmlWebPackPlugin({
-            template: "./public/index.html",
+        new HtmlWebpackPlugin({
+            template: "./src/public/public/index.html",
             filename: "./index.html",
+            excludeChunks: ['admin', 'vendors~admin'],
             stats: { children: false },
-            favicon: "./public/favicon.png"
+            favicon: "./src/public/public/favicon.png"
         }),
+        new HtmlWebpackPlugin({
+            template: "./src/admin/public/index.html",
+            filename: "./admin.html",
+            excludeChunks: ['main', 'vendors~main'],
+            stats: { children: false },
+            favicon: "./src/admin/public/favicon.png"
+        }),
+        new webpack.HotModuleReplacementPlugin(),
         new MiniCssExtractPlugin(
-            {
-                filename: "css/main.css"
-            }),
+        {
+            filename: "css/[name].css"
+        }),
         new webpack.DefinePlugin ({
             "process.env": JSON.stringify(dotenv.parsed)
         }),

@@ -2,18 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>pogoda24</artifactId>
         <groupId>com.rubik</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>frontend-admin</artifactId>
+    <artifactId>frontend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>frontend-admin</name>
-    <description>Pogoda 24/7 Admin Frontend Module</description>
+    <name>frontend</name>
+    <description>Pogoda 24/7 Frontend Module</description>
 
     <build>
         <plugins>
@@ -21,9 +21,6 @@
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
                 <version>1.6</version>
-                <configuration>
-                    <workingDirectory>src/main</workingDirectory>
-                </configuration>
                 <executions>
                     <execution>
                         <id>install node and npm</id>
@@ -67,9 +64,9 @@
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>assembly/frontend-admin.xml</descriptor>
+                                <descriptor>assembly/frontend.xml</descriptor>
                             </descriptors>
-                            <finalName>admin</finalName>
+                            <finalName>frontend</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                     </execution>

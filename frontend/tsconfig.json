@@ -22,7 +22,8 @@
     "noImplicitAny": false
   },
   "include": [
-    "src"
+    "src/admin/src",
+    "src/public/src"
   ],
-  "exclude": ["node_modules", "build", "dist"]
+  "exclude": ["node", "node_modules", "dist"]
 }
