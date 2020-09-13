@@ -73,12 +73,7 @@
         </dependency>
         <dependency>
             <groupId>com.rubik</groupId>
-            <artifactId>frontend-public</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.rubik</groupId>
-            <artifactId>frontend-admin</artifactId>
+            <artifactId>frontend</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
