@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context path="/" docBase="backend-0.0.1-SNAPSHOT.war" antiResourceLocking="false" privileged="true" >
+<Context path="/" docBase="ROOT.war" antiResourceLocking="false" privileged="true" >
   <!--
   <Valve className="org.apache.catalina.valves.RemoteAddrValve"
          allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
