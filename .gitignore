@@ -33,3 +33,8 @@ node
 node_modules
 .env
 pogoda-24-7-service-account.json
+backend/tomcat-users.xml
+*.key
+*.crt
+
+
