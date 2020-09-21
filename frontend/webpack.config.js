@@ -27,16 +27,13 @@ module.exports = {
     devServer: {
         proxy: { '/api/': 'http://localhost:8080' },
         port: 3000,
-        hot: true,
         historyApiFallback: {
             rewrites: [
-                { from: /^\/(writer?|traffic|factwriter|list)$/, to: 'admin.html'}
+                { from: /^\/(writer?|traffic|factwriter|list)$/, to: '/admin.html'}
             ]
         },
         watchContentBase: true,
-        contentBase: path.resolve('dist'),
-        publicPath: '/',
-        contentBasePublicPath: '/'
+        contentBase: path.resolve('src')
     },
     mode: process.env.NODE_ENV,
     devtool: process.env.NODE_ENV === 'production' ? false : 'inline-module-source-map',
