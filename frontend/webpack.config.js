@@ -29,7 +29,7 @@ module.exports = {
         port: 3000,
         historyApiFallback: {
             rewrites: [
-                { from: /^\/(writer?|traffic|factwriter|list)$/, to: '/admin.html'}
+                { from: /^\/(writer?|traffic|factwriter|list|files)$/, to: '/admin.html'}
             ]
         },
         watchContentBase: true,

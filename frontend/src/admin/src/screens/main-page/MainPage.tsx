@@ -20,10 +20,6 @@ export default class MainPage extends React.Component {
                     Pixel perfect
                 </a>
                 {', '}
-                <a href="https://www.flaticon.com/authors/pixel-perfect" title="Pixel perfect" target="_blank">
-                    Pixel perfect
-                </a>
-                {', '}
                 <a
                     href="https://www.flaticon.com/free-icon/list_847476?term=list&page=2&position=67"
                     title="Kiranshastry"
@@ -33,6 +29,10 @@ export default class MainPage extends React.Component {
                 {', '}
                 <a href="https://www.flaticon.com/authors/itim2101" title="itim2101" target="_blank">
                     itim2101
+                </a>
+                {', '}
+                <a href="https://www.flaticon.com/authors/tomas-knop" title="Tomas Knop">
+                    Tomas Knop
                 </a>
                 {', '}
                 <a href="https://www.flaticon.com/authors/those-icons" title="Those Icons" target="_blank">

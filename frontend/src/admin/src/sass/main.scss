@@ -272,19 +272,31 @@ $footer-padding: 3rem 1.5rem 3rem;
     margin: 5px 0;
 }
 
-.mainPageLinks {
+.mainPageLinks, .filesList {
     margin: 15px 0 20px 0;
     display: flex;
-    justify-content: space-between;
-    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: start;
 }
 
 .mainPageLinksItem {
     border: 2px white solid;
     border-radius: 10px;
-    box-sizing: border-box;
+    flex: 0 1 170px;
+    margin: 0.5rem;
     text-align: center;
-    width: 15%;
+}
+
+.filesListItem {
+    border: 2px white solid;
+    border-radius: 10px;
+    flex: 0 1 250px;
+    margin: 0.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .mainPageLinksItem a {
@@ -294,13 +306,15 @@ $footer-padding: 3rem 1.5rem 3rem;
     justify-content: space-between;
 }
 
-.mainPageLinksItem img {
-    margin: 1rem;
+.mainPageLinksItem img, .filesListItem img {
+    width: 100%;
+    padding: 1rem;
 }
 
-.mainPageLinksItem span {
+.mainPageLinksItem span, .filesListItem span {
     color: white;
-    box-sizing: initial;
+    font-size: 18px;
+    padding: 0 0.5rem;
 }
 
 .copyright * {

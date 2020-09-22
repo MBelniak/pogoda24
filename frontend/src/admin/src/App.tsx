@@ -6,6 +6,7 @@ import MainPage from './screens/main-page/MainPage';
 import PostsList from './screens/posts-list/PostsList';
 import Writer from './screens/writer/Writer';
 import FactWriter from './screens/fact-writer/FactWriter';
+import Files from './screens/files/Files';
 
 export default class App extends React.Component {
     render() {
@@ -17,6 +18,7 @@ export default class App extends React.Component {
                     <Route path="/factwriter" component={FactWriter} />
                     <Route path="/list" component={PostsList} />
                     <Route path="/traffic" component={Traffic} />
+                    <Route path="/files" component={Files} />
                 </Switch>
             </Router>
         );
