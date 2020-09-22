@@ -69,7 +69,7 @@ public class TrafficService {
 
     public List<SiteTraffic> getViewsForSite(Integer daysBack) {
         LocalDate localDate = new LocalDate();
-        Date today = localDate.toDate();
+        Date today = localDate.toDateTimeAtStartOfDay(DateTimeZone.UTC).toDate();
         Calendar c = Calendar.getInstance();
         c.setTime(today);
         c.add(Calendar.DATE, -daysBack);
