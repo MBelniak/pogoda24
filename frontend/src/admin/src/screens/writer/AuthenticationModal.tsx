@@ -1,4 +1,6 @@
 import React from 'react';
+import { closeModal } from '../components/modals/Modal';
+import { validateField } from '../../helpers/ValidateField';
 
 interface AuthenticationModalProps {
     authFailed?: boolean;
@@ -8,21 +10,10 @@ interface AuthenticationModalProps {
 }
 
 export const AuthenticationModal: React.FC<AuthenticationModalProps> = (props) => {
-
-    const validateField = (htmlInput, additionalConstraint?: (value) => boolean) => {
-        if (!htmlInput.value || (additionalConstraint ? !additionalConstraint(htmlInput.value) : false)) {
-            htmlInput.classList.add('is-danger');
-            return false;
-        } else {
-            htmlInput.classList.remove('is-danger');
-            return true;
-        }
-    };
-
     return <div className="container mainLoginWindow">
         <span className="loginTitle">Pogoda 24/7</span>
         <span style={{ margin: '5px 0', fontSize: '18px' }}>Zaloguj się, aby zapisać post</span>
-        <div className="mainForm" id="mainForm">
+        <div className="mainForm">
             {props.authFailed ? <p className="loginFailMessage">Nieprawidłowe dane logowania</p> : null}
             <label className="label">Login: </label>
             <input
@@ -53,6 +44,13 @@ export const AuthenticationModal: React.FC<AuthenticationModalProps> = (props) =
                 type="submit"
                 value="Zaloguj"
                 onClick={props.handleLoginClick}
+            />
+            <input
+                className="button is-secondary"
+                style={{ marginTop: '10px' }}
+                type="submit"
+                value="Anuluj"
+                onClick={closeModal}
             />
         </div>
     </div>

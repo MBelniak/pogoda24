@@ -1,7 +1,7 @@
 import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
 import { PostImage } from '../../model/PostImage';
-import { closeModal, showModal } from '../components/ModalWindow';
+import { closeModal, showModal } from '../components/modals/Modal';
 
 interface UploadedFilesItemProps {
     file: PostImage;
@@ -11,9 +11,7 @@ interface UploadedFilesItemProps {
     onMoveBackward: (id: number) => void;
 }
 
-export default class FileToUploadItem extends React.Component<
-    UploadedFilesItemProps
-> {
+export default class FileToUploadItem extends React.Component<UploadedFilesItemProps> {
     private overlayDiv;
 
     constructor(props) {
@@ -46,10 +44,7 @@ export default class FileToUploadItem extends React.Component<
                     <img src={URL.createObjectURL(this.props.file.file)} />
                 ) : (
                     <div onClick={() => closeModal()}>
-                        <Image
-                            publicId={this.props.file.publicId}
-                            format="png"
-                            quality="auto">
+                        <Image publicId={this.props.file.publicId} format="png" quality="auto">
                             <Transformation crop="fill" gravity="faces" />
                         </Image>
                     </div>
@@ -60,18 +55,12 @@ export default class FileToUploadItem extends React.Component<
 
     render() {
         return (
-            <div
-                className="uploadedFilesItem"
-                onMouseOver={this.displayOverlay}
-                onMouseOut={this.hideOverlay}>
+            <div className="uploadedFilesItem" onMouseOver={this.displayOverlay} onMouseOut={this.hideOverlay}>
                 <div className="uploadedFilesItemContent">
                     {this.props.file.file ? (
                         <img src={URL.createObjectURL(this.props.file.file)} />
                     ) : (
-                        <Image
-                            publicId={this.props.file.publicId}
-                            format="png"
-                            quality="auto">
+                        <Image publicId={this.props.file.publicId} format="png" quality="auto">
                             <Transformation crop="fill" gravity="faces" />
                         </Image>
                     )}
@@ -79,29 +68,21 @@ export default class FileToUploadItem extends React.Component<
                         {this.props.listId +
                             1 +
                             '. ' +
-                            (this.props.file.file
-                                ? this.props.file.file.name
-                                : this.props.file.publicId)}
+                            (this.props.file.file ? this.props.file.file.name : this.props.file.publicId)}
                     </p>
                 </div>
-                <div
-                    className="uploadedFilesItemOverlayWrapper"
-                    ref={this.overlayDiv}
-                    onClick={this.showPicture}>
+                <div className="uploadedFilesItemOverlayWrapper" ref={this.overlayDiv} onClick={this.showPicture}>
                     <div className="uploadedFilesItemOverlay" />
-                    <div className="uploadedFilesItemOverlayContent">
+                    <div className="uploadedFilesItemOverlayContent ">
                         <div
                             className="arrowLeft"
                             onClick={e => {
                                 e.stopPropagation();
                                 this.props.onMoveBackward(this.props.listId);
                             }}>
-                            <span style={{ fontSize: '40px', margin: '10px' }}>
-                                &lt;
-                            </span>
+                            <i style={{ fontSize: '40px', margin: '10px' }} className={'fa fa-angle-left'} />
                         </div>
-                        <div className="centerVertically">
-                            <p style={{ fontSize: '25px' }}>Usuń</p>
+                        <div>
                             <div
                                 className="uploadedFilesItemDelete"
                                 onClick={e => {
@@ -116,9 +97,7 @@ export default class FileToUploadItem extends React.Component<
                                 e.stopPropagation();
                                 this.props.onMoveForward(this.props.listId);
                             }}>
-                            <span style={{ fontSize: '40px', margin: '10px' }}>
-                                &gt;
-                            </span>
+                            <i style={{ fontSize: '40px', margin: '10px' }} className={'fa fa-angle-right'} />
                         </div>
                     </div>
                 </div>

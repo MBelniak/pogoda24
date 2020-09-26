@@ -84,13 +84,18 @@ $footer-padding: 3rem 1.5rem 3rem;
     color: white;
 }
 
-.writerForm * {
-    margin-top: 0.7rem;
-    margin-bottom: 0.7rem;
+.writerForm p, .writerForm label{
+    margin: 0.5rem 0;
 }
 
-.daysValidInput {
-    width: 4rem;
+.writerBottomButtons {
+    margin: 0.5rem 0;
+}
+
+.warningDetails {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .charts {
@@ -183,7 +188,6 @@ $footer-padding: 3rem 1.5rem 3rem;
 .centerVertically {
     display: flex;
     flex-direction: column;
-    //align-items: center;
     justify-content: center;
 }
 .centerHorizontally {
@@ -221,7 +225,7 @@ $footer-padding: 3rem 1.5rem 3rem;
     width: 100%;
 }
 .input, .textarea {
-    border: 2px solid transparent;
+    border: 2px solid;
     border-radius: 4px;
 }
 
@@ -252,10 +256,6 @@ $footer-padding: 3rem 1.5rem 3rem;
     flex-direction: column;
     background-color: white;
     text-align: center;
-}
-
-.mainLoginWindow .button:hover {
-    background-color: $secondary-color;
 }
 
 .mainLoginWindow .input {

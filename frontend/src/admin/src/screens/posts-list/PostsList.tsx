@@ -4,7 +4,7 @@ import Post, { PostDTO, postDTOToPost } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
 import Writer from '../writer/Writer';
 import FactWriter from '../fact-writer/FactWriter';
-import { closeModal, showModal } from '../components/ModalWindow';
+import { closeModal, showModal } from '../components/modals/Modal';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { TopImage } from '../components/TopImage';
 import { PagingBar } from '../components/PagingBar';

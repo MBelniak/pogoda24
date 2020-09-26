@@ -24,9 +24,10 @@ import { fetchApi } from '../../helpers/fetchHelper';
 import { default as Post, PostType } from '../../model/Post';
 import config from '../../config/config';
 import { LoadingIndicator } from '../components/LoadingIndicator';
-import { closeModal, showModal } from '../components/ModalWindow';
+import { closeModal, showModal } from '../components/modals/Modal';
 import { TopImage } from '../components/TopImage';
 import { Copyright } from '../components/Copyright';
+import { showActionModal } from '../components/modals/ActionModalWindow';
 const { BACKEND_DATE_FORMAT } = config;
 
 function findIndex(array: Image[], index) {
@@ -286,25 +287,11 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
     }
 
     private showSuccessMessage() {
-        showModal(
-            <div>
-                <p className="dialogMessage">Pomyślnie zapisano ciekawostkę</p>
-                <button className="button is-primary" style={{ float: 'right' }} onClick={this.reloadPage}>
-                    Ok
-                </button>
-            </div>
-        );
+        showActionModal('Pomyślnie zapisano ciekawostkę', [{ text: 'Ok', action: this.reloadPage }]);
     }
 
     private showErrorMessage(errorMessage: string) {
-        showModal(
-            <div>
-                <p className="dialogMessage">{errorMessage}</p>
-                <button className="button is-primary" style={{ float: 'right' }} onClick={this.closeModalAndShowEditor}>
-                    Ok
-                </button>
-            </div>
-        );
+        showActionModal(errorMessage, [{ text: 'Ok', action: this.closeModalAndShowEditor }]);
     }
 
     private handleLoginClick() {

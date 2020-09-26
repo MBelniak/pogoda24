@@ -2,8 +2,10 @@ import React from 'react';
 import { Image, Transformation } from 'cloudinary-react';
 import Post, { PostType } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
-import { closeModal, showModal } from '../components/ModalWindow';
+import { closeModal, showModal } from '../components/modals/Modal';
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import { showActionModal } from '../components/modals/ActionModalWindow';
+import { showInfoModal } from '../components/modals/InfoModalWindow';
 
 interface PostListItemProps {
     post: Post;
@@ -23,17 +25,10 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
     }
 
     private handleDeleteClick() {
-        showModal(
-            <div>
-                <p className="dialogMessage">Czy na pewno chcesz usunąć ten post?</p>
-                <button className="button is-secondary" style={{ float: 'right' }} onClick={closeModal}>
-                    Nie
-                </button>
-                <button className="button is-primary" style={{ float: 'right' }} onClick={this.deletePost}>
-                    Tak
-                </button>
-            </div>
-        );
+        showActionModal('Czy na pewno chcesz usunąć ten post?', [
+            { text: 'Nie', action: closeModal },
+            { text: 'Tak', action: this.deletePost }
+        ]);
     }
 
     private deletePost() {
@@ -46,26 +41,12 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
                     location.reload();
                 } else {
                     console.log(response);
-                    showModal(
-                        <div>
-                            <p className="dialogMessage">Wystąpił błąd podczas usuwania posta.</p>
-                            <button className="button is-primary" style={{ float: 'right' }} onClick={closeModal}>
-                                Ok
-                            </button>
-                        </div>
-                    );
+                    showInfoModal('Wystąpił błąd podczas usuwania posta.');
                 }
             })
             .catch(error => {
                 console.log(error);
-                showModal(
-                    <div>
-                        <p className="dialogMessage">Wystąpił błąd podczas usuwania posta.</p>
-                        <button className="button is-primary" style={{ float: 'right' }} onClick={closeModal}>
-                            Ok
-                        </button>
-                    </div>
-                );
+                showInfoModal('Wystąpił błąd podczas usuwania posta.');
             });
     }
 
