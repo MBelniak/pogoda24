@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { closeModal, destroyModal, StyledModal } from './Modal';
+import { closeModal, StyledModal } from './Modal';
 
 export function showInfoModal(message: string) {
-    destroyModal();
+    closeModal();
     ReactDOM.render(
         <StyledModal
             render={

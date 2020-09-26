@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { destroyModal, StyledModal } from './Modal';
+import { closeModal, StyledModal } from './Modal';
 
 export function showActionModal(message: string, actions: { text: string; action: () => void }[]) {
-    destroyModal();
+    closeModal();
     ReactDOM.render(
         <StyledModal
             render={

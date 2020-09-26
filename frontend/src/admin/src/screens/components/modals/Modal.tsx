@@ -20,7 +20,7 @@ const customStyles = {
 
 Modal.setAppElement('body');
 
-export function destroyModal() {
+export function closeModal() {
     const modal = document.getElementById('modal');
     if (modal) {
         ReactDOM.unmountComponentAtNode(modal); //This is a no-no, but I want to have the modal logic like that sooo much :D
@@ -38,10 +38,6 @@ export const StyledModal: FunctionComponent<ModalProps> = ({ render }: ModalProp
 );
 
 export function showModal(render: JSX.Element) {
-    destroyModal();
+    closeModal();
     ReactDOM.render(<StyledModal render={render} />, document.getElementById('modal'));
-}
-
-export function closeModal() {
-    destroyModal();
 }

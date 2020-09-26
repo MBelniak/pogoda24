@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { validateField } from '../../../helpers/ValidateField';
-import { closeModal, destroyModal, StyledModal } from './Modal';
+import { closeModal, StyledModal } from './Modal';
 
 type AuthenticationModalProps = {
     authFailed?: boolean;
@@ -11,7 +11,7 @@ type AuthenticationModalProps = {
 }
 
 export function showAuthModal(props: AuthenticationModalProps) {
-    destroyModal();
+    closeModal();
     ReactDOM.render(
         <StyledModal
             render={
