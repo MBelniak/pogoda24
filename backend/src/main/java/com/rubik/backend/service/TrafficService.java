@@ -36,10 +36,16 @@ public class TrafficService {
         ApiFuture<QuerySnapshot> query = collectionReference.whereEqualTo("date", today).get();
 
         try {
-            if (query.get().size() == 0) {
+            QuerySnapshot snapshot = query.get();
+            if (snapshot.size() == 0) {
                 collectionReference.document().set(new SiteTraffic(null, today, 1L));
-            } else {
-                query.get().getDocuments().get(0).getReference().update("views", FieldValue.increment(1L));
+            } else if (snapshot.size() == 1){
+                snapshot.getDocuments().get(0).getReference().update("views", FieldValue.increment(1L));
+            } else { //transaction not working - PERMISSION DENIED
+                Long views1 = snapshot.getDocuments().get(0).getLong("views");
+                Long views2 = snapshot.getDocuments().get(1).getLong("views");
+                snapshot.getDocuments().get(views1 > views2 ? 0 : 1).getReference().update("views", FieldValue.increment(1L + (views1 > views2 ? views2 : views1)));
+                snapshot.getDocuments().get(views1 > views2 ? 1 : 0).getReference().delete();
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
