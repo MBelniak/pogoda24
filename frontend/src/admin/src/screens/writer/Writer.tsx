@@ -7,7 +7,6 @@ import { default as Post, PostType } from '../../model/Post';
 import { uploadImages } from '../../helpers/CloudinaryHelper';
 import { fetchApi } from '../../helpers/fetchHelper';
 import { PostImage } from '../../model/PostImage';
-import { AuthenticationModal } from './AuthenticationModal';
 import { closeModal, showModal } from '../components/modals/Modal';
 import { showInfoModal } from '../components/modals/InfoModalWindow';
 import { LoadingIndicator } from '../components/LoadingIndicator';
@@ -21,6 +20,7 @@ import { registerLocale } from 'react-datepicker';
 import pl from 'date-fns/locale/pl';
 import addDays from 'date-fns/addDays';
 import { validateField } from '../../helpers/ValidateField';
+import { showAuthModal } from '../components/modals/AuthenticationModal';
 registerLocale('pl', pl);
 const { MAX_IMAGES_PER_POST, BACKEND_DATE_FORMAT } = config;
 
@@ -153,14 +153,12 @@ export default class Writer extends React.Component<WriterProps, State> {
                         });
                 } else if (response.status === 401) {
                     //user is not authenticated
-                    showModal(
-                        <AuthenticationModal
-                            handleLoginClick={this.handleLoginClick}
-                            loginInputRef={this.loginInput}
-                            passwordInputRef={this.passwordInput}
-                            authFailed={typeof authHeader !== 'undefined'}
-                        />
-                    );
+                    showAuthModal({
+                        handleLoginClick: this.handleLoginClick,
+                        loginInputRef: this.loginInput,
+                        passwordInputRef: this.passwordInput,
+                        authFailed: typeof authHeader !== 'undefined'
+                    });
                 } else {
                     response.text().then(text => {
                         console.log(text);

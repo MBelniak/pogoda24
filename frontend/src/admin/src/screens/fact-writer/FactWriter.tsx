@@ -28,6 +28,8 @@ import { closeModal, showModal } from '../components/modals/Modal';
 import { TopImage } from '../components/TopImage';
 import { Copyright } from '../components/Copyright';
 import { showActionModal } from '../components/modals/ActionModalWindow';
+import { validateField } from '../../helpers/ValidateField';
+import { showAuthModal } from '../components/modals/AuthenticationModal';
 const { BACKEND_DATE_FORMAT } = config;
 
 function findIndex(array: Image[], index) {
@@ -60,8 +62,6 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
     private loginInput;
     private passwordInput;
 
-    private authenticationWindow: (authFailed?: boolean) => JSX.Element;
-
     constructor(props) {
         super(props);
         this.abortController = new AbortController();
@@ -72,67 +72,13 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
         this.handleImageUpload = this.handleImageUpload.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.reloadPage = this.reloadPage.bind(this);
-        this.validateField = this.validateField.bind(this);
         this.closeModalAndShowEditor = this.closeModalAndShowEditor.bind(this);
         this.handleLoginClick = this.handleLoginClick.bind(this);
-        this.authenticationWindow = this.getAuthWindow();
-    }
-
-    private getAuthWindow(): (authFailed?: boolean) => JSX.Element {
-        return (authFailed?: boolean) => (
-            <div className="container mainLoginWindow">
-                <span className="loginTitle">Pogoda 24/7</span>
-                <span style={{ margin: '5px 0', fontSize: '18px' }}>Zaloguj się, aby zapisać post</span>
-                <div className="mainForm" id="mainForm">
-                    {authFailed ? <p className="loginFailMessage">Nieprawidłowe dane logowania</p> : null}
-                    <label className="label">Login: </label>
-                    <input
-                        className="input"
-                        ref={this.loginInput}
-                        type="text"
-                        placeholder="Login"
-                        autoFocus={true}
-                        maxLength={100}
-                        onKeyUp={e => this.validateField(e.target)}
-                        onBlur={e => this.validateField(e.target)}
-                    />
-                    <br />
-                    <label className="label">Hasło:</label>
-                    <input
-                        className="input"
-                        ref={this.passwordInput}
-                        type="password"
-                        placeholder="Hasło"
-                        maxLength={100}
-                        onKeyUp={e => this.validateField(e.target)}
-                        onBlur={e => this.validateField(e.target)}
-                    />
-                    <br />
-                    <input
-                        className="button is-primary"
-                        style={{ marginTop: '10px' }}
-                        type="submit"
-                        value="Zaloguj"
-                        onClick={this.handleLoginClick}
-                    />
-                </div>
-            </div>
-        );
     }
 
     private initializeEditor(post: Post) {
         let target = document.getElementsByClassName('se-wrapper')[0];
         target.innerHTML = post.description.replace(/\\"/g, '"');
-    }
-
-    private validateField(htmlInput, additionalConstraint?: (value) => boolean) {
-        if (!htmlInput.value || (additionalConstraint ? !additionalConstraint(htmlInput.value) : false)) {
-            htmlInput.classList.add('is-danger');
-            return false;
-        } else {
-            htmlInput.classList.remove('is-danger');
-            return true;
-        }
     }
 
     private handleImageUploadBefore(files: Array<File>, info: object) {
@@ -269,7 +215,12 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
                         });
                 } else if (response.status === 401) {
                     //user is not authenticated
-                    showModal(this.authenticationWindow(typeof authHeader !== 'undefined'));
+                    showAuthModal({
+                        handleLoginClick: this.handleLoginClick,
+                        loginInputRef: this.loginInput,
+                        passwordInputRef: this.passwordInput,
+                        authFailed: typeof authHeader !== 'undefined'
+                    });
                 } else {
                     console.log(response.status);
                     console.log(response.statusText + ', ' + response.body);
@@ -295,8 +246,8 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
     }
 
     private handleLoginClick() {
-        const loginValid = this.validateField(this.loginInput.current);
-        const passwordValid = this.validateField(this.passwordInput.current);
+        const loginValid = validateField(this.loginInput.current);
+        const passwordValid = validateField(this.passwordInput.current);
         if (!(loginValid && passwordValid)) {
             return;
         }
