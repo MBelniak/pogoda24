@@ -44,8 +44,8 @@ public class TrafficService {
             } else { //transaction not working - PERMISSION DENIED
                 Long views1 = snapshot.getDocuments().get(0).getLong("views");
                 Long views2 = snapshot.getDocuments().get(1).getLong("views");
-                snapshot.getDocuments().get(views1 > views2 ? 0 : 1).getReference().update("views", FieldValue.increment(1L + (views1 > views2 ? views2 : views1)));
-                snapshot.getDocuments().get(views1 > views2 ? 1 : 0).getReference().delete();
+                snapshot.getDocuments().get(1).getReference().delete();
+                snapshot.getDocuments().get(0).getReference().update("views", FieldValue.increment(1L + (views1 + views2)));
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
