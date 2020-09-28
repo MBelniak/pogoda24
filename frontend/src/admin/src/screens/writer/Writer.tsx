@@ -495,6 +495,7 @@ export default class Writer extends React.Component<WriterProps, State> {
                         <input
                             type="file"
                             style={{ display: 'none' }}
+                            id="mapsFiles"
                             accept="image/*"
                             multiple={true}
                             ref={this.fileInput}
