@@ -7,6 +7,7 @@ import parseISO from 'date-fns/parseISO';
 import { SiteViewsChart } from '../../charts/SiteViewsChart';
 import { TopImage } from '../components/TopImage';
 import { Copyright } from '../components/Copyright';
+import { Link } from 'react-router-dom';
 
 const daysBackInputConstraint = (text: string): boolean => {
     return parseInt(text) >= 0 && parseInt(text) <= 9999;
@@ -220,6 +221,10 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                             </p>
                         </div>
                     </div>
+                    <div className="is-divider"/>
+                    <Link to="/write" className="button">
+                        Wróć
+                    </Link>
                 </section>
                 <Copyright />
             </div>

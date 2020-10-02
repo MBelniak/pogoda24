@@ -30,6 +30,8 @@ import { Copyright } from '../components/Copyright';
 import { showActionModal } from '../components/modals/ActionModalWindow';
 import { validateField } from '../../helpers/ValidateField';
 import { showAuthModal } from '../components/modals/AuthenticationModal';
+import { Link } from 'react-router-dom';
+
 const { BACKEND_DATE_FORMAT } = config;
 
 function findIndex(array: Image[], index) {
@@ -324,6 +326,9 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
                     <button className="button" onClick={this.handleSubmit}>
                         Wyślij
                     </button>
+                    <Link to="/write" className="button">
+                        Anuluj
+                    </Link>
                 </section>
                 <Copyright />
             </div>

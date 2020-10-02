@@ -9,6 +9,7 @@ import { LoadingIndicator } from '../components/LoadingIndicator';
 import { TopImage } from '../components/TopImage';
 import { PagingBar } from '../components/PagingBar';
 import { Copyright } from '../components/Copyright';
+import { Link } from 'react-router-dom';
 
 interface State {
     posts: Post[] | undefined;
@@ -146,6 +147,10 @@ export default class PostsList extends React.Component<{}, State> {
                                     currentPage={this.state.currentPage}
                                 />
                             )}
+                            <div className="is-divider"/>
+                            <Link to="/write" className="button">
+                                Wróć
+                            </Link>
                         </section>
                         <Copyright />
                     </div>
