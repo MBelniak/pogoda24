@@ -6,7 +6,7 @@ import subDays from 'date-fns/subDays';
 import parseISO from 'date-fns/parseISO';
 import { SiteViewsChart } from '../../charts/SiteViewsChart';
 import { TopImage } from '../components/TopImage';
-import { Copyright } from '../components/Copyright';
+import Copyright from '@shared/components/Copyright';
 import { Link } from 'react-router-dom';
 
 const daysBackInputConstraint = (text: string): boolean => {
@@ -226,7 +226,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                         Wróć
                     </Link>
                 </section>
-                <Copyright />
+                <Copyright fontColor={'white'}/>
             </div>
         );
     }

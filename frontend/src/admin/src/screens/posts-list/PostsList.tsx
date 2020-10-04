@@ -7,9 +7,10 @@ import FactWriter from '../fact-writer/FactWriter';
 import { closeModal, showModal } from '../components/modals/Modal';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { TopImage } from '../components/TopImage';
-import { PagingBar } from '../components/PagingBar';
-import { Copyright } from '../components/Copyright';
+import Copyright from '@shared/components/Copyright';
 import { Link } from 'react-router-dom';
+import PagingBar from '@shared/components/PagingBar';
+import styles from '@shared/scss/main.scss'
 
 interface State {
     posts: Post[] | undefined;
@@ -145,6 +146,9 @@ export default class PostsList extends React.Component<{}, State> {
                                     pages={Math.ceil(this.state.totalPostsCount / this.postsPerPage)}
                                     handlePageClick={this.handlePageClick}
                                     currentPage={this.state.currentPage}
+                                    mainColor={styles.secondaryColor}
+                                    shadowColor={styles.secondaryColor}
+                                    fontColor={'white'}
                                 />
                             )}
                             <div className="is-divider"/>
@@ -152,7 +156,7 @@ export default class PostsList extends React.Component<{}, State> {
                                 Wróć
                             </Link>
                         </section>
-                        <Copyright />
+                        <Copyright fontColor={'white'}/>
                     </div>
                 )}
             </>

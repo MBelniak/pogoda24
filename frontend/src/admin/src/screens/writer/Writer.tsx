@@ -10,7 +10,7 @@ import { PostImage } from '../../model/PostImage';
 import { closeModal, showModal } from '../components/modals/Modal';
 import { showInfoModal } from '../components/modals/InfoModalWindow';
 import { LoadingIndicator } from '../components/LoadingIndicator';
-import { Copyright } from '../components/Copyright';
+import Copyright from '@shared/components/Copyright';
 import { TopImage } from '../components/TopImage';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -537,7 +537,7 @@ export default class Writer extends React.Component<WriterProps, State> {
                         </div>
                     </div>
                 </section>
-                <Copyright />
+                <Copyright fontColor={'white'}/>
             </div>
         );
     }

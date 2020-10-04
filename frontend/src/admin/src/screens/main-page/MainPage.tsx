@@ -1,7 +1,7 @@
 import React from 'react';
 import { Links } from './Links';
 import { TopImage } from '../components/TopImage';
-import { Copyright } from '../components/Copyright';
+import Copyright from '@shared/components/Copyright';
 
 export default class MainPage extends React.Component {
     constructor(props) {
@@ -53,7 +53,7 @@ export default class MainPage extends React.Component {
                     <TopImage />
                     <Links />
                 </section>
-                <Copyright additionalRender={this.renderFlaticonAttribution} />
+                <Copyright fontColor={'white'} additionalRender={this.renderFlaticonAttribution} />
             </div>
         );
     }

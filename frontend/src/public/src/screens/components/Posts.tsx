@@ -4,7 +4,8 @@ import Post, { postDTOToPost, PostType } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
 import CustomLinearProgress from './LinearProgress';
 import './Posts.scss';
-import { PagingBar } from './PagingBar';
+import PagingBar from '@shared/components/PagingBar';
+import styles from '@shared/scss/main.scss'
 
 interface State {
     posts: Post[] | undefined;
@@ -133,6 +134,8 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                                                 this.handlePageClick
                                             }
                                             currentPage={this.state.currentPage}
+                                            mainColor={styles.secondaryColor}
+                                            shadowColor={styles.primaryColor}
                                         />
                                     )}
                                 </>

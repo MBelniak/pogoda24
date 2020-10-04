@@ -1,5 +1,5 @@
 import React from 'react';
-import { Copyright } from '../components/Copyright';
+import Copyright from '@shared/components/Copyright';
 import { TopImage } from '../components/TopImage';
 import warningImg from '../../img/warning.png';
 import thunderWarningImg from '../../img/thunderWarning.png';
@@ -26,7 +26,7 @@ export default class Files extends React.Component {
                         Wróć
                     </Link>
                 </section>
-                <Copyright />
+                <Copyright fontColor={'white'}/>
             </div>
         );
     }

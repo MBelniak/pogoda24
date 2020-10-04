@@ -8,7 +8,8 @@ import { TopBar } from './screens/components/TopBar';
 import PostView from './screens/post-view/PostView';
 import { Posts } from './screens/components/Posts';
 import { PostType } from './model/Post';
-import { Copyright } from './screens/components/Copyright';
+import Copyright from '@shared/components/Copyright';
+import styles from '@shared/scss/main.scss';
 
 export default class App extends React.Component {
 
@@ -54,7 +55,7 @@ export default class App extends React.Component {
                         />
                     </Switch>
                     <div className="is-divider" style={{marginLeft: "4rem", marginRight: "4rem"}}/>
-                    <Copyright additionalRender={this.renderSocialMedia} />
+                    <Copyright fontColor={styles.primaryFontColor} additionalRender={this.renderSocialMedia}/>
                 </div>
             </Router>
         );

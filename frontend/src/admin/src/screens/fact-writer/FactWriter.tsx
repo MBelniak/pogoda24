@@ -26,7 +26,7 @@ import config from '../../config/config';
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { closeModal, showModal } from '../components/modals/Modal';
 import { TopImage } from '../components/TopImage';
-import { Copyright } from '../components/Copyright';
+import Copyright from '@shared/components/Copyright';
 import { showActionModal } from '../components/modals/ActionModalWindow';
 import { validateField } from '../../helpers/ValidateField';
 import { showAuthModal } from '../components/modals/AuthenticationModal';
@@ -330,7 +330,7 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
                         Anuluj
                     </Link>
                 </section>
-                <Copyright />
+                <Copyright fontColor={'white'}/>
             </div>
         );
     }

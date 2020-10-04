@@ -18,12 +18,17 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["src/shared/*"]
+    },
     "jsx": "preserve",
     "noImplicitAny": false
   },
   "include": [
     "src/admin/src",
-    "src/public/src"
+    "src/public/src",
+    "src/shared"
   ],
   "exclude": ["node", "node_modules", "dist"]
 }

@@ -39,14 +39,15 @@ module.exports = {
     devtool: process.env.NODE_ENV === 'production' ? false : 'inline-module-source-map',
     resolve: {
         modules: [
-            'admin',
-            'public',
+            'src/admin',
+            'src/public',
+            'src/shared',
             'node_modules'
         ],
         symlinks: true,
-        extensions: ['.ts', '.tsx', '.js', '.jsx', '.css'],
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.css', '.scss'],
         alias: {
-            react: path.resolve('./node_modules/react')
+            "@shared": path.resolve('src/shared')
         }
     },
     module: {

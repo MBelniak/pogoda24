@@ -1,8 +1,5 @@
 @charset "utf-8";
-$primary-color: #23425f;
-$secondary-color: #25a5a5;
-$primary-font-color: #222;
-$secondary-font-color: #353535;
+@import "../../../shared/scss/main";
 $navbar-background-color: $secondary-color;
 $divider-background-color: $primary-color;
 $divider-thickness: 1px;
@@ -42,24 +39,6 @@ body {
     flex-direction: column;
     justify-content: space-between;
 }
-
-.copyright {
-    color: $primary-font-color;
-}
-
-.fontSizeLarge {
-    font-size: 1.2rem;
-}
-
-.fontSizeMedium {
-    font-size: 1rem;
-}
-
-
-.fontSizeSmall {
-    font-size: 0.9rem;
-}
-
 
 .is-divider {
     margin: 15px 0 15px 0;

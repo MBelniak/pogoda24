@@ -1,14 +1,11 @@
 @charset "utf-8";
-$primary-color: #23425f;
-$secondary-color: #25afaf;
+@import "../../../shared/scss/main";
 $background: $primary-color;
 $body-background-color: $primary-color;
 $navbar-background-color: $secondary-color;
 $navbar-item-hover-color: $primary-color;
 $title-color: white;
 $divider-color: white;
-$footer-background-color: $primary-color;
-$footer-padding: 3rem 1.5rem 3rem;
 // Import only what you need from Bulma
 @import '../../../../node_modules/bulma/sass/utilities/_all.sass';
 @import '../../../../node_modules/bulma/sass/base/_all.sass';
@@ -28,35 +25,6 @@ $footer-padding: 3rem 1.5rem 3rem;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-}
-
-.copyright {
-    color: white;
-}
-
-.fontSizeLarge {
-    font-size: 18px;
-}
-
-.fontSizeMedium {
-    font-size: 16px;
-}
-
-
-.fontSizeSmall {
-    font-size: 14px;
-}
-
-@media all and (max-width: 800px) {
-    .fontSizeSmall {
-        font-size: 1.75vw;
-    }
-    .fontSizeMedium {
-        font-size: 2vw;
-    }
-    .fontSizeLarge {
-        font-size: 2.25vw;
-    }
 }
 
 .container.is-fluid {
@@ -315,10 +283,6 @@ $footer-padding: 3rem 1.5rem 3rem;
     color: white;
     font-size: 18px;
     padding: 0 0.5rem;
-}
-
-.copyright * {
-    color: white;
 }
 
 .pagingBar {
