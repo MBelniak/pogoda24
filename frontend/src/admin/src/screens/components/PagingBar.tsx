@@ -13,15 +13,7 @@ export class PagingBar extends React.Component<PagingBarProps> {
     }
 
     componentDidMount() {
-        let elements = document.querySelectorAll(".pagingBar li");
-        elements.forEach(element => {
-            element.addEventListener("click", () => {
-                if (element.firstChild) {
-                    (element.firstChild as HTMLElement).click();
-                }
-            })
-        });
-        elements = document.querySelectorAll(".pagingBar li a");
+        const elements = document.querySelectorAll(".pagingBar li a");
         elements.forEach(element => {
             element.addEventListener("click", () => {
                 setTimeout(() => {
