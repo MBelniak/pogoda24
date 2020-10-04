@@ -85,7 +85,7 @@ export default class PostView extends React.Component<{}, State> {
 
     render() {
         return (
-            <section className="mainContent container is-fluid">
+            <section className="mainContent">
                 <div>
                     {this.state.loading ? (
                         <CustomLinearProgress />

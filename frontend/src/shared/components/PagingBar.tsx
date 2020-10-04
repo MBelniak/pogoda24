@@ -20,19 +20,6 @@ class DefaultPagingBar extends React.Component<{className?: string} & PagingBarP
         super(props);
     }
 
-    componentDidMount() {
-        let elements = document.querySelectorAll(".pagingBar li");
-        elements.forEach(element => {
-            element.addEventListener("click", (e: Event) => {
-                e.preventDefault();
-                if (element.firstChild) {
-                    (element.firstChild as HTMLElement).click();
-                }
-            })
-        });
-    }
-
-
     render() {
         return (
             <div className="pagination">
@@ -41,7 +28,7 @@ class DefaultPagingBar extends React.Component<{className?: string} & PagingBarP
                     nextLabel={<i className={"fa fa-angle-right"}/>}
                     breakLabel={'...'}
                     pageCount={this.props.pages}
-                    marginPagesDisplayed={2}
+                    marginPagesDisplayed={1}
                     pageRangeDisplayed={1}
                     onPageChange={this.props.handlePageClick}
                     containerClassName={`${this.props.className} ${styles.fontSizeLarge} pagingBar`}
@@ -62,18 +49,15 @@ const PagingBar = styled(DefaultPagingBar)<PagingBarStyles>`
     justify-content: center;
     margin: 2rem 0 0.7rem 0;
 
-    * {
-        margin: 0.6rem;
-    }
-
     li {
       place-items: center;
       border-radius: 0.3rem;
       box-shadow: 0 0 3px ${props => props.shadowColor};
+      margin: 0.6rem;
     }
     
     li a {
-      padding: 5px;
+      padding: 5px 10px;
       transition: 0.3s;
     }
     
