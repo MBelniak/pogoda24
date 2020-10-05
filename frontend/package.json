@@ -34,7 +34,7 @@
     "start": "cross-env NODE_ENV=development webpack-dev-server",
     "eject": "react-scripts eject",
     "watch": "webpack --watch -d",
-    "build": "cross-env NODE_ENV=production webpack"
+    "build": "cross-env NODE_ENV=production node --max_old_space_size=1024 ./node_modules/webpack/bin/webpack.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -76,7 +76,7 @@
     "mini-css-extract-plugin": "^0.9.0",
     "node-sass": "^4.13.1",
     "sass-loader": "^8.0.2",
-    "terser-webpack-plugin": "^4.1.0",
+    "terser-webpack-plugin": "^4.2.2",
     "ts-loader": "^6.2.1",
     "prettier": "2.0.4",
     "style-loader": "^1.1.3",
