@@ -52,7 +52,7 @@ export class Generator extends React.Component<{}, GeneratorState> {
         this.onIconSelected = this.onIconSelected.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
         this.onReady = this.onReady.bind(this);
-        const savedDayOrNight = getCookie('generator_time');
+        const savedDayOrNight = getCookie('new_generator_time');
         let dayOrNight: DayOrNight;
         dayOrNight = (savedDayOrNight as DayOrNight) || 'night';
         this.state = {
@@ -65,6 +65,7 @@ export class Generator extends React.Component<{}, GeneratorState> {
     private onDayNightChange(dayOrNight: DayOrNight) {
         this.setState({ dayOrNight: dayOrNight });
         this.clearImgSrcs();
+        saveCookie('new_generator_time', dayOrNight);
     }
 
     private clearImgSrcs() {
