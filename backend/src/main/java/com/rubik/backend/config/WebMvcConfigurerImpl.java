@@ -14,9 +14,7 @@ public class WebMvcConfigurerImpl implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/generator/**").addResourceLocations("classpath:generator/");
         registry.addResourceHandler("/static/templates/**").addResourceLocations("classpath:templates/");
-        registry.addResourceHandler("/generator/**").addResourceLocations("classpath:generator/");
         registry.addResourceHandler("/templates/**").addResourceLocations("classpath:templates/");
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:frontend/");
         registry.addResourceHandler("/**").addResourceLocations("classpath:frontend/");
