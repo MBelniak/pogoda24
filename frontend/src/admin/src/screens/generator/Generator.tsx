@@ -1,22 +1,22 @@
 import React from 'react';
-import Canvas from './Canvas';
+import { Canvas } from './Canvas';
 import { cityList, imgSrcsDay, imgSrcsNight } from './consts';
 import { CityComponent } from './CityComponent';
 import './Generator.scss';
 import Copyright from '@shared/components/Copyright';
 import { DayNightDate } from './DayNightDate';
 import format from 'date-fns/format';
-import parse from 'date-fns/parse';
-import { validateField } from '../../helpers/ValidateField';
 import { getCookie, saveCookie } from '../../helpers/getCookie';
+import { showInfoModal } from '../components/modals/InfoModalWindow';
+import { Link } from 'react-router-dom';
 
 type CityData = {
-    temperature: number;
-    iconSrc: string | null;
+    temperature: string;
+    iconCode: string | null;
 };
 
-interface CityDataMap {
-    [cityMap: string]: CityData;
+export interface CityDataMap {
+    [cityKey: string]: CityData;
 }
 
 export type DayOrNight = 'day' | 'night';
@@ -27,31 +27,27 @@ interface GeneratorState {
     date: string;
 }
 
-function isValidDate(d) {
-    return d instanceof Date && !isNaN(d.getTime());
-}
-
 const getInitialCityData = (): CityDataMap => {
     const dataMap: CityDataMap = {};
-    cityList.forEach(
-        city =>
-            (dataMap[city.displayName] = {
-                temperature: parseInt(getCookie('generator_' + city.displayName + '_temp') || '0'),
-                iconSrc: getCookie('generator_' + city.displayName + '_type')
-            })
-    );
+    cityList.forEach(city => {
+        dataMap[city.name] = {
+            temperature: getCookie('new_generator_' + city.name + '_temp') || '0',
+            iconCode: getCookie('new_generator_' + city.name + '_type')
+        };
+    });
     return dataMap;
 };
 
 export class Generator extends React.Component<{}, GeneratorState> {
-    private dateRef = React.createRef();
+    private canvas;
+    public context;
+
     constructor(props) {
         super(props);
         this.onDayNightChange = this.onDayNightChange.bind(this);
         this.onTemperatureChange = this.onTemperatureChange.bind(this);
         this.onIconSelected = this.onIconSelected.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
-        this.onReady = this.onReady.bind(this);
         const savedDayOrNight = getCookie('new_generator_time');
         let dayOrNight: DayOrNight;
         dayOrNight = (savedDayOrNight as DayOrNight) || 'night';
@@ -60,42 +56,104 @@ export class Generator extends React.Component<{}, GeneratorState> {
             dayOrNight: dayOrNight,
             date: format(new Date(), 'dd-MM-yyyy')
         };
+        document.getElementById('viewport')!.outerHTML = '';
+    }
+
+    componentDidMount() {
+        this.redrawMap(true, this.state.dayOrNight);
     }
 
     private onDayNightChange(dayOrNight: DayOrNight) {
-        this.setState({ dayOrNight: dayOrNight });
-        this.clearImgSrcs();
+        this.setState({ dayOrNight: dayOrNight, cityDataMap: getInitialCityData() });
+        this.redrawMap(false, dayOrNight);
         saveCookie('new_generator_time', dayOrNight);
     }
 
-    private clearImgSrcs() {
-        const map: CityDataMap = {};
-        Object.keys(this.state.cityDataMap).forEach(city => {
-            map[city] = { ...this.state.cityDataMap[city], iconSrc: null };
-        });
-        this.setState({ cityDataMap: map });
-    }
-
-    private onTemperatureChange(cityName: string, temperature: number) {
+    private onTemperatureChange(cityName: string, temperature: string) {
         const currentMap = this.state.cityDataMap;
         currentMap[cityName] = { ...currentMap[cityName], temperature: temperature };
         this.setState({ cityDataMap: currentMap });
         saveCookie('new_generator_' + cityName + '_temp', temperature);
     }
 
-    private onIconSelected(cityName: string, iconSrc: string) {
+    private onIconSelected(cityName: string, iconCode: string) {
         const currentMap = this.state.cityDataMap;
-        currentMap[cityName] = { ...currentMap[cityName], iconSrc: iconSrc };
+        currentMap[cityName] = { ...currentMap[cityName], iconCode: iconCode };
         this.setState({ cityDataMap: currentMap });
-        saveCookie('new_generator_' + cityName + '_type', iconSrc);
+        saveCookie('new_generator_' + cityName + '_type', iconCode);
     }
 
     private onDateChange(e) {
         this.setState({ date: e.target.value });
     }
 
-    private onReady() {
-        validateField(this.dateRef.current, value => isValidDate(parse(value, 'dd-MM-yyyy', new Date())));
+    private redrawMap(generateIcons: boolean, dayOrNight: DayOrNight) {
+        const cImg = new Image();
+        cImg.src =
+            dayOrNight === 'day'
+                ? 'https://res.cloudinary.com/pogoda24/image/upload/v1602335810/mapa-dzien_bf2tbp.png'
+                : 'https://res.cloudinary.com/pogoda24/image/upload/v1602335834/mapa-noc_jwbswe.png';
+        cImg.onload = () => {
+            this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
+            this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
+            this.context.clearRect(0, 0, Canvas.canvasWidth, Canvas.canvasHeight);
+            this.context.drawImage(cImg, 0, 0, Canvas.canvasWidth, Canvas.canvasHeight);
+
+            if (generateIcons) {
+                this.generateIcons();
+            }
+        };
+    }
+
+    private generateIcons(): void {
+        window.scrollTo(0, 0);
+        const iconsJson = this.state.dayOrNight === 'day' ? imgSrcsDay : imgSrcsNight;
+        for (let index = 0; index < cityList.length; ++index) {
+            const iconCode = this.state.cityDataMap[cityList[index].name].iconCode;
+            if (iconCode === null || typeof iconsJson[iconCode] === 'undefined') {
+                showInfoModal('Uzupełnij wszystkie ikonki!');
+                return;
+            }
+        }
+        cityList.forEach(city => {
+            const cityIconCode = this.state.cityDataMap[city.name].iconCode!;
+            const icon = new Image();
+            icon.src = iconsJson[cityIconCode];
+            icon.onload = e => {
+                if (['Tatry', 'Sudety', 'Bieszczady'].indexOf(city.name) > -1) {
+                    this.context.drawImage(e.target, city.x, city.y, 55, 55);
+                } else {
+                    this.context.drawImage(e.target, city.x, city.y, 65, 65);
+                }
+            };
+            const temperature = this.state.cityDataMap[city.name].temperature;
+            if (temperature === '' || parseInt(temperature) < 0) {
+                this.context.fillStyle = '#7CE';
+            } else {
+                this.context.fillStyle = '#F40';
+            }
+
+            this.context.font = 'bold 30px Calibri';
+
+            if (city.name === 'Poznań') {
+                this.context.fillText(temperature + '°C', city.x + 60, city.y + 45);
+                this.context.strokeText(temperature + '°C', city.x + 60, city.y + 45);
+            } else if (city.name === 'Radom') {
+                this.context.fillText(temperature + '°C', city.x + 10, city.y + 5);
+                this.context.strokeText(temperature + '°C', city.x + 10, city.y + 5);
+            } else {
+                if (['Tatry', 'Sudety', 'Bieszczady'].indexOf(city.name) > -1) {
+                    this.context.font = 'bold 30px Calibri';
+                }
+                this.context.fillText(temperature + '°C', city.x + 60, city.y + 30);
+                this.context.strokeText(temperature + '°C', city.x + 60, city.y + 30);
+            }
+        });
+        this.context.font = 'bold 45px Calibri';
+        this.context.fillStyle = 'white';
+        this.context.strokeStyle = 'black';
+        this.context.fillText(this.state.date, 55, 620);
+        this.context.strokeText(this.state.date, 55, 620);
     }
 
     render() {
@@ -103,19 +161,19 @@ export class Generator extends React.Component<{}, GeneratorState> {
             <div className="main">
                 <section className="container is-fluid">
                     <Canvas />
-                    <DayNightDate
-                        innerRef={this.dateRef}
-                        dayOrNight={this.state.dayOrNight}
-                        onDayNightChange={this.onDayNightChange}
-                        onDateChange={this.onDateChange}
-                        date={this.state.date}
-                    />
                     <div className="cities">
+                        <DayNightDate
+                            dayOrNight={this.state.dayOrNight}
+                            onDayNightChange={this.onDayNightChange}
+                            onDateChange={this.onDateChange}
+                            date={this.state.date}
+                        />
+                        <div className="break" />
                         {Object.keys(this.state.cityDataMap).map((cityName, key) => {
                             return (
                                 <CityComponent
                                     temperature={this.state.cityDataMap[cityName].temperature}
-                                    iconSrc={this.state.cityDataMap[cityName].iconSrc}
+                                    iconCode={this.state.cityDataMap[cityName].iconCode}
                                     key={key}
                                     cityName={cityName}
                                     dayOrNight={this.state.dayOrNight}
@@ -125,9 +183,15 @@ export class Generator extends React.Component<{}, GeneratorState> {
                             );
                         })}
                     </div>
-                    <button className="button" style={{ width: '100%', fontSize: '1.2rem' }} onClick={this.onReady}>
-                        Gotowe
+                    <button
+                        className="button"
+                        style={{ width: '100%', fontSize: '1.2rem' }}
+                        onClick={() => this.redrawMap(true, this.state.dayOrNight)}>
+                        Generuj
                     </button>
+                    <Link to="/write" className="button" style={{ width: '100%', fontSize: '1.2rem' }}>
+                        Wróc
+                    </Link>
                 </section>
                 <Copyright fontColor={'white'} />
             </div>

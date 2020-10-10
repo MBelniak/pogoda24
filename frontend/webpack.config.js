@@ -6,17 +6,6 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const webpack = require('webpack');
 const path = require('path');
 const dotenv = require('dotenv').config();
-// const walkSync = require('walk-sync');
-// const fs = require('fs-extra');
-
-// const imgNames = walkSync('src/admin/src/img/generator', { ignore: ['mapa'] });
-// const constFile = 'src/admin/src/screens/generator/consts.ts';
-// let fileWithImg = fs.readFileSync(constFile, 'utf8');
-// fileWithImg = fileWithImg.replace(
-//     /export const imgSrcs = \[];/g,
-//     `export const imgSrcs = [${imgNames.map(name => `require('../../img/generator/${name}')`)}];`
-// );
-// fs.writeFileSync(constFile, fileWithImg);
 
 module.exports = {
     entry: {

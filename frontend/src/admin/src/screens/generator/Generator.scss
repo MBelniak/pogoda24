@@ -7,25 +7,30 @@
 .cities {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
 }
 
-.city {
-  flex: 1 1 200px;
-  margin: 10px;
+.city, .dateAndDaySelectDiv {
+  flex: 0 1 220px;
+  margin: 0.5rem;
   padding: 10px;
   border: $secondary-color 2px solid;
   border-radius: 1rem;
 }
 
-.dateAndDaySelectDiv {
-  width: 200px;
-  margin: 10px auto 10px 10px;
-  padding: 10px;
-  border: $secondary-color 2px solid;
-  border-radius: 1rem;
+.break {
+  flex-basis: 100%;
+  height: 0;
 }
 
 .input {
   margin: 0.5rem 0
+}
+
+.iconSelectItem {
+  background-color: $primary-color;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
 }

@@ -4,10 +4,10 @@ import { IconSelect } from './IconSelect';
 interface CityComponentProps {
     cityName: string;
     dayOrNight: 'day' | 'night';
-    temperature: number;
-    onTemperatureChange: (cityName: string, temperature: number) => void;
-    onIconSelected: (cityName: string, iconSrc: string) => void;
-    iconSrc: string | null;
+    temperature: string;
+    onTemperatureChange: (cityName: string, temperature: string) => void;
+    onIconSelected: (cityName: string, iconCode: string) => void;
+    iconCode: string | null;
 }
 
 export class CityComponent extends React.Component<CityComponentProps> {
@@ -22,11 +22,11 @@ export class CityComponent extends React.Component<CityComponentProps> {
         if (input.value.length > 2) {
             input.value = input.value.substr(0, 2 + (parseInt(input.value) < 0 ? 1 : 0));
         }
-        this.props.onTemperatureChange(this.props.cityName, parseInt(input.value));
+        this.props.onTemperatureChange(this.props.cityName, input.value);
     }
 
-    private onIconSelected(iconSrc: string) {
-        this.props.onIconSelected(this.props.cityName, iconSrc);
+    private onIconSelected(iconCode: string) {
+        this.props.onIconSelected(this.props.cityName, iconCode);
     }
 
     render() {
@@ -42,7 +42,7 @@ export class CityComponent extends React.Component<CityComponentProps> {
                 <IconSelect
                     onIconSelected={this.onIconSelected}
                     dayOrNight={this.props.dayOrNight}
-                    defaultIconSrc={this.props.iconSrc}
+                    defaultIconCode={this.props.iconCode}
                 />
             </div>
         );
