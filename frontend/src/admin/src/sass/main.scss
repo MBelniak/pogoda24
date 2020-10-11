@@ -29,6 +29,10 @@ $tablet: 960px + (2 * $gap);
     flex-direction: column;
 }
 
+p, span {
+    word-break: break-word;
+}
+
 .container.is-fluid {
     padding: 0 2 * $gap;
 }

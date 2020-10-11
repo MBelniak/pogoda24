@@ -51,7 +51,6 @@ function findIndex(array: Image[], index) {
 interface Image {
     htmlElement?: HTMLImageElement;
     postImage: PostImage;
-    fileExtension: string;
 }
 
 export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
@@ -81,6 +80,9 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
     private initializeEditor(post: Post) {
         let target = document.getElementsByClassName('se-wrapper')[0];
         target.innerHTML = post.description.replace(/\\"/g, '"');
+        this.titleInput.current.value = post.title;
+        target = document.getElementsByClassName('se-wrapper-inner')[0];
+        target.setAttribute('contenteditable', 'true');
     }
 
     private handleImageUploadBefore(files: Array<File>, info: object) {
@@ -89,12 +91,11 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
             timestamp = timestamp.substr(0, timestamp.length - 3);
             this.imagesList.push({
                 postImage: {
-                    id: this.nextImageId++,
+                    id: this.nextImageId,
                     file: file,
                     publicId: file.name + timestamp,
                     timestamp: timestamp
-                },
-                fileExtension: file.name.slice(file.name.lastIndexOf('.'), file.name.length).toLowerCase()
+                }
             });
         }
 
@@ -111,6 +112,7 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
         if (state === 'delete') {
             this.imagesList.splice(findIndex(this.imagesList, index), 1);
         } else {
+            this.nextImageId++;
             if (state === 'create') {
                 const image = this.imagesList[findIndex(this.imagesList, index)];
                 image.htmlElement = targetImgElement;
@@ -174,7 +176,9 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
     }
 
     private sendPostToBackend(authHeader?: string) {
-        const target = document.getElementsByClassName('se-wrapper')[0].cloneNode(true) as HTMLElement;
+        let target = document.getElementsByClassName('se-wrapper-inner')[0];
+        target.setAttribute('contenteditable', 'false');
+        target = document.getElementsByClassName('se-wrapper')[0].cloneNode(true) as HTMLElement;
         let description = JSON.stringify(target.innerHTML);
         description = description.substr(1, description.length - 2);
         const requestBodyPost = {
@@ -312,6 +316,9 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
                 <section className="container is-fluid">
                     <TopImage />
                     <div style={{ color: 'white', margin: '10px 0 10px 0' }}>
+                        <p className="fontSizeLarge">
+                            Uwaga! Nie dodawaj zdjęć ze schowka. Zamiast tego, użyj przyciku "Image".{' '}
+                        </p>
                         <label htmlFor="titleInput">Dodaj tytuł do ciekawostki: </label>
                         <input
                             style={{ marginTop: '10px' }}
@@ -330,7 +337,7 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
                         Anuluj
                     </Link>
                 </section>
-                <Copyright fontColor={'white'}/>
+                <Copyright fontColor={'white'} />
             </div>
         );
     }
