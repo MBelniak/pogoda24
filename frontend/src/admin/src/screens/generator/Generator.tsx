@@ -60,7 +60,7 @@ export class Generator extends React.Component<{}, GeneratorState> {
     }
 
     componentDidMount() {
-        this.redrawMap(true, this.state.dayOrNight);
+        this.redrawMap(false, this.state.dayOrNight);
     }
 
     private onDayNightChange(dayOrNight: DayOrNight) {
@@ -190,7 +190,7 @@ export class Generator extends React.Component<{}, GeneratorState> {
                         Generuj
                     </button>
                     <Link to="/write" className="button" style={{ width: '100%', fontSize: '1.2rem' }}>
-                        Wróc
+                        Wróć
                     </Link>
                 </section>
                 <Copyright fontColor={'white'} />
