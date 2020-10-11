@@ -79,20 +79,16 @@ export default class PostsListItem extends React.Component<PostsItemProps, Posts
             if (description.length > nonExpandedPostLength) {
                 description = description.substr(0, nonExpandedPostLength);
             }
-            if (description.split(/[(\r\n)(\n)]/g).length > 2) {
+            if (description.split(/(\r\n)|(\n)/g).length > 2) {
                 description = description
-                    .split(/[(\r\n)(\n)]/g)
+                    .split(/(\r\n)|(\n)/g)
                     .slice(0, 2)
                     .join('\n');
             }
             const regex = /^.*\s/g;
             const match = description.match(regex);
-            if (match && match.length > 70) {
-                if (typeof match === 'string') {
-                    description = match + '... ';
-                } else {
-                    description = match[0] + '... ';
-                }
+            if (match && match[0].length > 70) {
+                description = match[0] + '... ';
             } else {
                 //let's not clip very long words (does a word over 50 characters long even exist? Probably.)
                 description = description + '... ';

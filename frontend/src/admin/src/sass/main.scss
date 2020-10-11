@@ -27,6 +27,10 @@ $divider-color: white;
     flex-direction: column;
 }
 
+p, span {
+    word-break: break-word;
+}
+
 .container.is-fluid {
     padding-left: 64px;
     padding-right: 64px;

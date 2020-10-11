@@ -59,9 +59,7 @@ export default class PostView extends React.Component<{}, State> {
 
     private processDescription() {
         if (this.post) {
-            return this.post.description
-                .replace(/\r\n/g, '<br/>')
-                .replace(/\n/g, '<br/>');
+            return this.post.description.replace(/\r\n/g, '<br/>').replace(/\n/g, '<br/>');
         }
         return '';
     }
@@ -71,9 +69,6 @@ export default class PostView extends React.Component<{}, State> {
             <div
                 dangerouslySetInnerHTML={{
                     __html: post.description.replace(/\\"/g, '"')
-                }}
-                style={{
-                    wordWrap: 'break-word'
                 }}
             />
         );
@@ -93,22 +88,14 @@ export default class PostView extends React.Component<{}, State> {
                         <div className="posts">
                             {this.post ? (
                                 <div className="post">
-                                    <div className="postdate fontSizeSmall">
-                                        {this.processDate(this.post.postDate)}
-                                    </div>
+                                    <div className="postdate fontSizeSmall">{this.processDate(this.post.postDate)}</div>
                                     <br />
                                     <div className="postTitle fontSizeLarge">
-                                        <span
-                                            style={{ wordWrap: 'break-word' }}>
-                                            {this.post.title}
-                                        </span>
+                                        <span style={{ wordWrap: 'break-word' }}>{this.post.title}</span>
                                     </div>
                                     <div className="postDescription fontSizeSmall">
-                                        {this.post.postType ===
-                                        PostType.FACT ? (
-                                            this.processDescriptionForFact(
-                                                this.post
-                                            )
+                                        {this.post.postType === PostType.FACT ? (
+                                            this.processDescriptionForFact(this.post)
                                         ) : (
                                             <span
                                                 dangerouslySetInnerHTML={{
@@ -120,15 +107,9 @@ export default class PostView extends React.Component<{}, State> {
                                             />
                                         )}
                                     </div>
-                                    <div
-                                        className="is-divider"
-                                    />
+                                    <div className="is-divider" />
                                     <div style={{ textAlign: 'center' }}>
-                                        <ForecastMapList
-                                            imagesPublicIds={
-                                                this.post.imagesPublicIds
-                                            }
-                                        />
+                                        <ForecastMapList imagesPublicIds={this.post.imagesPublicIds} />
                                     </div>
                                 </div>
                             ) : (
@@ -137,9 +118,7 @@ export default class PostView extends React.Component<{}, State> {
                                         textAlign: 'center',
                                         marginTop: '20px'
                                     }}>
-                                    <p className="fontSizeLarge">
-                                        Nie udało się znaleźć posta.
-                                    </p>
+                                    <p className="fontSizeLarge">Nie udało się znaleźć posta.</p>
                                 </div>
                             )}
                         </div>

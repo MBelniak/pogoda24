@@ -23,6 +23,10 @@ body {
     background-size: 100vw 100%;
 }
 
+p, span {
+    word-break: break-word;
+}
+
 .main {
     min-width: 100%;
     min-height: 100vh;
