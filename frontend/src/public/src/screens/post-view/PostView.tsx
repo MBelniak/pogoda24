@@ -1,6 +1,7 @@
 import React from 'react';
 import Post, { postDTOToPost, PostType } from '../../model/Post';
 import { fetchApi } from '../../helpers/fetchHelper';
+
 import { ForecastMapList } from '../components/ForecastMapList';
 import CustomLinearProgress from '../components/LinearProgress';
 import '../../sass/main.scss';
@@ -107,10 +108,14 @@ export default class PostView extends React.Component<{}, State> {
                                             />
                                         )}
                                     </div>
-                                    <div className="is-divider" />
-                                    <div style={{ textAlign: 'center' }}>
-                                        <ForecastMapList imagesPublicIds={this.post.imagesPublicIds} />
-                                    </div>
+                                    {this.post.postType !== PostType.FACT ? (
+                                        <>
+                                            <div className="is-divider" />
+                                            <div style={{ textAlign: 'center' }}>
+                                                <ForecastMapList imagesPublicIds={this.post.imagesPublicIds} />
+                                            </div>
+                                        </>
+                                    ) : null}
                                 </div>
                             ) : (
                                 <div
