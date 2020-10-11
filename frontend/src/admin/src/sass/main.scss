@@ -6,6 +6,8 @@ $navbar-background-color: $secondary-color;
 $navbar-item-hover-color: $primary-color;
 $title-color: white;
 $divider-color: white;
+$gap: 32px;
+$tablet: 960px + (2 * $gap);
 // Import only what you need from Bulma
 @import '../../../../node_modules/bulma/sass/utilities/_all.sass';
 @import '../../../../node_modules/bulma/sass/base/_all.sass';
@@ -32,8 +34,13 @@ p, span {
 }
 
 .container.is-fluid {
-    padding-left: 64px;
-    padding-right: 64px;
+    padding: 0 2 * $gap;
+}
+
+@media all and (max-width: $tablet) {
+    .container.is-fluid {
+        padding: 0 $gap;
+    }
 }
 
 .button {

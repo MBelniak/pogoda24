@@ -1,0 +1,36 @@
+@import "../../../../shared/scss/main";
+
+.main {
+  color: white;
+}
+
+.cities {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.city, .dateAndDaySelectDiv {
+  flex: 0 1 220px;
+  margin: 0.5rem;
+  padding: 10px;
+  border: $secondary-color 2px solid;
+  border-radius: 1rem;
+}
+
+.break {
+  flex-basis: 100%;
+  height: 0;
+}
+
+.input {
+  margin: 0.5rem 0
+}
+
+.iconSelectItem {
+  background-color: $primary-color;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
