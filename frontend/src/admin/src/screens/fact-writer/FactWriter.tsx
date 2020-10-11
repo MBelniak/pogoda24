@@ -316,6 +316,9 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
                 <section className="container is-fluid">
                     <TopImage />
                     <div style={{ color: 'white', margin: '10px 0 10px 0' }}>
+                        <p className="fontSizeLarge">
+                            Uwaga! Nie dodawaj zdjęć ze schowka. Zamiast tego, użyj przyciku "Image".{' '}
+                        </p>
                         <label htmlFor="titleInput">Dodaj tytuł do ciekawostki: </label>
                         <input
                             style={{ marginTop: '10px' }}
