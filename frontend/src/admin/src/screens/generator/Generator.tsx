@@ -91,8 +91,8 @@ export class Generator extends React.Component<{}, GeneratorState> {
         const cImg = new Image();
         cImg.src =
             dayOrNight === 'day'
-                ? 'https://res.cloudinary.com/pogoda24/image/upload/v1602335810/mapa-dzien_bf2tbp.png'
-                : 'https://res.cloudinary.com/pogoda24/image/upload/v1602335834/mapa-noc_jwbswe.png';
+                ? 'https://res.cloudinary.com/pogoda24/image/upload/v1602439091/mapa-dzien_wqfijp.png'
+                : 'https://res.cloudinary.com/pogoda24/image/upload/v1602439319/mapa-noc_mm8tzj.png';
         cImg.onload = () => {
             this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
             this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
