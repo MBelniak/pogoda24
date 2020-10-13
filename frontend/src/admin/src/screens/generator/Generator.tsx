@@ -136,7 +136,7 @@ export class Generator extends React.Component<{}, GeneratorState> {
                 this.context.fillStyle = '#F40';
             }
 
-            this.context.font = 'bold 30px Calibri';
+            this.context.font = 'bold 33px Calibri';
 
             if (city.name === 'Poznań') {
                 this.context.fillText(temperature + '°C', city.x + 60, city.y + 45);
