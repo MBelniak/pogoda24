@@ -1,5 +1,7 @@
 import React from 'react';
 import './Generator.scss';
+import { iconLabelH, iconLabelW } from './consts';
+import { Image, Transformation } from 'cloudinary-react';
 
 interface IconSelectLabelProps {
     iconCodesJson: {};
@@ -16,12 +18,12 @@ export class IconSelectLabel extends React.Component<IconSelectLabelProps> {
         return (
             <div className="iconSelectItem">
                 <div className="iconSelectItemImgDiv">
-                    <img
-                        className="selectImage"
-                        src={this.props.iconCodesJson[this.props.iconCode]}
-                        height="50px"
-                        width="50px"
-                    />
+                    <Image
+                        publicId={this.props.iconCodesJson[this.props.iconCode] + '.png'}
+                        format="png"
+                        quality="auto">
+                        <Transformation width={iconLabelW} height={iconLabelH} />
+                    </Image>
                 </div>
                 <div className="iconSelectItemSpanDiv">
                     <i style={{ font: 'italic', fontSize: '1rem' }}>({this.props.iconCode})</i>

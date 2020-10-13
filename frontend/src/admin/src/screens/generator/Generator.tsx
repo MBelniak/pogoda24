@@ -1,6 +1,6 @@
 import React from 'react';
 import { Canvas } from './Canvas';
-import { cityList, imgSrcsDay, imgSrcsNight } from './consts';
+import { cityList, iconLabelH, iconLabelW, imgSrcsDay, imgSrcsNight } from './consts';
 import { CityComponent } from './CityComponent';
 import './Generator.scss';
 import Copyright from '@shared/components/Copyright';
@@ -91,8 +91,8 @@ export class Generator extends React.Component<{}, GeneratorState> {
         const cImg = new Image();
         cImg.src =
             dayOrNight === 'day'
-                ? 'https://res.cloudinary.com/pogoda24/image/upload/w_1080,h_720/v1602439091/mapa-dzien_wqfijp.png'
-                : 'https://res.cloudinary.com/pogoda24/image/upload/w_1080,h_720/v1602439319/mapa-noc_mm8tzj.png';
+                ? 'https://res.cloudinary.com/pogoda24/image/upload/w_1080,h_720/mapa-dzien_wqfijp.png'
+                : 'https://res.cloudinary.com/pogoda24/image/upload/w_1080,h_720/mapa-noc_mm8tzj.png';
         cImg.onload = () => {
             this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
             this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -118,7 +118,10 @@ export class Generator extends React.Component<{}, GeneratorState> {
         cityList.forEach(city => {
             const cityIconCode = this.state.cityDataMap[city.name].iconCode!;
             const icon = new Image();
-            icon.src = iconsJson[cityIconCode];
+            icon.src =
+                `https://res.cloudinary.com/pogoda24/image/upload/w_${iconLabelW},h_${iconLabelH}/` +
+                iconsJson[cityIconCode] +
+                '.png';
             icon.onload = e => {
                 if (['Tatry', 'Sudety', 'Bieszczady'].indexOf(city.name) > -1) {
                     this.context.drawImage(e.target, city.x, city.y, 55, 55);
