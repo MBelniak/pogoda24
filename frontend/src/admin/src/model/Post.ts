@@ -4,12 +4,11 @@ export default interface Post {
     id: string;
     postDate: Date;
     postType: PostType;
-    title: string,
+    title: string;
     description: string;
     views: number;
-    imagesPublicIds?: string[];
+    imagesPublicIds: string[];
     dueDate?: Date;
-    shortDescription?: string;
 }
 
 export interface PostDTO {
@@ -19,9 +18,8 @@ export interface PostDTO {
     title: string;
     description: string;
     views: number;
-    imagesPublicIds?: string[];
+    imagesPublicIds: string[];
     dueDate: string;
-    shortDescription: string;
 }
 
 export function postDTOToPost(postDTO: PostDTO): Post {

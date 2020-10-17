@@ -17,7 +17,7 @@ public class WarningInfoDTO {
     public WarningInfoDTO(Post post) {
         this.postId = post.getId();
         this.dueDate = post.getDueDate();
-        this.title = post.getShortDescription();
+        this.title = post.getTitle();
     }
 
     public String getPostId() {

@@ -40,7 +40,6 @@ export default class Writer extends React.Component<WriterProps, State> {
     private fileInput;
     private postDescriptionTextArea;
     private titleTextArea;
-    private warningShortInput;
     private abortController;
     private savedPostId;
     private loginInput;
@@ -52,7 +51,6 @@ export default class Writer extends React.Component<WriterProps, State> {
         this.fileInput = React.createRef();
         this.postDescriptionTextArea = React.createRef();
         this.titleTextArea = React.createRef();
-        this.warningShortInput = React.createRef();
         this.loginInput = React.createRef();
         this.passwordInput = React.createRef();
         this.abortController = new AbortController();
@@ -77,17 +75,16 @@ export default class Writer extends React.Component<WriterProps, State> {
 
     private registerImagesPresentAtCloudinary(post: Post) {
         const postImages: PostImage[] = [];
-        if (post.imagesPublicIds) {
-            for (let i = 0; i < post.imagesPublicIds.length; ++i) {
-                //only publicId and file as null are used
-                postImages.push({
-                    id: this.fileId++,
-                    publicId: post.imagesPublicIds[i],
-                    file: null,
-                    timestamp: ''
-                });
-            }
+        for (let i = 0; i < post.imagesPublicIds.length; ++i) {
+            //only publicId and file as null are used
+            postImages.push({
+                id: this.fileId++,
+                publicId: post.imagesPublicIds[i],
+                file: null,
+                timestamp: ''
+            });
         }
+
         this.setState({ postImages: postImages });
     }
 
@@ -115,13 +112,7 @@ export default class Writer extends React.Component<WriterProps, State> {
 
     private handleSubmit(event) {
         event.preventDefault();
-        let formValid = true;
-        if (this.state.postType === PostType.WARNING) {
-            formValid = validateField(this.warningShortInput.current) && formValid;
-        }
-        formValid = formValid && validateField(this.titleTextArea.current);
-
-        if (!formValid) return;
+        if (!validateField(this.titleTextArea.current)) return;
 
         showModal(<LoadingIndicator />);
         this.savePost();
@@ -135,15 +126,23 @@ export default class Writer extends React.Component<WriterProps, State> {
                         .text()
                         .then((postIdOrPostHash: any) => {
                             if (this.props.postToEdit) {
+                                // we get postHash from backend
                                 if (postIdOrPostHash !== null) {
-                                    this.saveImagesToCloudinary(postIdOrPostHash);
+                                    const uploadPromises = this.saveImagesToCloudinary();
+                                    this.afterImagesSaved(uploadPromises, postIdOrPostHash);
                                 } else {
                                     showInfoModal('Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.');
                                 }
                             } else if (postIdOrPostHash !== null) {
+                                // we get postId from backend
                                 this.savedPostId = postIdOrPostHash;
                                 //post saved, send images to cloudinary
-                                this.saveImagesToCloudinary();
+                                const uploadPromises = this.saveImagesToCloudinary();
+                                if (uploadPromises.length > 0) {
+                                    this.afterImagesSaved(uploadPromises);
+                                } else {
+                                    this.showSuccessMessage();
+                                }
                             } else {
                                 showInfoModal('Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.');
                             }
@@ -181,10 +180,7 @@ export default class Writer extends React.Component<WriterProps, State> {
             description: this.postDescriptionTextArea.current.value,
             imagesPublicIds: [] as string[],
             dueDate:
-                this.state.postType === PostType.WARNING
-                    ? format(this.state.warningDueDate, BACKEND_DATE_FORMAT)
-                    : null,
-            shortDescription: this.state.postType === PostType.WARNING ? this.warningShortInput.current.value : null
+                this.state.postType === PostType.WARNING ? format(this.state.warningDueDate, BACKEND_DATE_FORMAT) : null
         };
 
         if (this.props.postToEdit) {
@@ -212,34 +208,31 @@ export default class Writer extends React.Component<WriterProps, State> {
         });
     }
 
-    private saveImagesToCloudinary(postHash?: string) {
-        const uploadPromises: Promise<Response>[] = uploadImages(this.state.postImages, this.abortController.signal);
-        if (uploadPromises.length > 0) {
-            Promise.all(uploadPromises)
-                .then(responses => {
-                    if (responses.every(response => response && response.ok)) {
-                        //all images uploaded successfully
-                        if (postHash) {
-                            this.continueSavingPostToBackend(postHash);
-                        } else {
-                            this.showSuccessMessage();
-                        }
+    private saveImagesToCloudinary() {
+        return uploadImages(this.state.postImages, this.abortController.signal);
+    }
+
+    private afterImagesSaved(uploadPromises: Promise<Response>[], postHash?: string) {
+        Promise.all(uploadPromises)
+            .then(responses => {
+                if (responses.every(response => response && response.ok)) {
+                    //all images uploaded successfully
+                    if (postHash) {
+                        this.continueSavingPostToBackend(postHash);
                     } else {
-                        responses = responses.filter(response => !response || !response.ok);
-                        console.log(responses.toString());
-                        showInfoModal('Nie udało się wysłać wszystkich plików. Post nie został zapisany.');
-                        postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
+                        this.showSuccessMessage();
                     }
-                })
-                .catch(error => {
-                    console.log(error);
+                } else {
+                    responses = responses.filter(response => !response || !response.ok);
+                    console.log(responses.toString());
+                    showInfoModal('Nie udało się wysłać wszystkich plików. Post nie został zapisany.');
                     postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
-                });
-        } else if (postHash) {
-            this.continueSavingPostToBackend(postHash);
-        } else {
-            this.showSuccessMessage();
-        }
+                }
+            })
+            .catch(error => {
+                console.log(error);
+                postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
+            });
     }
 
     //Remove post changes, that are temporarily saved in backend
@@ -370,33 +363,23 @@ export default class Writer extends React.Component<WriterProps, State> {
 
     private renderForWarning() {
         return (
-            <div className="warningDetails">
-                <label htmlFor="warningDaysValidInput">Czas zakończenia ostrzeżenia:</label>
-                <DatePicker
-                    selected={this.state.warningDueDate}
-                    onChange={this.handleWarningDueDateChange}
-                    showTimeSelect
-                    timeFormat="p"
-                    timeIntervals={30}
-                    dateFormat="Pp"
-                    locale="pl"
-                    includeDates={Array.from(new Array(14), (val, index) => addDays(new Date(), index))}
-                    className="input"
-                    fixedHeight
-                />
-                <label htmlFor="warningShortInput">Krótki opis (zostanie wyświetlony w bocznej sekcji strony): </label>
-                <input
-                    id="warningShortInput"
-                    type="text"
-                    className="input"
-                    required={true}
-                    maxLength={80}
-                    ref={this.warningShortInput}
-                    defaultValue={this.props.postToEdit ? this.props.postToEdit.shortDescription : ''}
-                    onKeyUp={e => validateField(e.target)}
-                    onBlur={e => validateField(e.target)}
-                />
-            </div>
+            <>
+                <div className="warningDetails">
+                    <label htmlFor="warningDaysValidInput">Czas zakończenia ostrzeżenia:</label>
+                    <DatePicker
+                        selected={this.state.warningDueDate}
+                        onChange={this.handleWarningDueDateChange}
+                        showTimeSelect
+                        timeFormat="p"
+                        timeIntervals={30}
+                        dateFormat="Pp"
+                        locale="pl"
+                        includeDates={Array.from(new Array(14), (val, index) => addDays(new Date(), index))}
+                        className="input topBottomMargin"
+                        fixedHeight
+                    />
+                </div>
+            </>
         );
     }
 
@@ -434,7 +417,7 @@ export default class Writer extends React.Component<WriterProps, State> {
                                     placeholder="Tytuł"
                                     ref={this.titleTextArea}
                                     defaultValue={this.props.postToEdit ? this.props.postToEdit.title : ''}
-                                    className="input"
+                                    className="input topBottomMargin"
                                     onKeyUp={e => validateField(e.target)}
                                     onBlur={e => validateField(e.target)}
                                 />
@@ -446,38 +429,42 @@ export default class Writer extends React.Component<WriterProps, State> {
                                     placeholder="Treść posta..."
                                     ref={this.postDescriptionTextArea}
                                     defaultValue={this.props.postToEdit ? this.props.postToEdit.description : ''}
-                                    className="textarea"
+                                    className="textarea topBottomMargin"
                                 />
                             </div>
                             <div className="column">
                                 <p>Typ postu: </p>
-                                <input
-                                    type="radio"
-                                    id="forecast"
-                                    name="postType"
-                                    value="Prognoza"
-                                    checked={this.state.postType === PostType.FORECAST}
-                                    onChange={() =>
-                                        this.setState({
-                                            postType: PostType.FORECAST
-                                        })
-                                    }
-                                />
-                                <label htmlFor="forecast"> Prognoza</label>
-                                <br />
-                                <input
-                                    type="radio"
-                                    id="warning"
-                                    name="postType"
-                                    value="Ostrzeżenie"
-                                    checked={this.state.postType === PostType.WARNING}
-                                    onChange={() =>
-                                        this.setState({
-                                            postType: PostType.WARNING
-                                        })
-                                    }
-                                />
-                                <label htmlFor="warning"> Ostrzeżenie</label>
+                                <div style={{ marginBottom: '0.2rem' }}>
+                                    <input
+                                        type="radio"
+                                        id="forecast"
+                                        name="postType"
+                                        value="Prognoza"
+                                        checked={this.state.postType === PostType.FORECAST}
+                                        onChange={() =>
+                                            this.setState({
+                                                postType: PostType.FORECAST
+                                            })
+                                        }
+                                    />
+                                    <label htmlFor="forecast"> Prognoza</label>
+                                </div>
+                                <div style={{ marginBottom: '0.2rem' }}>
+                                    <input
+                                        type="radio"
+                                        id="warning"
+                                        name="postType"
+                                        value="Ostrzeżenie"
+                                        checked={this.state.postType === PostType.WARNING}
+                                        onChange={() =>
+                                            this.setState({
+                                                postType: PostType.WARNING
+                                            })
+                                        }
+                                    />
+                                    <label htmlFor="warning"> Ostrzeżenie</label>
+                                </div>
+                                {this.state.postType === PostType.WARNING ? this.renderForWarning() : null}
                             </div>
                         </div>
                         <p>
@@ -519,7 +506,6 @@ export default class Writer extends React.Component<WriterProps, State> {
                             })}
                         </div>
                         <div className="is-divider" />
-                        {this.state.postType === PostType.WARNING ? this.renderForWarning() : null}
                         <div className="writerBottomButtons">
                             <input type="button" className="button" value="Wyślij" onClick={this.handleSubmit} />
                             {this.props.postToEdit ? (
@@ -537,7 +523,7 @@ export default class Writer extends React.Component<WriterProps, State> {
                         </div>
                     </div>
                 </section>
-                <Copyright fontColor={'white'}/>
+                <Copyright fontColor={'white'} />
             </div>
         );
     }

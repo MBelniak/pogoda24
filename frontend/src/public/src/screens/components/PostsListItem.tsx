@@ -117,7 +117,7 @@ export default class PostsListItem extends React.Component<PostsItemProps, Posts
                     </a>
                 </div>
                 <div className="postDescription fontSizeSmall">{this.createDescription()}</div>
-                {this.props.post.postType !== PostType.FACT ? (
+                {this.props.post.postType !== PostType.FACT && this.props.post.imagesPublicIds.length > 0 ? (
                     <>
                         <div className="is-divider" />
                         <div style={{ textAlign: 'center' }}>

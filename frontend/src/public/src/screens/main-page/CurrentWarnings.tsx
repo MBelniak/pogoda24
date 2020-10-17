@@ -1,11 +1,6 @@
 import React from 'react';
 import './CurrentWarnings.scss';
-
-interface WarningInfo {
-    postId: string;
-    dueDate: Date;
-    title?: string;
-}
+import { WarningInfo } from './MainPage';
 
 interface CurrentWarningsProps {
     warningInfo: WarningInfo[];

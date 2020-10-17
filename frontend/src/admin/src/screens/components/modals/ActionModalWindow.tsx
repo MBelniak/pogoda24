@@ -12,6 +12,7 @@ export function showActionModal(message: string, actions: { text: string; action
                     {actions.map((action, key) => {
                         return (
                             <button
+                                key={key}
                                 className={key == 0 ? 'button is-primary' : 'button is-secondary'}
                                 style={{ float: 'right' }}
                                 onClick={action.action}>

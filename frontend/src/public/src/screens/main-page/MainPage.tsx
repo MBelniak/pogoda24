@@ -8,10 +8,10 @@ import CustomLinearProgress from '../components/LinearProgress';
 import { CurrentWarnings } from './CurrentWarnings';
 import '../../sass/main.scss';
 
-interface WarningInfo {
+export interface WarningInfo {
+    title: string;
     postId: string;
     dueDate: Date;
-    title?: string;
 }
 
 interface State {
@@ -33,7 +33,7 @@ export class MainPage extends React.Component<{}, State> {
         this.abortController = new AbortController();
     }
 
-    componentDidMount() {
+    private fetchPosts() {
         fetchApi('api/posts?page=0&count=' + this.forecastsPerPage, {
             signal: this.abortController.signal
         })
@@ -53,7 +53,9 @@ export class MainPage extends React.Component<{}, State> {
             .catch(error => {
                 console.log(error);
             });
+    }
 
+    private fetchWarningInfo() {
         fetchApi('api/posts/currentWarnings', {
             signal: this.abortController.signal
         })
@@ -86,6 +88,11 @@ export class MainPage extends React.Component<{}, State> {
             });
     }
 
+    componentDidMount() {
+        this.fetchPosts();
+        this.fetchWarningInfo();
+    }
+
     componentWillUnmount() {
         this.abortController.abort();
     }
@@ -102,7 +109,7 @@ export class MainPage extends React.Component<{}, State> {
                         <>
                             <div className="column is-2 warnings">
                                 {this.state.warningInfo ? (
-                                    <CurrentWarnings warningInfo={this.state.warningInfo}/>
+                                    <CurrentWarnings warningInfo={this.state.warningInfo} />
                                 ) : (
                                     <CustomLinearProgress />
                                 )}

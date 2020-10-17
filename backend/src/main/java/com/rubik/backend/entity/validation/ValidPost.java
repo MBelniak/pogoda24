@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Constraint(validatedBy = { PostValidation.class })
 public @interface ValidPost {
-    String message() default "Post of type 'warning' must have 'shortDescription' and 'isAddedToTopBar' properties specified.";
+    String message() default "Post of type 'warning' must have 'dueDate' property specified.";
 
     Class<?>[] groups() default {};
 

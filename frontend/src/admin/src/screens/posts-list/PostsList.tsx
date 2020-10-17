@@ -10,7 +10,7 @@ import { TopImage } from '../components/TopImage';
 import Copyright from '@shared/components/Copyright';
 import { Link } from 'react-router-dom';
 import PagingBar from '@shared/components/PagingBar';
-import styles from '@shared/scss/main.scss'
+import styles from '@shared/scss/main.scss';
 
 interface State {
     posts: Post[] | undefined;
@@ -24,7 +24,7 @@ export default class PostsList extends React.Component<{}, State> {
     private abortController;
 
     state: State = {
-        posts: [],
+        posts: undefined,
         totalPostsCount: 0,
         currentPage: 0,
         postToEdit: undefined
@@ -60,7 +60,6 @@ export default class PostsList extends React.Component<{}, State> {
                             this.setState({
                                 posts: posts.map(post => postDTOToPost(post))
                             });
-                            closeModal();
                         })
                         .catch(error => {
                             console.log(error);
@@ -121,25 +120,27 @@ export default class PostsList extends React.Component<{}, State> {
                             <TopImage />
                             <h2 className="title">Lista postów: </h2>
                             <div className="container">
-                                {!this.state.posts ? null : this.state.posts.length === 0 ? (
-                                    <div
-                                        style={{
-                                            textAlign: 'center',
-                                            marginTop: '20px'
-                                        }}>
-                                        <p>Brak postów.</p>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        {this.state.posts.map((post, i) => (
-                                            <PostsListItem
-                                                key={i}
-                                                post={post}
-                                                initiatePostEdit={this.initiatePostEdit}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
+                                {this.state.posts ? (
+                                    this.state.posts.length === 0 ? (
+                                        <div
+                                            style={{
+                                                textAlign: 'center',
+                                                marginTop: '20px'
+                                            }}>
+                                            <p>Brak postów.</p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            {this.state.posts.map((post, i) => (
+                                                <PostsListItem
+                                                    key={i}
+                                                    post={post}
+                                                    initiatePostEdit={this.initiatePostEdit}
+                                                />
+                                            ))}
+                                        </div>
+                                    )
+                                ) : null}
                             </div>
                             {this.state.totalPostsCount <= this.postsPerPage ? null : (
                                 <PagingBar
@@ -151,12 +152,12 @@ export default class PostsList extends React.Component<{}, State> {
                                     fontColor={'white'}
                                 />
                             )}
-                            <div className="is-divider"/>
+                            <div className="is-divider" />
                             <Link to="/write" className="button">
                                 Wróć
                             </Link>
                         </section>
-                        <Copyright fontColor={'white'}/>
+                        <Copyright fontColor={'white'} />
                     </div>
                 )}
             </>

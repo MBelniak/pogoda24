@@ -5,24 +5,24 @@ import './ForecastMapList.scss';
 import { closeModal, showModal } from './ModalWindow';
 
 export class ForecastMapList extends React.Component<{
-    imagesPublicIds?: string[];
+    imagesPublicIds: string[];
 }> {
     constructor(props) {
         super(props);
     }
 
     componentDidMount() {
-        const body = document.getElementsByTagName("body")[0];
-        body.addEventListener('keydown', (event) => {
+        const body = document.getElementsByTagName('body')[0];
+        body.addEventListener('keydown', event => {
             if (event.key === 'Escape') {
                 closeModal();
             }
         });
 
-        if (this.props.imagesPublicIds) {
-            const images = document.querySelectorAll(".forecastMapImage img");
+        if (this.props.imagesPublicIds.length > 0) {
+            const images = document.querySelectorAll('.forecastMapImage img');
             images.forEach(img => {
-                img.addEventListener("click", event => {
+                img.addEventListener('click', event => {
                     event.stopPropagation();
                     showModal(
                         <div
@@ -32,14 +32,14 @@ export class ForecastMapList extends React.Component<{
                                 maxHeight: '100%'
                             }}
                             onClick={() => closeModal()}>
-                            <img src={img.getAttribute("src")!!}/>
+                            <img src={img.getAttribute('src')!!} />
                         </div>
                     );
                     const clickListener = () => closeModal();
 
                     body.addEventListener('click', clickListener);
                     body.addEventListener('click', () => body.removeEventListener('click', clickListener));
-                })
+                });
             });
         }
     }
@@ -47,20 +47,13 @@ export class ForecastMapList extends React.Component<{
     render() {
         return (
             <div className="columns is-centered">
-                {this.props.imagesPublicIds
-                    ? this.props.imagesPublicIds.map((imagePublicId, i) => (
-                          <div
-                              className="forecastMapImage column is-half"
-                              key={i}>
-                              <Image
-                                  publicId={imagePublicId}
-                                  format="png"
-                                  quality="auto">
-                                  <Transformation crop="fill" gravity="faces" />
-                              </Image>
-                          </div>
-                      ))
-                    : null}
+                {this.props.imagesPublicIds.map((imagePublicId, i) => (
+                    <div className="forecastMapImage column is-half" key={i}>
+                        <Image publicId={imagePublicId} format="png" quality="auto">
+                            <Transformation crop="fill" gravity="faces" />
+                        </Image>
+                    </div>
+                ))}
             </div>
         );
     }

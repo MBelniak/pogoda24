@@ -9,6 +9,7 @@ import com.rubik.backend.entity.validation.ValidPost;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,8 +42,6 @@ public class Post {
     @JsonFormat(timezone="GMT+02", shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date dueDate;
 
-    private String shortDescription;
-
     public Post() {
         this.views = 0L;
     }
@@ -55,8 +54,8 @@ public class Post {
                    @JsonProperty(value = "description", required = true) String description,
                    @JsonProperty("imagesPublicIds") List<String> imagesPublicIds,
                    @JsonProperty("views") Long views,
-                   @JsonProperty("dueDate") Date dueDate,
-                   @JsonProperty("shortDescription") String shortDescription) {
+                   @JsonProperty("dueDate") Date dueDate)
+    {
         if (id != null) {
             this.id = id;
         }
@@ -65,7 +64,9 @@ public class Post {
         this.title = title;
         this.description = description;
         if (imagesPublicIds != null) {
-            this.setImagesPublicIds(imagesPublicIds);
+            this.imagesPublicIds = imagesPublicIds;
+        } else {
+            this.imagesPublicIds = new ArrayList<>();
         }
         if (views != null) {
             this.views = views;
@@ -74,9 +75,6 @@ public class Post {
         }
         if (dueDate != null) {
             this.dueDate = dueDate;
-        }
-        if (shortDescription != null) {
-            this.shortDescription = shortDescription;
         }
     }
 
@@ -142,13 +140,5 @@ public class Post {
 
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
-    }
-
-    public String getShortDescription() {
-        return shortDescription;
-    }
-
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
     }
 }

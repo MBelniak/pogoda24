@@ -108,7 +108,7 @@ export default class PostView extends React.Component<{}, State> {
                                             />
                                         )}
                                     </div>
-                                    {this.post.postType !== PostType.FACT ? (
+                                    {this.post.postType !== PostType.FACT && this.post.imagesPublicIds.length > 0 ? (
                                         <>
                                             <div className="is-divider" />
                                             <div style={{ textAlign: 'center' }}>

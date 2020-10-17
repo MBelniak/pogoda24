@@ -117,15 +117,13 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
                     <input type="button" className="button" value="Usuń" onClick={this.handleDeleteClick} />
                 </div>
                 <div className="postIconList">
-                    {this.props.post.imagesPublicIds
-                        ? this.props.post.imagesPublicIds.map((imagePublicId, i) => (
-                              <div key={i} className="postIconListItem">
-                                  <Image publicId={imagePublicId} format="png" quality="auto">
-                                      <Transformation crop="fill" gravity="faces" />
-                                  </Image>
-                              </div>
-                          ))
-                        : null}
+                    {this.props.post.imagesPublicIds.map((imagePublicId, i) => (
+                        <div key={i} className="postIconListItem">
+                            <Image publicId={imagePublicId} format="png" quality="auto">
+                                <Transformation crop="fill" gravity="faces" />
+                            </Image>
+                        </div>
+                    ))}
                 </div>
             </div>
         );

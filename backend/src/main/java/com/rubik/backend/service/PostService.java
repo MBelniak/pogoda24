@@ -146,7 +146,12 @@ public class PostService {
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         try {
             List<Post> posts = querySnapshot.get().toObjects(Post.class);
-            posts = posts.stream().filter(post -> post.getPostType() == PostType.WARNING && post.getDueDate() != null && post.getDueDate().getTime() >= new Date().getTime()).collect(Collectors.toList());
+            posts = posts.stream()
+                    .filter(post -> post.getPostType() == PostType.WARNING
+                                && post.getDueDate() != null
+                                && post.getDueDate().getTime() >= new Date().getTime())
+                    .collect(Collectors.toList());
+
             return posts.stream().map(WarningInfoDTO::new).collect(Collectors.toList());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();

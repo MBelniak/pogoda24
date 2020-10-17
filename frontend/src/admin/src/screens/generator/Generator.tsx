@@ -31,7 +31,7 @@ const getInitialCityData = (): CityDataMap => {
     const dataMap: CityDataMap = {};
     cityList.forEach(city => {
         dataMap[city.name] = {
-            temperature: getCookie('new_generator_' + city.name + '_temp') || '0',
+            temperature: getCookie('new_generator_' + city.name + '_temp') || '',
             iconCode: getCookie('new_generator_' + city.name + '_type')
         };
     });
@@ -171,7 +171,7 @@ export class Generator extends React.Component<{}, GeneratorState> {
                             onDateChange={this.onDateChange}
                             date={this.state.date}
                         />
-                        <div className="break" />
+                        <div className="break-flex" />
                         {Object.keys(this.state.cityDataMap).map((cityName, key) => {
                             return (
                                 <CityComponent

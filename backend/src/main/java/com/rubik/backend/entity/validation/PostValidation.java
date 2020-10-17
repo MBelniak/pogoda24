@@ -12,7 +12,7 @@ public class PostValidation implements ConstraintValidator<ValidPost, Post> {
 
     public boolean isValid(Post post, ConstraintValidatorContext context) {
         if (PostType.WARNING.toString().equals(post.getPostType().toString())) {
-            return post.getShortDescription() != null && post.getDueDate() != null;
+            return post.getDueDate() != null;
         }
         return true;
     }
