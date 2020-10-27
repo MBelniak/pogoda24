@@ -48,6 +48,7 @@ export class Generator extends React.Component<{}, GeneratorState> {
         this.onTemperatureChange = this.onTemperatureChange.bind(this);
         this.onIconSelected = this.onIconSelected.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
+        this.clearTemperatureInputs = this.clearTemperatureInputs.bind(this);
         const savedDayOrNight = getCookie('new_generator_time');
         let dayOrNight: DayOrNight;
         dayOrNight = (savedDayOrNight as DayOrNight) || 'night';
@@ -81,6 +82,17 @@ export class Generator extends React.Component<{}, GeneratorState> {
         currentMap[cityName] = { ...currentMap[cityName], iconCode: iconCode };
         this.setState({ cityDataMap: currentMap });
         saveCookie('new_generator_' + cityName + '_type', iconCode);
+    }
+
+    private clearTemperatureInputs() {
+        const newMap: CityDataMap = {};
+        Object.keys(this.state.cityDataMap).forEach(key => {
+            newMap[key] = {
+                temperature: '',
+                iconCode: this.state.cityDataMap[key].iconCode
+            };
+        });
+        this.setState({ cityDataMap: newMap });
     }
 
     private onDateChange(e) {
@@ -187,14 +199,16 @@ export class Generator extends React.Component<{}, GeneratorState> {
                         })}
                     </div>
                     <button
-                        className="button"
-                        style={{ width: '100%', fontSize: '1.2rem' }}
+                        className="button generatorButton"
                         onClick={() => this.redrawMap(true, this.state.dayOrNight)}>
                         Generuj
                     </button>
-                    <Link to="/write" className="button" style={{ width: '100%', fontSize: '1.2rem' }}>
+                    <Link to="/write" className="button generatorButton">
                         Wróć
                     </Link>
+                    <button className="button generatorButton" onClick={this.clearTemperatureInputs}>
+                        Jestem leniwy Marcin Borek
+                    </button>
                 </section>
                 <Copyright fontColor={'white'} />
             </div>
