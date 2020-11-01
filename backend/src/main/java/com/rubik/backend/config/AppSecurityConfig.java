@@ -48,7 +48,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), new AntPathRequestMatcher("/api/**"))
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login").not().authenticated()
                 .antMatchers("/write", "/list", "/writer", "/traffic", "/generator", "/factwriter").authenticated()
                 .antMatchers("/", "/prognozy", "/ciekawostki", "/ostrzezenia", "/onas", "/posts/**").permitAll()
                 .and()
