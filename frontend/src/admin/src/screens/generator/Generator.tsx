@@ -103,8 +103,8 @@ export class Generator extends React.Component<{}, GeneratorState> {
         const cImg = new Image();
         cImg.src =
             dayOrNight === 'day'
-                ? 'https://res.cloudinary.com/pogoda24/image/upload/w_1080,h_720/mapa-dzien_wqfijp.png'
-                : 'https://res.cloudinary.com/pogoda24/image/upload/w_1080,h_720/mapa-noc_mm8tzj.png';
+                ? 'https://res.cloudinary.com/pogoda24/image/upload/w_1080,h_720/mapa_dzien_ib0qcl.png'
+                : 'https://res.cloudinary.com/pogoda24/image/upload/w_1080,h_720/mapa_noc_s7zhjv.png';
         cImg.onload = () => {
             this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
             this.context = this.canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -136,7 +136,7 @@ export class Generator extends React.Component<{}, GeneratorState> {
                 '.png';
             icon.onload = e => {
                 if (['Tatry', 'Sudety', 'Bieszczady'].indexOf(city.name) > -1) {
-                    this.context.drawImage(e.target, city.x, city.y, 55, 55);
+                    this.context.drawImage(e.target, city.x, city.y, 60, 60);
                 } else {
                     this.context.drawImage(e.target, city.x, city.y, 65, 65);
                 }
@@ -167,8 +167,8 @@ export class Generator extends React.Component<{}, GeneratorState> {
         this.context.font = 'bold 45px Calibri';
         this.context.fillStyle = 'white';
         this.context.strokeStyle = 'black';
-        this.context.fillText(this.state.date, 55, 620);
-        this.context.strokeText(this.state.date, 55, 620);
+        this.context.fillText(this.state.date, 50, 620);
+        this.context.strokeText(this.state.date, 50, 620);
     }
 
     render() {
@@ -207,7 +207,7 @@ export class Generator extends React.Component<{}, GeneratorState> {
                         Wróć
                     </Link>
                     <button className="button generatorButton" onClick={this.clearTemperatureInputs}>
-                        Jestem leniwy Marcin Borek
+                        Wyczyść temperatury
                     </button>
                 </section>
                 <Copyright fontColor={'white'} />
