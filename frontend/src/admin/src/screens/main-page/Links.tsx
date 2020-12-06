@@ -13,10 +13,10 @@ export class Links extends React.Component {
         return (
             <div className="mainPageLinks">
                 <div className="mainPageLinksItem centerHorizontally">
-                    <a href="/generator">
+                    <Link to="/generator">
                         <img src={generatorImg} />
                         <span>Generator</span>
-                    </a>
+                    </Link>
                 </div>
                 <div className="mainPageLinksItem centerHorizontally">
                     <Link to="/writer">
