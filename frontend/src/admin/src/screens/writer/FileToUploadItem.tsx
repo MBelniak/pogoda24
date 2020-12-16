@@ -7,8 +7,8 @@ interface UploadedFilesItemProps {
     file: PostImage;
     listId: number;
     onRemoveFile: (id: number) => void;
-    onMoveForward: (id: number) => void;
-    onMoveBackward: (id: number) => void;
+    onMoveForward?: (id: number) => void;
+    onMoveBackward?: (id: number) => void;
 }
 
 export default class FileToUploadItem extends React.Component<UploadedFilesItemProps> {
@@ -74,14 +74,16 @@ export default class FileToUploadItem extends React.Component<UploadedFilesItemP
                 <div className="uploadedFilesItemOverlayWrapper" ref={this.overlayDiv} onClick={this.showPicture}>
                     <div className="uploadedFilesItemOverlay" />
                     <div className="uploadedFilesItemOverlayContent ">
-                        <div
-                            className="arrowLeft"
-                            onClick={e => {
-                                e.stopPropagation();
-                                this.props.onMoveBackward(this.props.listId);
-                            }}>
-                            <i style={{ fontSize: '40px', margin: '10px' }} className={'fa fa-angle-left'} />
-                        </div>
+                        {this.props.onMoveBackward && (
+                            <div
+                                className="arrowLeft"
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    this.props.onMoveBackward!(this.props.listId);
+                                }}>
+                                <i style={{ fontSize: '40px', margin: '10px' }} className={'fa fa-angle-left'} />
+                            </div>
+                        )}
                         <div>
                             <div
                                 className="uploadedFilesItemDelete"
@@ -91,14 +93,16 @@ export default class FileToUploadItem extends React.Component<UploadedFilesItemP
                                 }}
                             />
                         </div>
-                        <div
-                            className="arrowRight"
-                            onClick={e => {
-                                e.stopPropagation();
-                                this.props.onMoveForward(this.props.listId);
-                            }}>
-                            <i style={{ fontSize: '40px', margin: '10px' }} className={'fa fa-angle-right'} />
-                        </div>
+                        {this.props.onMoveForward && (
+                            <div
+                                className="arrowRight"
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    this.props.onMoveForward!(this.props.listId);
+                                }}>
+                                <i style={{ fontSize: '40px', margin: '10px' }} className={'fa fa-angle-right'} />
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

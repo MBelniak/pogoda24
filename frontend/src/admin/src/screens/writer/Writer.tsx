@@ -54,8 +54,8 @@ export default class Writer extends React.Component<WriterProps, State> {
         this.loginInput = React.createRef();
         this.passwordInput = React.createRef();
         this.abortController = new AbortController();
-        if (this.props.postToEdit) {
-            this.savedPostId = this.props.postToEdit.id;
+        if (props.postToEdit) {
+            this.savedPostId = props.postToEdit.id;
         }
         this.state = {
             postType: this.props.postToEdit ? this.props.postToEdit.postType : PostType.FORECAST,
@@ -128,7 +128,10 @@ export default class Writer extends React.Component<WriterProps, State> {
                             if (this.props.postToEdit) {
                                 // we get postHash from backend
                                 if (postIdOrPostHash !== null) {
-                                    const uploadPromises = this.saveImagesToCloudinary();
+                                    const uploadPromises = uploadImages(
+                                        this.state.postImages,
+                                        this.abortController.signal
+                                    );
                                     this.afterImagesSaved(uploadPromises, postIdOrPostHash);
                                 } else {
                                     showInfoModal('Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.');
@@ -137,7 +140,7 @@ export default class Writer extends React.Component<WriterProps, State> {
                                 // we get postId from backend
                                 this.savedPostId = postIdOrPostHash;
                                 //post saved, send images to cloudinary
-                                const uploadPromises = this.saveImagesToCloudinary();
+                                const uploadPromises = uploadImages(this.state.postImages, this.abortController.signal);
                                 if (uploadPromises.length > 0) {
                                     this.afterImagesSaved(uploadPromises);
                                 } else {
@@ -206,10 +209,6 @@ export default class Writer extends React.Component<WriterProps, State> {
             headers: headers,
             body: JSON.stringify(requestBody)
         });
-    }
-
-    private saveImagesToCloudinary() {
-        return uploadImages(this.state.postImages, this.abortController.signal);
     }
 
     private afterImagesSaved(uploadPromises: Promise<Response>[], postHash?: string) {

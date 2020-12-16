@@ -17,7 +17,6 @@ import {
     link
 } from 'suneditor/src/plugins';
 
-import { uploadImages } from '../../helpers/CloudinaryHelper';
 import { PostImage } from '../../model/PostImage';
 import { ButtonListItem } from 'suneditor/src/options';
 import { fetchApi } from '../../helpers/fetchHelper';
@@ -31,37 +30,24 @@ import { showActionModal } from '../components/modals/ActionModalWindow';
 import { validateField } from '../../helpers/ValidateField';
 import { showAuthModal } from '../components/modals/AuthenticationModal';
 import { Link } from 'react-router-dom';
+import FileDropper from '../components/FileDropper';
+import { showInfoModal } from '../components/modals/InfoModalWindow';
+import FileToUploadItem from '../writer/FileToUploadItem';
+import { uploadImages } from '../../helpers/CloudinaryHelper';
 
 const { BACKEND_DATE_FORMAT } = config;
 
-function findIndex(array: Image[], index) {
-    let idx = -1;
-
-    array.some(function (image, i) {
-        if (image.postImage.id === index) {
-            idx = i;
-            return true;
-        }
-        return false;
-    });
-
-    return idx;
-}
-
-interface Image {
-    htmlElement?: HTMLImageElement;
-    postImage: PostImage;
-}
-
-export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
+export default class FactWriter extends React.Component<
+    { postToEdit?: Post; onFinishEditing?: () => void },
+    { mainImage?: PostImage }
+> {
     private editor;
-    private imagesList: Image[] = [];
-    private imagesSrcQueue: string[] = [];
-    private nextImageId = 0;
     private abortController;
     private titleInput;
     private loginInput;
     private passwordInput;
+    private fileInput;
+    private savedPostId;
 
     constructor(props) {
         super(props);
@@ -69,12 +55,18 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
         this.titleInput = React.createRef();
         this.loginInput = React.createRef();
         this.passwordInput = React.createRef();
-        this.handleImageUploadBefore = this.handleImageUploadBefore.bind(this);
-        this.handleImageUpload = this.handleImageUpload.bind(this);
+        this.fileInput = React.createRef();
+
+        if (props.postToEdit) {
+            this.savedPostId = props.postToEdit.id;
+        }
+        this.state = { mainImage: undefined };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.reloadPage = this.reloadPage.bind(this);
         this.closeModalAndShowEditor = this.closeModalAndShowEditor.bind(this);
         this.handleLoginClick = this.handleLoginClick.bind(this);
+        this.onMainFileAdded = this.onMainFileAdded.bind(this);
+        this.onRemoveMainFile = this.onRemoveMainFile.bind(this);
     }
 
     private initializeEditor(post: Post) {
@@ -85,39 +77,12 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
         target.setAttribute('contenteditable', 'true');
     }
 
-    private handleImageUploadBefore(files: Array<File>, info: object) {
-        for (const file of files) {
-            let timestamp = new Date().getTime().toString();
-            timestamp = timestamp.substr(0, timestamp.length - 3);
-            this.imagesList.push({
-                postImage: {
-                    id: this.nextImageId,
-                    file: file,
-                    publicId: file.name + timestamp,
-                    timestamp: timestamp
-                }
-            });
-        }
-
-        return true;
-    }
-
-    private handleImageUpload(
-        targetImgElement: HTMLImageElement,
-        index: number,
-        state: string,
-        imageInfo: object,
-        remainingFilesCount: number
-    ) {
-        if (state === 'delete') {
-            this.imagesList.splice(findIndex(this.imagesList, index), 1);
-        } else {
-            this.nextImageId++;
-            if (state === 'create') {
-                const image = this.imagesList[findIndex(this.imagesList, index)];
-                image.htmlElement = targetImgElement;
-            }
-        }
+    private getDescriptionFromEditor() {
+        let target = document.getElementsByClassName('se-wrapper-inner')[0];
+        target.setAttribute('contenteditable', 'false');
+        target = document.getElementsByClassName('se-wrapper')[0].cloneNode(true) as HTMLElement;
+        let description = JSON.stringify(target.innerHTML);
+        return description.substr(1, description.length - 2);
     }
 
     private handleSubmit() {
@@ -126,42 +91,67 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
         }
         showModal(<LoadingIndicator />);
         this.editor.hide();
-        this.imagesSrcQueue = [];
 
-        //In this case, we first send images to cloudinary, because we're gonna need the direct URL to the image
-        Promise.all(
-            uploadImages(
-                this.imagesList.map(image => image.postImage),
-                this.abortController.signal
-            )
-        )
-            .then(responses => {
-                if (responses.every(response => response && response.ok)) {
-                    const jsonPromises: Promise<void>[] = [];
-                    // Save url from cloudinary to images info
-                    for (let i = 0; i < this.imagesList.length; ++i) {
-                        if (this.imagesList[i].htmlElement) {
-                            this.imagesSrcQueue.push(
-                                //save local images urls in case upload is not successful
-                                this.imagesList[i].htmlElement!!.src
-                            );
-                            jsonPromises.push(
-                                responses[i].json().then(response => {
-                                    this.imagesList[i].htmlElement!!.src = response.url;
-                                })
-                            );
-                        }
+        this.savePost();
+    }
+
+    private savePost(authHeader?: string) {
+        this.sendPostToBackend()
+            .then(response => {
+                if (response && response.ok) {
+                    if (this.state.mainImage && this.state.mainImage.file !== null) {
+                        response
+                            .text()
+                            .then((postIdOrPostHash: any) => {
+                                if (this.props.postToEdit) {
+                                    if (postIdOrPostHash !== null) {
+                                        const uploadPromises = uploadImages(
+                                            [this.state.mainImage!],
+                                            this.abortController.signal
+                                        );
+                                        this.afterImagesSaved(uploadPromises, postIdOrPostHash);
+                                    } else {
+                                        showInfoModal(
+                                            'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
+                                        );
+                                    }
+                                } else if (postIdOrPostHash !== null) {
+                                    // we get postId from backend
+                                    this.savedPostId = postIdOrPostHash;
+                                    //post saved, send images to cloudinary
+                                    const uploadPromises = uploadImages(
+                                        [this.state.mainImage!],
+                                        this.abortController.signal
+                                    );
+                                    if (uploadPromises.length > 0) {
+                                        this.afterImagesSaved(uploadPromises);
+                                    } else {
+                                        this.showSuccessMessage();
+                                    }
+                                } else {
+                                    showInfoModal('Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.');
+                                }
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            });
                     }
-                    Promise.all(jsonPromises).then(() => this.sendPostToBackend());
+                } else if (response.status === 401) {
+                    //user is not authenticated
+                    showAuthModal({
+                        handleLoginClick: this.handleLoginClick,
+                        loginInputRef: this.loginInput,
+                        passwordInputRef: this.passwordInput,
+                        authFailed: typeof authHeader !== 'undefined'
+                    });
                 } else {
-                    responses = responses.filter(response => !response || !response.ok);
-                    console.log(responses.toString());
-                    this.showErrorMessage('Nie udało się wysłać wszystkich plików. Ciekawostka nie została zapisana.');
+                    console.log(response.status);
+                    console.log(response.statusText + ', ' + response.body);
+                    this.showErrorMessage('Wystąpił błąd serwera. Nie udało się zapisać postu.');
                 }
             })
             .catch(error => {
                 console.log(error);
-                this.showErrorMessage('Nie udało się wysłać wszystkich plików. Ciekawostka nie została zapisana.');
             });
     }
 
@@ -176,11 +166,7 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
     }
 
     private sendPostToBackend(authHeader?: string) {
-        let target = document.getElementsByClassName('se-wrapper-inner')[0];
-        target.setAttribute('contenteditable', 'false');
-        target = document.getElementsByClassName('se-wrapper')[0].cloneNode(true) as HTMLElement;
-        let description = JSON.stringify(target.innerHTML);
-        description = description.substr(1, description.length - 2);
+        const description = this.getDescriptionFromEditor();
         const requestBodyPost = {
             postDate: format(new Date(), BACKEND_DATE_FORMAT),
             postType: PostType.FACT,
@@ -196,46 +182,81 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
 
         headers.append('Content-Type', 'application/json');
 
-        return fetchApi('api/posts', {
-            method: 'POST',
+        const post = this.props.postToEdit;
+        return fetchApi('api/posts' + (post ? '?temporary=true' : ''), {
+            method: post ? 'PUT' : 'POST',
             headers: headers,
             body: JSON.stringify(requestBodyPost)
-        })
-            .then(response => {
-                if (response && response.ok) {
-                    response
-                        .text()
-                        .then((data: any) => {
-                            if (data !== null) {
-                                //post saved
-                                this.showSuccessMessage();
-                            } else {
-                                this.revertImageSrcChange();
-                                this.showErrorMessage(
-                                    'Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.'
-                                );
-                            }
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-                } else if (response.status === 401) {
-                    //user is not authenticated
-                    showAuthModal({
-                        handleLoginClick: this.handleLoginClick,
-                        loginInputRef: this.loginInput,
-                        passwordInputRef: this.passwordInput,
-                        authFailed: typeof authHeader !== 'undefined'
-                    });
+        });
+    }
+
+    private afterImagesSaved(uploadPromises: Promise<Response>[], postHash?: string) {
+        Promise.all(uploadPromises)
+            .then(responses => {
+                if (responses.every(response => response && response.ok)) {
+                    //all images uploaded successfully
+                    if (postHash) {
+                        this.continueSavingPostToBackend(postHash);
+                    } else {
+                        this.showSuccessMessage();
+                    }
                 } else {
-                    console.log(response.status);
-                    console.log(response.statusText + ', ' + response.body);
-                    this.revertImageSrcChange();
-                    this.showErrorMessage('Wystąpił błąd serwera. Nie udało się zapisać postu.');
+                    responses = responses.filter(response => !response || !response.ok);
+                    console.log(responses.toString());
+                    showInfoModal('Nie udało się wysłać wszystkich plików. Post nie został zapisany.');
+                    postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
                 }
             })
             .catch(error => {
                 console.log(error);
+                postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
+            });
+    }
+
+    //Save temporarily saved changes to the database
+    private continueSavingPostToBackend(hash: string) {
+        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=true')
+            .then(response => {
+                if (response && response.ok) {
+                    this.showSuccessMessage();
+                } else {
+                    console.log(response.statusText + ', ' + response.body);
+                    showInfoModal('Wystąpił błąd przy zapisywaniu posta.');
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    //Remove post changes, that are temporarily saved in backend
+    private abortPostUpdate(hash: string) {
+        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=false')
+            .then(response => {
+                if (response && response.ok) {
+                    console.log('Post update aborted.');
+                } else {
+                    console.log('Cannot abort. Hash: ' + hash + '. Server response: ' + response);
+                }
+            })
+            .catch(error => {
+                console.log('Error while aborting update. Error message: ' + error);
+            });
+    }
+
+    private removePostFromBackend(postId: number) {
+        fetchApi('api/posts/' + postId, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (response && response.ok) {
+                    console.log('Removed post with id: ' + postId);
+                } else {
+                    console.log('Cannot remove post with id: ' + postId + '. Server response: ' + response);
+                }
+            })
+            .catch(error => {
+                console.log('Error while deleting post. Error message: ' + error);
             });
     }
 
@@ -260,20 +281,48 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
         const authHeader =
             'Basic ' + window.btoa(this.loginInput.current.value + ':' + this.passwordInput.current.value);
         showModal(<LoadingIndicator />);
-        this.sendPostToBackend(authHeader);
+        this.savePost(authHeader);
+    }
+
+    private onMainFileAdded(files: File[]) {
+        if (files.length > 1) {
+            showInfoModal('Możesz dodać tylko jedno zdjęcie.');
+            return;
+        }
+        if (this.state.mainImage) {
+            showActionModal('Już dodałeś zdjęcie. Czy chcesz je zmienić?', [
+                { text: 'Tak', action: () => this.addFileToState(files[0]) },
+                { text: 'Nie', action: () => {} }
+            ]);
+        } else {
+            this.addFileToState(files[0]);
+        }
+        this.fileInput.current.value = null;
+    }
+
+    private addFileToState(file: File) {
+        let timestamp = new Date().getTime().toString();
+        timestamp = timestamp.substr(0, timestamp.length - 3);
+
+        this.setState({
+            mainImage: {
+                id: 0,
+                file: file,
+                publicId: file.name + timestamp,
+                timestamp: timestamp
+            }
+        });
+    }
+
+    private onRemoveMainFile() {
+        this.setState({
+            mainImage: undefined
+        });
     }
 
     private closeModalAndShowEditor() {
         closeModal();
         this.editor.show();
-    }
-
-    private revertImageSrcChange() {
-        for (let i = 0; i < this.imagesList.length; ++i) {
-            if (this.imagesList[i].htmlElement) {
-                this.imagesList[i].htmlElement!!.src = this.imagesSrcQueue[i];
-            }
-        }
     }
 
     componentDidMount() {
@@ -299,10 +348,19 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
             ],
             buttonList: buttonList
         });
-        this.editor.onImageUpload = this.handleImageUpload;
-        this.editor.onImageUploadBefore = this.handleImageUploadBefore;
         if (this.props.postToEdit) {
             this.initializeEditor(this.props.postToEdit);
+            this.setState({
+                mainImage:
+                    this.props.postToEdit.imagesPublicIds.length > 0
+                        ? {
+                              id: 0,
+                              publicId: this.props.postToEdit.imagesPublicIds[0],
+                              file: null,
+                              timestamp: ''
+                          }
+                        : undefined
+            });
         }
     }
 
@@ -315,27 +373,71 @@ export default class FactWriter extends React.Component<{ postToEdit?: Post }> {
             <div className="main">
                 <section className="container is-fluid">
                     <TopImage />
-                    <div style={{ color: 'white', margin: '10px 0 10px 0' }}>
-                        <p className="fontSizeLarge">
-                            Uwaga! Nie dodawaj zdjęć ze schowka. Zamiast tego, użyj przyciku "Image".{' '}
+                    <div className="writerForm">
+                        <div style={{ color: 'white', margin: '10px 0 10px 0' }}>
+                            <p className="fontSizeLarge">
+                                Uwaga! Nie dodawaj zdjęć ze schowka. Zamiast tego, użyj przyciku "Image".{' '}
+                            </p>
+                            <label htmlFor="titleInput">Dodaj tytuł do ciekawostki: </label>
+                            <input
+                                style={{ marginTop: '10px' }}
+                                id="titleInput"
+                                className="input"
+                                placeholder="Tytuł"
+                                maxLength={100}
+                                ref={this.titleInput}
+                            />
+                        </div>
+                        <textarea id="suneditor" />
+                        <div className="is-divider" />
+                        <p>
+                            Dodaj zdjęcie główne. Będzie ono wyświetlone w skróconej wersji artykułu. Możesz przeciągnąć
+                            swoje pliki z dysku na kreskowane pole:
                         </p>
-                        <label htmlFor="titleInput">Dodaj tytuł do ciekawostki: </label>
+                        <FileDropper onFilesAdded={this.onMainFileAdded} customText={'Upuść plik tutaj'} />
+                        <p>...lub skorzystać z klasycznego dodawania plików: </p>
                         <input
-                            style={{ marginTop: '10px' }}
-                            id="titleInput"
-                            className="input"
-                            placeholder="Tytuł"
-                            maxLength={100}
-                            ref={this.titleInput}
+                            type="button"
+                            className="button"
+                            value="Wybierz pliki"
+                            onClick={() => document.getElementById('mapsFiles')?.click()}
                         />
+                        <input
+                            type="file"
+                            style={{ display: 'none' }}
+                            id="mapsFiles"
+                            accept="image/*"
+                            multiple={true}
+                            ref={this.fileInput}
+                            onChange={() => this.onMainFileAdded(this.fileInput.current.files)}
+                        />
+                        {this.state.mainImage && (
+                            <>
+                                <p>Obecnie wybrane zdjęcie:</p>
+                                <div className="column is-half">
+                                    <FileToUploadItem
+                                        listId={0}
+                                        file={this.state.mainImage}
+                                        onRemoveFile={this.onRemoveMainFile}
+                                    />
+                                </div>
+                            </>
+                        )}
+                        <div className="is-divider" />
+                        <input type="button" className="button" value="Wyślij" onClick={this.handleSubmit} />
+                        {this.props.postToEdit ? (
+                            <input
+                                type="button"
+                                className="button"
+                                value="Anuluj"
+                                onClick={this.props.onFinishEditing}
+                            />
+                        ) : (
+                            <Link to="/write" className="button">
+                                Anuluj
+                            </Link>
+                        )}
                     </div>
-                    <textarea id="suneditor" />
-                    <button className="button" onClick={this.handleSubmit}>
-                        Wyślij
-                    </button>
-                    <Link to="/write" className="button">
-                        Anuluj
-                    </Link>
                 </section>
                 <Copyright fontColor={'white'} />
             </div>

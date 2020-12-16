@@ -110,7 +110,7 @@ export default class PostsList extends React.Component<{}, State> {
             <>
                 {this.state.postToEdit ? (
                     this.state.postToEdit.postType === 'FACT' ? (
-                        <FactWriter postToEdit={this.state.postToEdit} />
+                        <FactWriter postToEdit={this.state.postToEdit} onFinishEditing={this.onFinishEditing} />
                     ) : (
                         <Writer postToEdit={this.state.postToEdit} onFinishEditing={this.onFinishEditing} />
                     )

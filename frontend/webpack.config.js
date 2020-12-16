@@ -2,7 +2,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const webpack = require('webpack');
 const path = require('path');
 const dotenv = require('dotenv').config();
@@ -110,7 +110,7 @@ module.exports = {
         }),
         // Ignore all locale files of moment.js
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        new LodashModuleReplacementPlugin()
-        // new BundleAnalyzerPlugin()
+        new LodashModuleReplacementPlugin(),
+        process.env.NODE_ENV === 'analyze' ? new BundleAnalyzerPlugin() : () => {}
     ]
 };
