@@ -5,7 +5,7 @@ import { fetchApi } from '../../helpers/fetchHelper';
 import CustomLinearProgress from './LinearProgress';
 import './Posts.scss';
 import PagingBar from '@shared/components/PagingBar';
-import styles from '@shared/scss/main.scss'
+import styles from '@shared/scss/main.scss';
 
 interface State {
     posts: Post[] | undefined;
@@ -14,7 +14,7 @@ interface State {
 }
 
 export class Posts extends React.Component<{ postType: PostType }, State> {
-    private readonly postsPerPage = 5;
+    private readonly postsPerPage;
     private abortController;
 
     state: State = {
@@ -27,23 +27,19 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
         super(props);
         this.handlePageClick = this.handlePageClick.bind(this);
         this.abortController = new AbortController();
+        this.postsPerPage = this.props.postType === PostType.FACT ? 10 : 5;
     }
 
     private fetchPosts(page: number) {
         fetchApi(
-            'api/posts?postType=' +
-            this.props.postType.toString() +
-            '&page=' + page + '&count=' +
-            this.postsPerPage
+            'api/posts?postType=' + this.props.postType.toString() + '&page=' + page + '&count=' + this.postsPerPage
         )
             .then(response =>
                 response
                     .json()
                     .then(posts => {
                         this.setState({
-                            posts: posts.map(post =>
-                                postDTOToPost(post)
-                            )
+                            posts: posts.map(post => postDTOToPost(post))
                         });
                     })
                     .catch(error => {
@@ -100,7 +96,7 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
 
     componentDidUpdate(prevProps) {
         if (this.props.postType !== prevProps.postType) {
-            this.setState({totalPostsCount: 0, currentPage: 0});
+            this.setState({ totalPostsCount: 0, currentPage: 0 });
             this.refreshPosts();
         }
     }
@@ -121,33 +117,25 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                     <div className="column is-10 posts">
                         {this.state.posts ? (
                             this.state.posts.length !== 0 ? (
-                                <>
+                                <div>
                                     <PostsList posts={this.state.posts} />
-                                    {this.state.totalPostsCount <=
-                                    this.postsPerPage ? null : (
+                                    {this.state.totalPostsCount <= this.postsPerPage ? null : (
                                         <PagingBar
-                                            pages={Math.ceil(
-                                                this.state.totalPostsCount /
-                                                    this.postsPerPage
-                                            )}
-                                            handlePageClick={
-                                                this.handlePageClick
-                                            }
+                                            pages={Math.ceil(this.state.totalPostsCount / this.postsPerPage)}
+                                            handlePageClick={this.handlePageClick}
                                             currentPage={this.state.currentPage}
                                             mainColor={styles.secondaryColor}
                                             shadowColor={styles.primaryColor}
                                         />
                                     )}
-                                </>
+                                </div>
                             ) : (
                                 <div
                                     style={{
                                         textAlign: 'center',
                                         marginTop: '20px'
                                     }}>
-                                    <p className="fontSizeLarge">
-                                        Brak {this.postTypeToText()}.
-                                    </p>
+                                    <p className="fontSizeLarge">Brak {this.postTypeToText()}.</p>
                                 </div>
                             )
                         ) : (

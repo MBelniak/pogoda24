@@ -12,7 +12,7 @@ export const CurrentWarnings = (props: CurrentWarningsProps) => {
             {props.warningInfo.length > 0 ? (
                 <>
                     <p
-                        className="postTitle fontSizeLarge"
+                        className="postTitle fontSizeMedium"
                         style={{
                             wordWrap: 'break-word'
                         }}>
@@ -31,7 +31,7 @@ export const CurrentWarnings = (props: CurrentWarningsProps) => {
                     })}
                 </>
             ) : (
-                <p className="currentWarningsNone fontSizeLarge">Brak ostrzeżeń</p>
+                <p className="currentWarningsNone fontSizeMedium">Brak ostrzeżeń</p>
             )}
         </div>
     );

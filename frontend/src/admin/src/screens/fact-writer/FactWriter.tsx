@@ -63,6 +63,7 @@ export default class FactWriter extends React.Component<
         this.state = { mainImage: undefined };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.reloadPage = this.reloadPage.bind(this);
+        this.goToPost = this.goToPost.bind(this);
         this.closeModalAndShowEditor = this.closeModalAndShowEditor.bind(this);
         this.handleLoginClick = this.handleLoginClick.bind(this);
         this.onMainFileAdded = this.onMainFileAdded.bind(this);
@@ -96,7 +97,7 @@ export default class FactWriter extends React.Component<
     }
 
     private savePost(authHeader?: string) {
-        this.sendPostToBackend()
+        this.sendPostToBackend(authHeader)
             .then(response => {
                 if (response && response.ok) {
                     if (this.state.mainImage && this.state.mainImage.file !== null) {
@@ -123,11 +124,7 @@ export default class FactWriter extends React.Component<
                                         [this.state.mainImage!],
                                         this.abortController.signal
                                     );
-                                    if (uploadPromises.length > 0) {
-                                        this.afterImagesSaved(uploadPromises);
-                                    } else {
-                                        this.showSuccessMessage();
-                                    }
+                                    this.afterImagesSaved(uploadPromises);
                                 } else {
                                     showInfoModal('Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.');
                                 }
@@ -135,6 +132,8 @@ export default class FactWriter extends React.Component<
                             .catch(error => {
                                 console.log(error);
                             });
+                    } else {
+                        this.showSuccessMessage();
                     }
                 } else if (response.status === 401) {
                     //user is not authenticated
@@ -167,12 +166,21 @@ export default class FactWriter extends React.Component<
 
     private sendPostToBackend(authHeader?: string) {
         const description = this.getDescriptionFromEditor();
-        const requestBodyPost = {
+        const requestBody = {
             postDate: format(new Date(), BACKEND_DATE_FORMAT),
             postType: PostType.FACT,
             title: this.titleInput.current.value,
-            description: description
+            description: description,
+            imagesPublicIds: [] as string[]
         };
+
+        if (this.props.postToEdit) {
+            requestBody['id'] = this.props.postToEdit.id;
+        }
+
+        if (this.state.mainImage) {
+            requestBody['imagesPublicIds'] = [this.state.mainImage.publicId];
+        }
 
         let headers = new Headers();
 
@@ -183,10 +191,10 @@ export default class FactWriter extends React.Component<
         headers.append('Content-Type', 'application/json');
 
         const post = this.props.postToEdit;
-        return fetchApi('api/posts' + (post ? '?temporary=true' : ''), {
+        return fetchApi('api/posts' + (post && this.state.mainImage ? '?temporary=true' : ''), {
             method: post ? 'PUT' : 'POST',
             headers: headers,
-            body: JSON.stringify(requestBodyPost)
+            body: JSON.stringify(requestBody)
         });
     }
 
@@ -264,8 +272,16 @@ export default class FactWriter extends React.Component<
         location.reload();
     }
 
+    private goToPost() {
+        const origin = location.href.split('/')[0];
+        location.href = origin + '/posts/' + this.savedPostId;
+    }
+
     private showSuccessMessage() {
-        showActionModal('Pomyślnie zapisano ciekawostkę', [{ text: 'Ok', action: this.reloadPage }]);
+        showActionModal('Pomyślnie zapisano ciekawostkę', [
+            { text: 'Ok', action: this.props.postToEdit ? this.props.onFinishEditing! : this.reloadPage },
+            { text: 'Przejdź do posta', action: this.goToPost }
+        ]);
     }
 
     private showErrorMessage(errorMessage: string) {
@@ -375,10 +391,9 @@ export default class FactWriter extends React.Component<
                     <TopImage />
                     <div className="writerForm">
                         <div style={{ color: 'white', margin: '10px 0 10px 0' }}>
-                            <p className="fontSizeLarge">
-                                Uwaga! Nie dodawaj zdjęć ze schowka. Zamiast tego, użyj przyciku "Image".{' '}
-                            </p>
-                            <label htmlFor="titleInput">Dodaj tytuł do ciekawostki: </label>
+                            <label style={{ fontSize: '1.2rem' }} htmlFor="titleInput">
+                                Dodaj tytuł do ciekawostki:{' '}
+                            </label>
                             <input
                                 style={{ marginTop: '10px' }}
                                 id="titleInput"

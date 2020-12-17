@@ -2,6 +2,7 @@ import React from 'react';
 import Post, { PostType } from '../../model/Post';
 import { Link } from 'react-router-dom';
 import { ForecastMapList } from './ForecastMapList';
+import { Image, Transformation } from 'cloudinary-react';
 import config from '../../config/config';
 import '../../sass/main.scss';
 import 'suneditor/dist/css/suneditor.min.css';
@@ -31,7 +32,7 @@ export default class PostsListItem extends React.Component<PostsItemProps, Posts
     private isExpandedByDefault() {
         let description;
         if (this.props.post.postType === 'FACT') {
-            description = this.getDescriptionForFact();
+            return false;
         } else {
             description = this.props.post.description;
         }
@@ -49,10 +50,7 @@ export default class PostsListItem extends React.Component<PostsItemProps, Posts
     }
 
     private createDescription() {
-        const description =
-            this.props.post.postType === PostType.FACT
-                ? this.processDescription(this.getDescriptionForFact())
-                : this.processDescription(this.props.post.description);
+        const description = this.processDescription(this.props.post.description);
         return (
             <>
                 <span
@@ -100,15 +98,9 @@ export default class PostsListItem extends React.Component<PostsItemProps, Posts
         return description;
     }
 
-    private getDescriptionForFact(): string {
-        const dummyDomEl = document.createElement('html');
-        dummyDomEl.innerHTML = this.props.post.description.replace(/\\"/g, '"');
-        return dummyDomEl.textContent ? dummyDomEl.textContent : '';
-    }
-
-    render() {
+    private renderMainContent() {
         return (
-            <div className="post">
+            <>
                 <div className="postDate fontSizeSmall">{this.processDate()}</div>
                 <br />
                 <div className="postTitle fontSizeLarge">
@@ -116,15 +108,45 @@ export default class PostsListItem extends React.Component<PostsItemProps, Posts
                         {this.props.post.title}
                     </a>
                 </div>
-                <div className="postDescription fontSizeSmall">{this.createDescription()}</div>
-                {this.props.post.postType !== PostType.FACT && this.props.post.imagesPublicIds.length > 0 ? (
+                {this.props.post.postType !== PostType.FACT && (
+                    <div className="postDescription fontSizeSmall">{this.createDescription()}</div>
+                )}
+                {this.props.post.postType === PostType.FACT ? (
                     <>
                         <div className="is-divider" />
-                        <div style={{ textAlign: 'center' }}>
-                            <ForecastMapList imagesPublicIds={this.props.post.imagesPublicIds} />
+                        <div className="factImage">
+                            <Image
+                                publicId={
+                                    this.props.post.imagesPublicIds.length > 0
+                                        ? this.props.post.imagesPublicIds[0]
+                                        : 'fb_main_logo_cukiun'
+                                }
+                                format="png"
+                                quality="auto">
+                                <Transformation crop="fill" gravity="faces" />
+                            </Image>
                         </div>
                     </>
-                ) : null}
+                ) : (
+                    this.props.post.imagesPublicIds.length > 0 && (
+                        <>
+                            <div className="is-divider" />
+                            <ForecastMapList imagesPublicIds={this.props.post.imagesPublicIds} />
+                        </>
+                    )
+                )}
+            </>
+        );
+    }
+
+    render() {
+        return (
+            <div className="post">
+                {this.props.post.postType === PostType.FACT ? (
+                    <a href={this.postHref}>{this.renderMainContent()}</a>
+                ) : (
+                    this.renderMainContent()
+                )}
             </div>
         );
     }

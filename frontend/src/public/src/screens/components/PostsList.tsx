@@ -11,7 +11,6 @@ interface PostsProps {
 }
 
 export class PostsList extends React.Component<PostsProps> {
-
     constructor(props) {
         super(props);
         this.registerView = this.registerView.bind(this);
@@ -39,10 +38,7 @@ export class PostsList extends React.Component<PostsProps> {
     }
 
     private isExpandedByDefault(post: Post) {
-        return (
-            post.description.length <= nonExpandedPostLength &&
-            post.description.split(/[(\r\n)(\n)]/g).length <= 2
-        );
+        return post.description.length <= nonExpandedPostLength && post.description.split(/[(\r\n)(\n)]/g).length <= 2;
     }
 
     componentDidMount() {
@@ -58,15 +54,11 @@ export class PostsList extends React.Component<PostsProps> {
             );
         }
         return (
-            <div>
+            <>
                 {this.props.posts.map((post, i) => (
-                    <PostsListItem
-                        post={post}
-                        registerView={this.registerView}
-                        key={i}
-                    />
+                    <PostsListItem post={post} registerView={this.registerView} key={i} />
                 ))}
-            </div>
+            </>
         );
     }
 }

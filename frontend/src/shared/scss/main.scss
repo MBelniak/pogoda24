@@ -4,18 +4,21 @@ $primary-font-color: #222;
 $secondary-font-color: #353535;
 $footer-background-color: transparent;
 $footer-padding: 3rem 1.5rem 3rem;
+$font-size-large: 1.4rem;
+$font-size-medium: 1.2rem;
+$font-size-small: 1rem;
 
 .fontSizeLarge {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
 
 .fontSizeMedium {
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 
 .fontSizeSmall {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 :export {
