@@ -104,9 +104,13 @@ export default class PostsListItem extends React.Component<PostsItemProps, Posts
                 <div className="postDate fontSizeSmall">{this.processDate()}</div>
                 <br />
                 <div className="postTitle fontSizeLarge">
-                    <a href={this.postHref} className="basicLink" style={{ textDecoration: 'none' }}>
-                        {this.props.post.title}
-                    </a>
+                    {this.props.post.postType === PostType.FACT ? (
+                        <p className="basicLink">{this.props.post.title}</p>
+                    ) : (
+                        <a href={this.postHref} className="basicLink">
+                            {this.props.post.title}
+                        </a>
+                    )}
                 </div>
                 {this.props.post.postType !== PostType.FACT && (
                     <div className="postDescription fontSizeSmall">{this.createDescription()}</div>

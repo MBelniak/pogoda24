@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 import config from '../../config/config';
-import StaffItem from "./StaffItem";
-import './ONas.scss'
+import StaffItem from './StaffItem';
+import './ONas.scss';
 
 export class ONas extends React.Component {
     constructor(props) {
@@ -16,7 +16,11 @@ export class ONas extends React.Component {
                         Dziękujemy, że zajrzałeś na naszą stronę.
                         <br />
                         Zostawiając łapkę w górę na naszej stronie na{' '}
-                        <a href="https://www.facebook.com/Polska24nadobe" target="_blank" className="basicLink">
+                        <a
+                            href="https://www.facebook.com/Polska24nadobe"
+                            target="_blank"
+                            className="basicLink"
+                            style={{ textDecoration: 'underline' }}>
                             facebooku
                         </a>{' '}
                         motywujesz nas do dalszej pracy, <br />

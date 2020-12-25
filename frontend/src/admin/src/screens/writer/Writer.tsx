@@ -33,24 +33,25 @@ interface State {
     postType: PostType;
     warningDueDate: Date;
     postImages: PostImage[];
+    mainImage?: PostImage;
 }
 
 export default class Writer extends React.Component<WriterProps, State> {
     private fileId: number;
-    private fileInput;
+    protected fileInput;
     private postDescriptionTextArea;
-    private titleTextArea;
-    private abortController;
-    private savedPostId;
-    private loginInput;
-    private passwordInput;
+    protected titleInput;
+    protected abortController;
+    protected savedPostId;
+    protected loginInput;
+    protected passwordInput;
 
     constructor(props) {
         super(props);
         this.fileId = 0;
         this.fileInput = React.createRef();
         this.postDescriptionTextArea = React.createRef();
-        this.titleTextArea = React.createRef();
+        this.titleInput = React.createRef();
         this.loginInput = React.createRef();
         this.passwordInput = React.createRef();
         this.abortController = new AbortController();
@@ -73,19 +74,23 @@ export default class Writer extends React.Component<WriterProps, State> {
         this.handleWarningDueDateChange = this.handleWarningDueDateChange.bind(this);
     }
 
-    private registerImagesPresentAtCloudinary(post: Post) {
-        const postImages: PostImage[] = [];
-        for (let i = 0; i < post.imagesPublicIds.length; ++i) {
-            //only publicId and file as null are used
-            postImages.push({
-                id: this.fileId++,
-                publicId: post.imagesPublicIds[i],
-                file: null,
-                timestamp: ''
-            });
-        }
+    //images coming from cloudinary let's add to state. They will be recognized by null file
+    protected registerImagesPresentAtCloudinary() {
+        if (this.props.postToEdit) {
+            const postImages: PostImage[] = [];
+            const post = this.props.postToEdit;
+            for (let i = 0; i < post.imagesPublicIds.length; ++i) {
+                //only publicId and file as null are used
+                postImages.push({
+                    id: this.fileId++,
+                    publicId: post.imagesPublicIds[i],
+                    file: null,
+                    timestamp: ''
+                });
+            }
 
-        this.setState({ postImages: postImages });
+            this.setState({ postImages: postImages });
+        }
     }
 
     private onFilesAdded(files: File[]) {
@@ -110,91 +115,66 @@ export default class Writer extends React.Component<WriterProps, State> {
         this.fileInput.current.value = null;
     }
 
-    private handleSubmit(event) {
+    protected handleSubmit(event) {
         event.preventDefault();
-        if (!validateField(this.titleTextArea.current)) return;
+        if (!validateField(this.titleInput.current)) return;
 
         showModal(<LoadingIndicator />);
         this.savePost();
     }
 
-    private savePost(authHeader?: string) {
-        this.sendPostToBackend(authHeader)
-            .then(response => {
-                if (response && (response.status === 201 || response.status === 200)) {
-                    response
-                        .text()
-                        .then((postIdOrPostHash: any) => {
-                            if (this.props.postToEdit) {
-                                // we get postHash from backend
-                                if (postIdOrPostHash !== null) {
-                                    const uploadPromises = uploadImages(
-                                        this.state.postImages,
-                                        this.abortController.signal
-                                    );
-                                    this.afterImagesSaved(uploadPromises, postIdOrPostHash);
-                                } else {
-                                    showInfoModal('Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.');
-                                }
-                            } else if (postIdOrPostHash !== null) {
-                                // we get postId from backend
-                                this.savedPostId = postIdOrPostHash;
-                                //post saved, send images to cloudinary
-                                const uploadPromises = uploadImages(this.state.postImages, this.abortController.signal);
-                                if (uploadPromises.length > 0) {
-                                    this.afterImagesSaved(uploadPromises);
-                                } else {
-                                    this.showSuccessMessage();
-                                }
-                            } else {
-                                showInfoModal('Wystąpił błąd przy zapisywaniu postu. Post nie został zapisany.');
-                            }
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-                } else if (response.status === 401) {
-                    //user is not authenticated
-                    showAuthModal({
-                        handleLoginClick: this.handleLoginClick,
-                        loginInputRef: this.loginInput,
-                        passwordInputRef: this.passwordInput,
-                        authFailed: typeof authHeader !== 'undefined'
-                    });
-                } else {
-                    response.text().then(text => {
-                        console.log(text);
-                    });
-                    showInfoModal('Wystąpił błąd serwera. Nie udało się zapisać postu.');
+    protected async savePost(authHeader?: string) {
+        const response = await this.sendPostToBackend(authHeader);
+        if (response && response.ok) {
+            const postIdOrPostHash = await response.text();
+
+            // we get postId from backend
+            if (!this.props.postToEdit) {
+                this.savedPostId = postIdOrPostHash;
+            }
+            if (this.state.mainImage && this.state.mainImage.file !== null) {
+                await this.sendMainImageToCloud();
+            }
+            let uploadPromises: Promise<Response>[] = [];
+            if (this.state.postImages.length > 0) {
+                uploadPromises = uploadImages(this.state.postImages, this.abortController.signal);
+            }
+            if (uploadPromises.length > 0) {
+                if (!(await Writer.checkIfImagesSaved(uploadPromises))) {
+                    this.props.postToEdit
+                        ? await Writer.abortPostUpdate(postIdOrPostHash)
+                        : await Writer.removePostFromBackend(postIdOrPostHash);
                 }
-            })
-            .catch(error => {
-                console.log(error);
+            }
+            if (this.props.postToEdit) {
+                await this.continueSavingPostToBackend(postIdOrPostHash);
+            } else {
+                // new post successfully added
+                this.showSuccessMessage();
+            }
+        } else if (response.status === 401) {
+            //user is not authenticated
+            showAuthModal({
+                handleLoginClick: this.handleLoginClick,
+                loginInputRef: this.loginInput,
+                passwordInputRef: this.passwordInput,
+                authFailed: typeof authHeader !== 'undefined'
             });
+        } else {
+            response.text().then(text => {
+                console.log(text);
+            });
+            showInfoModal('Wystąpił błąd serwera. Nie udało się zapisać postu.');
+        }
+    }
+
+    private sendMainImageToCloud(): Promise<any> {
+        return uploadImages([this.state.mainImage!], this.abortController.signal)[0];
     }
 
     private sendPostToBackend(authHeader?: string): Promise<Response> {
         const post = this.props.postToEdit;
-
-        const requestBody = {
-            postDate: format(post ? post.postDate : new Date(), BACKEND_DATE_FORMAT),
-            postType: this.state.postType.toString(),
-            title: this.titleTextArea.current.value,
-            description: this.postDescriptionTextArea.current.value,
-            imagesPublicIds: [] as string[],
-            dueDate:
-                this.state.postType === PostType.WARNING ? format(this.state.warningDueDate, BACKEND_DATE_FORMAT) : null
-        };
-
-        if (this.props.postToEdit) {
-            requestBody['id'] = this.props.postToEdit.id;
-        }
-
-        const uploadedFilesIdsOrdered: string[] = [];
-        for (let i = 0; i < this.state.postImages.length; ++i) {
-            uploadedFilesIdsOrdered.push(this.state.postImages[i].publicId!!);
-        }
-        requestBody['imagesPublicIds'] = uploadedFilesIdsOrdered;
+        const requestBody = this.buildRequestBody();
 
         let headers = new Headers();
 
@@ -211,77 +191,81 @@ export default class Writer extends React.Component<WriterProps, State> {
         });
     }
 
-    private afterImagesSaved(uploadPromises: Promise<Response>[], postHash?: string) {
-        Promise.all(uploadPromises)
-            .then(responses => {
-                if (responses.every(response => response && response.ok)) {
-                    //all images uploaded successfully
-                    if (postHash) {
-                        this.continueSavingPostToBackend(postHash);
-                    } else {
-                        this.showSuccessMessage();
-                    }
-                } else {
-                    responses = responses.filter(response => !response || !response.ok);
-                    console.log(responses.toString());
-                    showInfoModal('Nie udało się wysłać wszystkich plików. Post nie został zapisany.');
-                    postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                postHash ? this.abortPostUpdate(postHash) : this.removePostFromBackend(this.savedPostId);
-            });
+    protected buildRequestBody() {
+        const post = this.props.postToEdit;
+        const description = this.getDescription();
+
+        const requestBody = {
+            postDate: format(post ? post.postDate : new Date(), BACKEND_DATE_FORMAT),
+            postType: this.state.postType.toString(),
+            title: this.titleInput.current.value,
+            description: description,
+            imagesPublicIds: [] as string[],
+            dueDate:
+                this.state.postType === PostType.WARNING ? format(this.state.warningDueDate, BACKEND_DATE_FORMAT) : null
+        };
+
+        if (post) {
+            requestBody['id'] = post.id;
+        }
+
+        const uploadedFilesIdsOrdered: string[] = [];
+        for (let i = 0; i < this.state.postImages.length; ++i) {
+            uploadedFilesIdsOrdered.push(this.state.postImages[i].publicId!!);
+        }
+        requestBody['imagesPublicIds'] = uploadedFilesIdsOrdered;
+
+        return requestBody;
+    }
+
+    protected getDescription() {
+        return this.postDescriptionTextArea.current.value;
+    }
+
+    private static async checkIfImagesSaved(uploadPromises: Promise<Response>[]): Promise<boolean> {
+        const responses = await Promise.all(uploadPromises);
+        if (!responses.every(response => response && response.ok)) {
+            responses.filter(response => !response || !response.ok);
+            console.log(responses.toString());
+            showInfoModal('Nie udało się wysłać wszystkich plików. Post nie został zapisany.');
+            return false;
+        }
+        return true;
     }
 
     //Remove post changes, that are temporarily saved in backend
-    private abortPostUpdate(hash: string) {
-        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=false')
-            .then(response => {
-                if (response && response.ok) {
-                    console.log('Post update aborted.');
-                } else {
-                    console.log('Cannot abort. Hash: ' + hash + '. Server response: ' + response);
-                }
-            })
-            .catch(error => {
-                console.log('Error while aborting update. Error message: ' + error);
-            });
+    private static async abortPostUpdate(hash: string): Promise<void> {
+        const response = await fetchApi('api/posts/continuePostUpdate/' + hash + '?success=false');
+        if (response && response.ok) {
+            console.log('Post update aborted.');
+        } else {
+            console.log('Cannot abort. Hash: ' + hash + '. Server response: ' + response);
+        }
     }
 
     //Save temporarily saved changes to the database
-    private continueSavingPostToBackend(hash: string) {
-        fetchApi('api/posts/continuePostUpdate/' + hash + '?success=true')
-            .then(response => {
-                if (response && response.ok) {
-                    this.showSuccessMessage();
-                } else {
-                    console.log(response.statusText + ', ' + response.body);
-                    showInfoModal('Wystąpił błąd przy zapisywaniu posta.');
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
+    private async continueSavingPostToBackend(hash: string): Promise<void> {
+        const response = await fetchApi('api/posts/continuePostUpdate/' + hash + '?success=true');
+        if (response && response.ok) {
+            this.showSuccessMessage();
+        } else {
+            console.log(response.statusText + ', ' + response.body);
+            showInfoModal('Wystąpił błąd przy zapisywaniu posta.');
+        }
     }
 
-    private removePostFromBackend(postId: number) {
-        fetchApi('api/posts/' + postId, {
+    private static async removePostFromBackend(postId: string): Promise<void> {
+        const response = await fetchApi('api/posts/' + postId, {
             method: 'DELETE'
-        })
-            .then(response => {
-                if (response && response.ok) {
-                    console.log('Removed post with id: ' + postId);
-                } else {
-                    console.log('Cannot remove post with id: ' + postId + '. Server response: ' + response);
-                }
-            })
-            .catch(error => {
-                console.log('Error while deleting post. Error message: ' + error);
-            });
+        });
+        if (response && response.ok) {
+            console.log('Removed post with id: ' + postId);
+        } else {
+            console.log('Cannot remove post with id: ' + postId + '. Server response: ' + response);
+        }
     }
 
-    private showSuccessMessage() {
+    protected showSuccessMessage() {
         let postType;
         switch (this.state.postType) {
             case PostType.FORECAST: {
@@ -318,12 +302,12 @@ export default class Writer extends React.Component<WriterProps, State> {
         });
         this.fileInput.current.value = null;
         this.postDescriptionTextArea.current.value = null;
-        this.titleTextArea.current.value = null;
+        this.titleInput.current.value = null;
         this.savedPostId = undefined;
         closeModal();
     }
 
-    private goToPost() {
+    protected goToPost() {
         const origin = location.href.split('/')[0];
         location.href = origin + '/posts/' + this.savedPostId;
     }
@@ -383,10 +367,7 @@ export default class Writer extends React.Component<WriterProps, State> {
     }
 
     componentDidMount() {
-        if (this.props.postToEdit) {
-            //images coming from cloudinary let's add to state. They will be recognized by null file
-            this.registerImagesPresentAtCloudinary(this.props.postToEdit);
-        }
+        this.registerImagesPresentAtCloudinary();
     }
 
     componentWillUnmount() {
@@ -414,7 +395,7 @@ export default class Writer extends React.Component<WriterProps, State> {
                                     required={true}
                                     maxLength={100}
                                     placeholder="Tytuł"
-                                    ref={this.titleTextArea}
+                                    ref={this.titleInput}
                                     defaultValue={this.props.postToEdit ? this.props.postToEdit.title : ''}
                                     className="input topBottomMargin"
                                     onKeyUp={e => validateField(e.target)}

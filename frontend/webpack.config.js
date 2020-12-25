@@ -9,8 +9,8 @@ const dotenv = require('dotenv').config();
 
 module.exports = {
     entry: {
-        main: './src/public/src/index.tsx',
-        admin: './src/admin/src/index.tsx'
+        main: ['@babel/polyfill', './src/public/src/index.tsx'],
+        admin: ['@babel/polyfill', './src/admin/src/index.tsx']
     },
     output: {
         path: path.resolve('dist'),
@@ -72,7 +72,7 @@ module.exports = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            sourceMap: process.env.NODE_ENV === 'production'
+                            sourceMap: process.env.NODE_ENV !== 'production'
                         }
                     }
                 ]
