@@ -21,7 +21,7 @@ import { ButtonListItem } from 'suneditor/src/options';
 import { PostType } from '../../model/Post';
 import config from '../../config/config';
 import { LoadingIndicator } from '../components/LoadingIndicator';
-import { closeModal, showModal } from '../components/modals/Modal';
+import { showModal } from '../components/modals/Modal';
 import { TopImage } from '../components/TopImage';
 import Copyright from '@shared/components/Copyright';
 import { showActionModal } from '../components/modals/ActionModalWindow';
@@ -29,8 +29,6 @@ import { Link } from 'react-router-dom';
 import FileDropper from '../components/FileDropper';
 import { showInfoModal } from '../components/modals/InfoModalWindow';
 import FileToUploadItem from '../writer/FileToUploadItem';
-import 'froala-editor/css/froala_style.min.css';
-import 'froala-editor/css/froala_editor.pkgd.min.css';
 import Writer from '../writer/Writer';
 
 const { BACKEND_DATE_FORMAT } = config;
@@ -42,7 +40,6 @@ export default class FactWriter extends Writer {
         super(props);
 
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.closeModalAndShowEditor = this.closeModalAndShowEditor.bind(this);
         this.onMainFileAdded = this.onMainFileAdded.bind(this);
         this.onRemoveMainFile = this.onRemoveMainFile.bind(this);
     }
@@ -80,7 +77,6 @@ export default class FactWriter extends Writer {
             return;
         }
         showModal(<LoadingIndicator />);
-        this.editor.hide();
 
         this.savePost();
     }
@@ -172,11 +168,6 @@ export default class FactWriter extends Writer {
         this.setState({
             mainImage: undefined
         });
-    }
-
-    private closeModalAndShowEditor() {
-        closeModal();
-        this.editor.show();
     }
 
     componentDidMount() {
