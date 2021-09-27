@@ -30,9 +30,9 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
         this.postsPerPage = this.props.postType === PostType.FACT ? 10 : 5;
     }
 
-    private fetchPosts(page: number) {
+    private fetchPosts() {
         fetchApi(
-            'api/posts?postType=' + this.props.postType.toString() + '&page=' + page + '&count=' + this.postsPerPage
+            'api/posts?postType=' + this.props.postType.toString() + '&page=' + this.state.currentPage + '&count=' + this.postsPerPage
         )
             .then(response =>
                 response
@@ -61,12 +61,13 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
                     response
                         .json()
                         .then(data => {
-                            this.setState({ totalPostsCount: data });
-                            if (this.state.totalPostsCount !== 0) {
-                                this.fetchPosts(0);
-                            } else {
-                                this.setState({ posts: [] });
-                            }
+                            this.setState({ totalPostsCount: data }, () => {
+                                if (this.state.totalPostsCount !== 0) {
+                                    this.fetchPosts();
+                                } else {
+                                    this.setState({ posts: [] });
+                                }
+                            });
                         })
                         .catch(error => {
                             console.log(error);
@@ -82,8 +83,7 @@ export class Posts extends React.Component<{ postType: PostType }, State> {
 
     private handlePageClick(data) {
         const selected = data.selected;
-        this.setState({ posts: undefined, currentPage: selected });
-        this.fetchPosts(selected);
+        this.setState({ posts: undefined, currentPage: selected }, this.fetchPosts);
     }
 
     private postTypeToText(): string {

@@ -1,10 +1,10 @@
 import React from 'react';
-import Post, { postDTOToPost, PostType } from '../../model/Post';
-import { fetchApi } from '../../helpers/fetchHelper';
+import PostModel, {postDTOToPost} from '../../model/Post';
+import {fetchApi} from '../../helpers/fetchHelper';
 
-import { ForecastMapList } from '../components/ForecastMapList';
 import CustomLinearProgress from '../components/LinearProgress';
 import '../../sass/main.scss';
+import {Post} from "./Post";
 
 interface State {
     loading: boolean;
@@ -15,7 +15,7 @@ export default class PostView extends React.Component<{}, State> {
         loading: true
     };
 
-    private post: Post | undefined;
+    private post: PostModel | undefined;
     private controller;
 
     constructor(props) {
@@ -25,24 +25,23 @@ export default class PostView extends React.Component<{}, State> {
     }
 
     componentDidMount() {
-        const splitted = location.href.split('/');
-        const postId = splitted[splitted.length - 1];
+        const postId = location.href.split('/').pop();
         if (postId) {
-            fetchApi('api/posts/' + postId, { signal: this.controller.signal })
+            fetchApi('api/posts/' + postId, {signal: this.controller.signal})
                 .then(response => {
                     if (response && response.ok) {
                         response
                             .json()
                             .then(post => {
                                 this.post = postDTOToPost(post);
-                                this.setState({ loading: false });
+                                this.setState({loading: false});
                             })
                             .catch(error => {
-                                this.setState({ loading: false });
+                                this.setState({loading: false});
                                 console.log(error);
                             });
                     } else {
-                        this.setState({ loading: false });
+                        this.setState({loading: false});
                     }
                 })
                 .catch(error => {
@@ -51,28 +50,6 @@ export default class PostView extends React.Component<{}, State> {
         } else {
             console.log('Incorrect URL for post: ' + location.href);
         }
-    }
-
-    private processDate(postDate: Date) {
-        const date = postDate.toLocaleString('pl-PL');
-        return date.replace(', ', ' o ');
-    }
-
-    private processDescription() {
-        if (this.post) {
-            return this.post.description.replace(/\r\n/g, '<br/>').replace(/\n/g, '<br/>');
-        }
-        return '';
-    }
-
-    private processDescriptionForFact(post: Post) {
-        return (
-            <div
-                dangerouslySetInnerHTML={{
-                    __html: post.description.replace(/\\"/g, '"')
-                }}
-            />
-        );
     }
 
     componentWillUnmount() {
@@ -84,40 +61,10 @@ export default class PostView extends React.Component<{}, State> {
             <section className="mainContent">
                 <div>
                     {this.state.loading ? (
-                        <CustomLinearProgress />
+                        <CustomLinearProgress/>
                     ) : (
                         <div className="posts">
-                            {this.post ? (
-                                <div className="post">
-                                    <div className="postdate fontSizeSmall">{this.processDate(this.post.postDate)}</div>
-                                    <br />
-                                    <div className="postTitle fontSizeLarge">
-                                        <span style={{ wordWrap: 'break-word' }}>{this.post.title}</span>
-                                    </div>
-                                    <div className="postDescription fontSizeSmall">
-                                        {this.post.postType === PostType.FACT ? (
-                                            this.processDescriptionForFact(this.post)
-                                        ) : (
-                                            <span
-                                                dangerouslySetInnerHTML={{
-                                                    __html: this.processDescription()
-                                                }}
-                                                style={{
-                                                    wordWrap: 'break-word'
-                                                }}
-                                            />
-                                        )}
-                                    </div>
-                                    {this.post.postType !== PostType.FACT && this.post.imagesPublicIds.length > 0 ? (
-                                        <>
-                                            <div className="is-divider" />
-                                            <div style={{ textAlign: 'center' }}>
-                                                <ForecastMapList imagesPublicIds={this.post.imagesPublicIds} />
-                                            </div>
-                                        </>
-                                    ) : null}
-                                </div>
-                            ) : (
+                            {this.post ? (<Post {...this.post}/>) : (
                                 <div
                                     style={{
                                         textAlign: 'center',
