@@ -1,11 +1,11 @@
 import React from 'react';
-import { PostsList } from '../components/PostsList';
-import { ExternalApi } from './ExternalApi';
-import Post, { postDTOToPost } from '../../model/Post';
-import { fetchApi } from '../../helpers/fetchHelper';
+import {PostsList} from '../components/PostsList';
+import {ExternalApi} from './ExternalApi';
+import Post, {postDTOToPost} from '../../model/Post';
+import {fetchApi} from '../../helpers/fetchHelper';
 import zonedTimeToUtc from 'date-fns-tz/zonedTimeToUtc';
 import CustomLinearProgress from '../components/LinearProgress';
-import { CurrentWarnings } from './CurrentWarnings';
+import {CurrentWarnings} from './CurrentWarnings';
 import '../../sass/main.scss';
 
 export interface WarningInfo {
@@ -33,59 +33,52 @@ export class MainPage extends React.Component<{}, State> {
         this.abortController = new AbortController();
     }
 
-    private fetchPosts() {
-        fetchApi('api/posts?page=0&count=' + this.forecastsPerPage, {
-            signal: this.abortController.signal
-        })
-            .then(response =>
-                response
-                    .json()
-                    .then(posts => {
-                        this.setState({
-                            posts: posts.map(post => postDTOToPost(post))
-                        });
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        this.setState({ posts: [] });
-                    })
-            )
-            .catch(error => {
-                console.log(error);
+    private async fetchPosts() {
+        try {
+            const response = await fetchApi('api/posts?page=0&count=' + this.forecastsPerPage, {
+                signal: this.abortController.signal
             });
+            if (response && response.ok) {
+
+                const posts = await response.json();
+                this.setState({
+                    posts: posts.map(post => postDTOToPost(post))
+                });
+            } else {
+                this.setState({posts: []});
+            }
+        } catch (error) {
+            console.log(error);
+            this.setState({posts: []});
+        }
     }
 
-    private fetchWarningInfo() {
-        fetchApi('api/posts/currentWarnings', {
-            signal: this.abortController.signal
-        })
-            .then(response => {
-                if (response && response.ok) {
-                    response
-                        .json()
-                        .then(warningInfo => {
-                            this.setState({
-                                warningInfo: warningInfo.map(info => {
-                                    return {
-                                        ...info,
-                                        dueDate: warningInfo.dueDate
-                                            ? zonedTimeToUtc(warningInfo.dueDate, 'Europe/Warsaw')
-                                            : undefined
-                                    };
-                                })
-                            });
-                        })
-                        .catch(error => {
-                            console.log(error);
-                            this.setState({ warningInfo: [] });
-                        });
-                } else {
-                    console.log(response);
-                }
-            })
-            .catch(error => {
-                console.log(error);
+    private async fetchWarningInfo() {
+        try {
+            const response = await fetchApi('api/posts/currentWarnings', {
+                signal: this.abortController.signal
             });
+            if (response && response.ok) {
+                const warningInfo = await response.json();
+                this.setState({
+                    warningInfo: warningInfo.map(info => {
+                        return {
+                            ...info,
+                            dueDate: warningInfo.dueDate
+                                ? zonedTimeToUtc(warningInfo.dueDate, 'Europe/Warsaw')
+                                : undefined
+                        };
+                    })
+                });
+
+            } else {
+                this.setState({warningInfo: []});
+                console.log(response);
+            }
+        } catch (error) {
+            console.log(error);
+            this.setState({warningInfo: []});
+        }
     }
 
     componentDidMount() {
@@ -103,21 +96,21 @@ export class MainPage extends React.Component<{}, State> {
                 <div className="columns">
                     {!this.state.warningInfo && !this.state.posts ? (
                         <div className="column is-10">
-                            <CustomLinearProgress />
+                            <CustomLinearProgress/>
                         </div>
                     ) : (
                         <>
                             <div className="column is-2 warnings">
                                 {this.state.warningInfo ? (
-                                    <CurrentWarnings warningInfo={this.state.warningInfo} />
+                                    <CurrentWarnings warningInfo={this.state.warningInfo}/>
                                 ) : (
-                                    <CustomLinearProgress />
+                                    <CustomLinearProgress/>
                                 )}
                             </div>
                             <div className="column is-8 posts">
                                 {this.state.posts ? (
                                     this.state.posts.length !== 0 ? (
-                                        <PostsList posts={this.state.posts} />
+                                        <PostsList posts={this.state.posts}/>
                                     ) : (
                                         <div
                                             style={{
@@ -128,13 +121,13 @@ export class MainPage extends React.Component<{}, State> {
                                         </div>
                                     )
                                 ) : (
-                                    <CustomLinearProgress />
+                                    <CustomLinearProgress/>
                                 )}
                             </div>
                         </>
                     )}
                     <div className="column is-2 fontSizeMedium">
-                        <ExternalApi />
+                        <ExternalApi/>
                     </div>
                 </div>
             </section>

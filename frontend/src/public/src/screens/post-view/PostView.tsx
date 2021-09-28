@@ -24,29 +24,20 @@ export default class PostView extends React.Component<{}, State> {
         this.controller = new AbortController();
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         const postId = location.href.split('/').pop();
         if (postId) {
-            fetchApi('api/posts/' + postId, {signal: this.controller.signal})
-                .then(response => {
-                    if (response && response.ok) {
-                        response
-                            .json()
-                            .then(post => {
-                                this.post = postDTOToPost(post);
-                                this.setState({loading: false});
-                            })
-                            .catch(error => {
-                                this.setState({loading: false});
-                                console.log(error);
-                            });
-                    } else {
-                        this.setState({loading: false});
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            try {
+                const response = await fetchApi('api/posts/' + postId, {signal: this.controller.signal});
+                if (response && response.ok) {
+                    const post = await response.json();
+                    this.post = postDTOToPost(post);
+                }
+            } catch (error) {
+                console.log(error);
+            } finally {
+                this.setState({loading: false});
+            }
         } else {
             console.log('Incorrect URL for post: ' + location.href);
         }

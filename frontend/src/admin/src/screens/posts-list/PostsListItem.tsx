@@ -1,11 +1,11 @@
 import React from 'react';
-import { Image, Transformation } from 'cloudinary-react';
-import Post, { PostType } from '../../model/Post';
-import { fetchApi } from '../../helpers/fetchHelper';
-import { closeModal, showModal } from '../components/modals/Modal';
-import { LoadingIndicator } from '../components/LoadingIndicator';
-import { showActionModal } from '../components/modals/ActionModalWindow';
-import { showInfoModal } from '../components/modals/InfoModalWindow';
+import {Image, Transformation} from 'cloudinary-react';
+import Post, {PostType} from '../../model/Post';
+import {fetchApi} from '../../helpers/fetchHelper';
+import {closeModal, showModal} from '../components/modals/Modal';
+import {LoadingIndicator} from '../components/LoadingIndicator';
+import {showActionModal} from '../components/modals/ActionModalWindow';
+import {showInfoModal} from '../components/modals/InfoModalWindow';
 
 interface PostListItemProps {
     post: Post;
@@ -26,28 +26,28 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
 
     private handleDeleteClick() {
         showActionModal('Czy na pewno chcesz usunąć ten post?', [
-            { text: 'Nie', action: closeModal },
-            { text: 'Tak', action: this.deletePost }
+            {text: 'Nie', action: closeModal},
+            {text: 'Tak', action: this.deletePost}
         ]);
     }
 
-    private deletePost() {
-        showModal(<LoadingIndicator />);
-        fetchApi('api/posts/' + this.props.post.id, {
-            method: 'DELETE'
-        })
-            .then(response => {
-                if (response && response.ok) {
-                    location.reload();
-                } else {
-                    console.log(response);
-                    showInfoModal('Wystąpił błąd podczas usuwania posta.');
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                showInfoModal('Wystąpił błąd podczas usuwania posta.');
+    private async deletePost() {
+        showModal(<LoadingIndicator/>);
+
+        try {
+            const response = await fetchApi('api/posts/' + this.props.post.id, {
+                method: 'DELETE'
             });
+            if (response && response.ok) {
+                location.reload();
+            } else {
+                console.log(response);
+                showInfoModal('Wystąpił błąd podczas usuwania posta.');
+            }
+        } catch (error) {
+            console.log(error);
+            showInfoModal('Wystąpił błąd podczas usuwania posta.');
+        }
     }
 
     private processDescription() {
@@ -114,13 +114,13 @@ export default class PostsListItem extends React.Component<PostListItemProps> {
                         value="Edytuj"
                         onClick={() => this.props.initiatePostEdit(this.props.post)}
                     />
-                    <input type="button" className="button" value="Usuń" onClick={this.handleDeleteClick} />
+                    <input type="button" className="button" value="Usuń" onClick={this.handleDeleteClick}/>
                 </div>
                 <div className="postIconList">
                     {this.props.post.imagesPublicIds.map((imagePublicId, i) => (
                         <div key={i} className="postIconListItem">
                             <Image publicId={imagePublicId} format="png" quality="auto">
-                                <Transformation crop="fill" gravity="faces" />
+                                <Transformation crop="fill" gravity="faces"/>
                             </Image>
                         </div>
                     ))}

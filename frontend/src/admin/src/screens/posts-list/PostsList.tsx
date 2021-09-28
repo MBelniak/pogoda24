@@ -1,14 +1,14 @@
 import React from 'react';
 import PostsListItem from './PostsListItem';
-import Post, { PostDTO, postDTOToPost } from '../../model/Post';
-import { fetchApi } from '../../helpers/fetchHelper';
+import Post, {PostDTO, postDTOToPost} from '../../model/Post';
+import {fetchApi} from '../../helpers/fetchHelper';
 import Writer from '../writer/Writer';
 import FactWriter from '../fact-writer/FactWriter';
-import { closeModal, showModal } from '../components/modals/Modal';
-import { LoadingIndicator } from '../components/LoadingIndicator';
-import { TopImage } from '../components/TopImage';
+import {closeModal, showModal} from '../components/modals/Modal';
+import {LoadingIndicator} from '../components/LoadingIndicator';
+import {TopImage} from '../components/TopImage';
 import Copyright from '@shared/components/Copyright';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import PagingBar from '@shared/components/PagingBar';
 import styles from '@shared/scss/main.scss';
 
@@ -39,66 +39,53 @@ export default class PostsList extends React.Component<{}, State> {
     }
 
     private initiatePostEdit(post: Post) {
-        this.setState({ postToEdit: post });
+        this.setState({postToEdit: post});
     }
 
     private onFinishEditing() {
-        showModal(<LoadingIndicator />);
-        this.setState({ postToEdit: undefined });
+        showModal(<LoadingIndicator/>);
+        this.setState({postToEdit: undefined});
         this.fetchPostsFromApi(0).finally(closeModal);
     }
 
-    private fetchPostsFromApi(page: number): Promise<void> {
-        return fetchApi('api/posts?page=' + page + '&count=' + this.postsPerPage, {
-            signal: this.abortController.signal
-        })
-            .then(response => {
-                if (response && response.ok) {
-                    response
-                        .json()
-                        .then((posts: PostDTO[]) => {
-                            this.setState({
-                                posts: posts.map(post => postDTOToPost(post))
-                            });
-                        })
-                        .catch(error => {
-                            console.log(error);
-                        });
-                } else {
-                    this.setState({ posts: [] });
-                }
-            })
-            .catch(error => {
-                console.log(error);
+    private async fetchPostsFromApi(page: number): Promise<void> {
+        try {
+            const response = await fetchApi('api/posts?page=' + page + '&count=' + this.postsPerPage, {
+                signal: this.abortController.signal
             });
+            if (response && response.ok) {
+                const posts: PostDTO[] = await response.json();
+                this.setState({
+                    posts: posts.map(post => postDTOToPost(post))
+                });
+            } else {
+                this.setState({posts: []});
+            }
+        } catch (error) {
+            this.setState({posts: []});
+            console.log(error);
+        }
     }
 
     private handlePageClick(data) {
         const selected = data.selected;
-        this.setState({ posts: undefined, currentPage: selected });
-        showModal(<LoadingIndicator />);
+        this.setState({posts: undefined, currentPage: selected});
+        showModal(<LoadingIndicator/>);
         this.fetchPostsFromApi(selected).finally(closeModal);
     }
 
-    componentDidMount() {
-        showModal(<LoadingIndicator />);
-        fetchApi('api/posts/count', { signal: this.abortController.signal })
-            .then(response =>
-                response
-                    .json()
-                    .then(data => {
-                        this.setState({ totalPostsCount: data });
-                        this.fetchPostsFromApi(0).finally(closeModal);
-                    })
-                    .catch(error => {
-                        console.log(error);
-                        closeModal();
-                    })
-            )
-            .catch(error => {
-                console.log(error);
-                closeModal();
-            });
+    async componentDidMount() {
+        showModal(<LoadingIndicator/>);
+        try {
+            const response = await fetchApi('api/posts/count', {signal: this.abortController.signal});
+            const data = await response.json();
+            this.setState({totalPostsCount: data});
+            await this.fetchPostsFromApi(0);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            closeModal();
+        }
     }
 
     componentWillUnmount() {
@@ -110,14 +97,14 @@ export default class PostsList extends React.Component<{}, State> {
             <>
                 {this.state.postToEdit ? (
                     this.state.postToEdit.postType === 'FACT' ? (
-                        <FactWriter postToEdit={this.state.postToEdit} onFinishEditing={this.onFinishEditing} />
+                        <FactWriter postToEdit={this.state.postToEdit} onFinishEditing={this.onFinishEditing}/>
                     ) : (
-                        <Writer postToEdit={this.state.postToEdit} onFinishEditing={this.onFinishEditing} />
+                        <Writer postToEdit={this.state.postToEdit} onFinishEditing={this.onFinishEditing}/>
                     )
                 ) : (
                     <div className="main">
                         <section className="container is-fluid">
-                            <TopImage />
+                            <TopImage/>
                             <h2 className="title">Lista postów: </h2>
                             <div className="container">
                                 {this.state.posts ? (
@@ -152,12 +139,12 @@ export default class PostsList extends React.Component<{}, State> {
                                     fontColor={'white'}
                                 />
                             )}
-                            <div className="is-divider" />
+                            <div className="is-divider"/>
                             <Link to="/write" className="button">
                                 Wróć
                             </Link>
                         </section>
-                        <Copyright fontColor={'white'} />
+                        <Copyright fontColor={'white'}/>
                     </div>
                 )}
             </>
