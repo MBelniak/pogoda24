@@ -1,6 +1,7 @@
 import React from 'react';
 import './CurrentWarnings.scss';
 import { WarningInfo } from './MainPage';
+import {Divider} from "@shared/components/Divider";
 
 interface CurrentWarningsProps {
     warningInfo: WarningInfo[];
@@ -25,7 +26,7 @@ export const CurrentWarnings = (props: CurrentWarningsProps) => {
                                 <a className="postLink" href={href}>
                                     {info.title}
                                 </a>
-                                {list.length - 1 === key ? null : <div className="is-divider" />}
+                                {list.length - 1 === key ? null : <Divider />}
                             </div>
                         );
                     })}

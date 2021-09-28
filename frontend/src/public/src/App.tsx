@@ -10,6 +10,7 @@ import { Posts } from './screens/components/Posts';
 import { PostType } from './model/Post';
 import Copyright from '@shared/components/Copyright';
 import styles from '@shared/scss/main.scss';
+import {Divider} from "@shared/components/Divider";
 
 export default class App extends React.Component {
 
@@ -54,7 +55,7 @@ export default class App extends React.Component {
                             component={PostView}
                         />
                     </Switch>
-                    <div className="is-divider" style={{marginLeft: "4rem", marginRight: "4rem"}}/>
+                    <Divider style={{marginLeft: "4rem", marginRight: "4rem"}}/>
                     <Copyright fontColor={styles.primaryFontColor} additionalRender={this.renderSocialMedia}/>
                 </div>
             </Router>

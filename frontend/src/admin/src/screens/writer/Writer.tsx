@@ -21,6 +21,7 @@ import pl from 'date-fns/locale/pl';
 import addDays from 'date-fns/addDays';
 import { validateField } from '../../helpers/ValidateField';
 import { showAuthModal } from '../components/modals/AuthenticationModal';
+import {Divider} from "@shared/components/Divider";
 registerLocale('pl', pl);
 const { MAX_IMAGES_PER_POST, BACKEND_DATE_FORMAT } = config;
 
@@ -485,7 +486,7 @@ export default class Writer extends React.Component<WriterProps, State> {
                                 );
                             })}
                         </div>
-                        <div className="is-divider" />
+                        <Divider />
                         <div className="writerBottomButtons">
                             <input type="button" className="button" value="Wyślij" onClick={this.handleSubmit} />
                             {this.props.postToEdit ? (

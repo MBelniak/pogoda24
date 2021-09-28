@@ -11,6 +11,7 @@ import Copyright from '@shared/components/Copyright';
 import {Link} from 'react-router-dom';
 import PagingBar from '@shared/components/PagingBar';
 import styles from '@shared/scss/main.scss';
+import {Divider} from "@shared/components/Divider";
 
 interface State {
     posts: Post[] | undefined;
@@ -139,7 +140,7 @@ export default class PostsList extends React.Component<{}, State> {
                                     fontColor={'white'}
                                 />
                             )}
-                            <div className="is-divider"/>
+                            <Divider />
                             <Link to="/write" className="button">
                                 Wróć
                             </Link>

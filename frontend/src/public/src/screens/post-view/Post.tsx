@@ -1,6 +1,7 @@
 import React from 'react';
 import {PostType} from "../../model/Post";
 import {ForecastMapList} from "../components/ForecastMapList";
+import {Divider} from "@shared/components/Divider";
 
 export interface PostProps {
     postType: PostType;
@@ -53,7 +54,7 @@ export const Post = (props: PostProps) => {
         </div>
         {props.postType !== PostType.FACT && props.imagesPublicIds.length > 0 ? (
             <>
-                <div className="is-divider"/>
+                <Divider />
                 <div style={{textAlign: 'center'}}>
                     <ForecastMapList imagesPublicIds={props.imagesPublicIds}/>
                 </div>

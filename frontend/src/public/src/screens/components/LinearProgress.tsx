@@ -4,8 +4,8 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 
 class CustomLinearProgress extends React.Component<any> {
     render() {
-        const { classes } = this.props;
-        return <LinearProgress {...this.props} classes={{colorPrimary: classes.colorPrimary, barColorPrimary: classes.barColorPrimary}}/>;
+        const { classes, ...rest } = this.props;
+        return <LinearProgress {...rest} classes={{colorPrimary: classes.colorPrimary, barColorPrimary: classes.barColorPrimary}}/>;
     }
 }
 
@@ -18,4 +18,4 @@ const styles = () => ({
     }
 });
 
-export default  withStyles(styles)(CustomLinearProgress);
+export default withStyles(styles)(CustomLinearProgress);

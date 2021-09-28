@@ -2,6 +2,7 @@ import React from 'react';
 import config from '../../config/config';
 import StaffItem from './StaffItem';
 import './ONas.scss';
+import {Divider} from "@shared/components/Divider";
 
 export class ONas extends React.Component {
     constructor(props) {
@@ -35,7 +36,7 @@ export class ONas extends React.Component {
                     {config.staff.map((person, key, list) => (
                         <div key={key}>
                             <StaffItem person={person} />
-                            {list.length - 1 !== key ? <div className="is-divider" /> : null}
+                            {list.length - 1 !== key ? <Divider /> : null}
                         </div>
                     ))}
                     <p style={{ margin: '15px', wordWrap: 'break-word' }} className="fontSizeMedium">

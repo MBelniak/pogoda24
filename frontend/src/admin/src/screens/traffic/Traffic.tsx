@@ -8,6 +8,7 @@ import {SiteViewsChart} from '../../charts/SiteViewsChart';
 import {TopImage} from '../components/TopImage';
 import Copyright from '@shared/components/Copyright';
 import {Link} from 'react-router-dom';
+import {Divider} from "@shared/components/Divider";
 
 const daysBackInputConstraint = (text: string): boolean => {
     return parseInt(text) >= 0 && parseInt(text) <= 9999;
@@ -172,7 +173,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                                 )}
                             </div>
                         </div>
-                        <div className="is-divider"/>
+                        <Divider />
                         <div>
                             <p>
                                 Całkowita liczba odwiedzin strony:{' '}
@@ -208,7 +209,7 @@ export default class Traffic extends React.Component<{}, TrafficState> {
                             </p>
                         </div>
                     </div>
-                    <div className="is-divider"/>
+                    <Divider />
                     <Link to="/write" className="button">
                         Wróć
                     </Link>

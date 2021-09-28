@@ -30,6 +30,7 @@ import FileDropper from '../components/FileDropper';
 import { showInfoModal } from '../components/modals/InfoModalWindow';
 import FileToUploadItem from '../writer/FileToUploadItem';
 import Writer from '../writer/Writer';
+import {Divider} from "@shared/components/Divider";
 
 const { BACKEND_DATE_FORMAT } = config;
 
@@ -221,7 +222,7 @@ export default class FactWriter extends Writer {
                             />
                         </div>
                         <textarea id="suneditor" />
-                        <div className="is-divider" />
+                        <Divider />
                         <p>
                             Dodaj zdjęcie główne. Będzie ono wyświetlone w skróconej wersji artykułu. Możesz przeciągnąć
                             swoje pliki z dysku na kreskowane pole:
@@ -255,7 +256,7 @@ export default class FactWriter extends Writer {
                                 </div>
                             </>
                         )}
-                        <div className="is-divider" />
+                        <Divider />
                         <input type="button" className="button" value="Wyślij" onClick={this.handleSubmit} />
                         {this.props.postToEdit ? (
                             <input

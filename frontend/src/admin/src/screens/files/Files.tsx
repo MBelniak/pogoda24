@@ -4,6 +4,7 @@ import { TopImage } from '../components/TopImage';
 import warningImg from '../../img/warning.png';
 import thunderWarningImg from '../../img/thunderWarning.png';
 import { Link } from 'react-router-dom';
+import {Divider} from "@shared/components/Divider";
 
 export default class Files extends React.Component {
     render() {
@@ -21,7 +22,7 @@ export default class Files extends React.Component {
                             <span>Mapa do ostrzeżeń burzowych</span>
                         </div>
                     </div>
-                    <div className="is-divider"/>
+                    <Divider />
                     <Link to="/write" className="button">
                         Wróć
                     </Link>
