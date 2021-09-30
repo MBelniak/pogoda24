@@ -5,10 +5,13 @@ import config from './config/config';
 const suneditorStyle = require('suneditor/dist/css/suneditor.min.css');
 import './sass/main.scss';
 import App from './App';
+import jQuery from 'jquery';
 
 const images = require.context('./img/', false, /\.(png|jpe?g|svg)$/);
 
 const { cloud_name, upload_preset, api_key, api_secret } = config;
+
+jQuery("#root").addClass("Dupa");
 
 ReactDOM.render(
     <CloudinaryContext cloudName={cloud_name} api_key={api_key} api_secret={api_secret} upload_preset={upload_preset}>

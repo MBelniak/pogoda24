@@ -6,6 +6,9 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const webpack = require('webpack');
 const path = require('path');
 const dotenv = require('dotenv').config();
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+const isProd = process.env.NODE_ENV === 'production';
 
 module.exports = {
     entry: {
@@ -14,14 +17,16 @@ module.exports = {
     },
     output: {
         path: path.resolve('dist'),
-        filename: `[name].bundle${process.env.NODE_ENV === 'production' ? '.min' : ''}.js`,
-        publicPath: '/'
+        filename: `[name].bundle${isProd ? '.min' : ''}.js`,
+        publicPath: '/',
+        library: 'MyApp',
+        libraryTarget: 'amd'
     },
     optimization: {
         splitChunks: {
             chunks: 'all'
         },
-        minimize: process.env.NODE_ENV === 'production',
+        minimize: isProd,
         minimizer: [new TerserPlugin()]
     },
     devServer: {
@@ -30,11 +35,12 @@ module.exports = {
         historyApiFallback: {
             rewrites: [{ from: /^\/(writer?|traffic|factwriter|list|files|generator)$/, to: '/admin.html' }]
         },
+        writeToDisk: true,
         watchContentBase: true,
         contentBase: path.resolve('src')
     },
     mode: process.env.NODE_ENV,
-    devtool: process.env.NODE_ENV === 'production' ? false : 'inline-module-source-map',
+    devtool: isProd ? false : 'inline-module-source-map',
     resolve: {
         modules: ['src/admin', 'src/public', 'src/shared', 'node_modules'],
         symlinks: true,
@@ -42,6 +48,9 @@ module.exports = {
         alias: {
             '@shared': path.resolve('src/shared')
         }
+    },
+    externals: {
+      jquery: 'jquery'
     },
     module: {
         rules: [
@@ -90,6 +99,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './src/public/public/index.html',
             filename: './index.html',
+            inject: 'head',
             excludeChunks: ['admin', 'vendors~admin'],
             stats: { children: false },
             favicon: './src/public/public/favicon.png'
@@ -97,6 +107,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: './src/admin/public/index.html',
             filename: './admin.html',
+            inject: 'head',
             excludeChunks: ['main', 'vendors~main'],
             stats: { children: false },
             favicon: './src/admin/public/favicon.png'
@@ -104,6 +115,18 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin(),
         new MiniCssExtractPlugin({
             filename: 'css/[name].css'
+        }),
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    from: 'node_modules/requirejs/require.js',
+                    to: 'vendors/require.js'
+                },
+                {
+                    from: `node_modules/jquery/dist/jquery${isProd ? '.min' : ''}.js`,
+                    to: 'vendors/jquery.js'
+                }
+            ]
         }),
         new webpack.DefinePlugin({
             'process.env': JSON.stringify(dotenv.parsed)
