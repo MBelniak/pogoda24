@@ -17,7 +17,7 @@ export default class App extends React.Component {
                     <Route exact path="/write" component={MainPage} />
                     <Route path="/writer" component={Writer} />
                     <Route path="/factwriter" component={FactWriter} />
-                    <Route path="/list" component={PostsList} />
+                    <Route path="/list(\?page=\d+)?" component={PostsList} />
                     <Route path="/traffic" component={Traffic} />
                     <Route path="/files" component={Files} />
                     <Route path="/generator" component={Generator} />

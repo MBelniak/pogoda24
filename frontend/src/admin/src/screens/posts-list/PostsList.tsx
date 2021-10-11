@@ -12,6 +12,7 @@ import {Link} from 'react-router-dom';
 import PagingBar from '@shared/components/PagingBar';
 import styles from '@shared/scss/main.scss';
 import {Divider} from "@shared/components/Divider";
+import queryString from "query-string";
 
 interface State {
     posts: Post[] | undefined;
@@ -24,15 +25,16 @@ export default class PostsList extends React.Component<{}, State> {
     private postsPerPage = 10;
     private abortController;
 
-    state: State = {
-        posts: undefined,
-        totalPostsCount: 0,
-        currentPage: 0,
-        postToEdit: undefined
-    };
-
     constructor(props) {
         super(props);
+        const pageParam = queryString.parse(location.search).page;
+        const currentPage = pageParam ? Array.isArray(pageParam) ? pageParam[0] : parseInt(pageParam) - 1 : 0;
+        this.state = {
+            posts: undefined,
+            totalPostsCount: 0,
+            currentPage,
+            postToEdit: undefined
+        } as State;
         this.initiatePostEdit = this.initiatePostEdit.bind(this);
         this.onFinishEditing = this.onFinishEditing.bind(this);
         this.handlePageClick = this.handlePageClick.bind(this);
@@ -46,12 +48,12 @@ export default class PostsList extends React.Component<{}, State> {
     private onFinishEditing() {
         showModal(<LoadingIndicator/>);
         this.setState({postToEdit: undefined});
-        this.fetchPostsFromApi(0).finally(closeModal);
+        this.fetchPostsFromApi().finally(closeModal);
     }
 
-    private async fetchPostsFromApi(page: number): Promise<void> {
+    private async fetchPostsFromApi(): Promise<void> {
         try {
-            const response = await fetchApi('api/posts?page=' + page + '&count=' + this.postsPerPage, {
+            const response = await fetchApi('api/posts?page=' + this.state.currentPage + '&count=' + this.postsPerPage, {
                 signal: this.abortController.signal
             });
             if (response && response.ok) {
@@ -70,9 +72,13 @@ export default class PostsList extends React.Component<{}, State> {
 
     private handlePageClick(data) {
         const selected = data.selected;
-        this.setState({posts: undefined, currentPage: selected});
-        showModal(<LoadingIndicator/>);
-        this.fetchPostsFromApi(selected).finally(closeModal);
+        this.setState({posts: undefined, currentPage: selected}, () => {
+            showModal(<LoadingIndicator/>);
+            this.fetchPostsFromApi().finally(closeModal);
+            const pageParams = queryString.parse(location.search)
+            pageParams.page = `${this.state.currentPage + 1}`;
+            window.history.replaceState(null, "", `?${queryString.stringify(pageParams)}`);
+        });
     }
 
     async componentDidMount() {
@@ -81,7 +87,7 @@ export default class PostsList extends React.Component<{}, State> {
             const response = await fetchApi('api/posts/count', {signal: this.abortController.signal});
             const data = await response.json();
             this.setState({totalPostsCount: data});
-            await this.fetchPostsFromApi(0);
+            await this.fetchPostsFromApi();
         } catch (error) {
             console.log(error);
         } finally {
@@ -140,7 +146,7 @@ export default class PostsList extends React.Component<{}, State> {
                                     fontColor={'white'}
                                 />
                             )}
-                            <Divider />
+                            <Divider/>
                             <Link to="/write" className="button">
                                 Wróć
                             </Link>

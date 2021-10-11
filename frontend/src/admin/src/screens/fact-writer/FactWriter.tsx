@@ -49,7 +49,7 @@ export default class FactWriter extends Writer {
         if (this.props.postToEdit) {
             const post = this.props.postToEdit;
             let target = document.getElementsByClassName('se-wrapper')[0];
-            target.innerHTML = post.description.replace(/\\"/g, '"');
+            target.innerHTML = JSON.parse(post.description);
             this.titleInput.current.value = post.title;
             target = document.getElementsByClassName('se-wrapper-inner')[0];
             target.setAttribute('contenteditable', 'true');

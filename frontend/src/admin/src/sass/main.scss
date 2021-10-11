@@ -195,8 +195,19 @@ p, span {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-end;
     width: 100%;
+}
+
+@media all and (min-width: $tablet) {
+    .postIconList {
+        justify-content: flex-end;
+    }
+}
+
+@media all and (max-width: $tablet) {
+    .postIconList {
+        justify-content: flex-start;
+    }
 }
 
 .postIconListItem {
