@@ -48,11 +48,13 @@ export default class FactWriter extends Writer {
     private initializeEditor() {
         if (this.props.postToEdit) {
             const post = this.props.postToEdit;
-            let target = document.getElementsByClassName('se-wrapper')[0];
-            target.innerHTML = JSON.parse(post.description);
             this.titleInput.current.value = post.title;
-            target = document.getElementsByClassName('se-wrapper-inner')[0];
+            const div = document.createElement('div');
+            div.innerHTML = post.description;
+            const innerDescription = div.getElementsByClassName('se-wrapper-inner')[0].innerHTML;
+            let target = document.getElementsByClassName('se-wrapper-inner')[0];
             target.setAttribute('contenteditable', 'true');
+            target.innerHTML = innerDescription;
         }
     }
 
@@ -119,9 +121,8 @@ export default class FactWriter extends Writer {
     protected getDescription() {
         let target = document.getElementsByClassName('se-wrapper-inner')[0];
         target.setAttribute('contenteditable', 'false');
-        target = document.getElementsByClassName('se-wrapper')[0].cloneNode(true) as HTMLElement;
-        let description = JSON.stringify(target.innerHTML);
-        return description.substr(1, description.length - 2);
+        target = document.getElementsByClassName('se-wrapper')[0];
+        return target.innerHTML;
     }
 
     private static reloadPage() {
@@ -182,7 +183,6 @@ export default class FactWriter extends Writer {
                 list,
                 horizontalRule,
                 table,
-                image,
                 fontSize,
                 formatBlock,
                 paragraphStyle,

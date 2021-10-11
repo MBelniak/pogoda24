@@ -6,8 +6,6 @@ import App from './App';
 const suneditorStyle = require('suneditor/dist/css/suneditor.min.css');
 import './sass/main.scss';
 
-// const Navigation = require('shared24').Navigation;
-
 const { cloud_name, upload_preset, api_key, api_secret } = config;
 
 ReactDOM.render(
