@@ -43,59 +43,73 @@ public class PostService {
     }
 
     public List<Post> getPostsOrderedByDate() {
-        CollectionReference posts = firestore.collection(POSTS_COLLECTION);
-        Query query = posts.orderBy("postDate", Query.Direction.DESCENDING);
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-        try {
-            return querySnapshot.get().toObjects(Post.class);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return getPostsOrderedByDate(null, null);
     }
 
-    public List<Post> getPostsOrderedByDate(PostType postType) {
+    public List<Post> getPostsOrderedByDate(PostType postType, String filter) {
         CollectionReference postsCollection = firestore.collection(POSTS_COLLECTION);
-        Query query = postsCollection.orderBy("postDate", Query.Direction.DESCENDING);
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-        try {
-            List<Post> posts = querySnapshot.get().toObjects(Post.class);
-            return posts.stream().filter(post -> post.getPostType() == postType).collect(Collectors.toList());
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+        Query query;
 
-    public List<Post> getPostsOrderedByDate(int page, int pageSize) {
-        CollectionReference postsCollection = firestore.collection(POSTS_COLLECTION);
-        Query query = postsCollection.orderBy("postDate", Query.Direction.DESCENDING).limit(pageSize).offset(page * pageSize);
-        ApiFuture<QuerySnapshot> querySnapshot = query.get();
-        try {
-            return querySnapshot.get().toObjects(Post.class);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            return null;
+        if (filter != null) {
+            query = postsCollection.orderBy("title").startAt(filter).endAt(filter + "\uf8ff");
+        } else {
+            query = postsCollection.orderBy("postDate", Query.Direction.DESCENDING);
         }
-    }
 
-    public List<Post> getPostsOrderedByDate(PostType postType, int page, int pageSize) {
-        CollectionReference postsCollection = firestore.collection(POSTS_COLLECTION);
-        Query query = postsCollection.orderBy("postDate", Query.Direction.DESCENDING);
         ApiFuture<QuerySnapshot> querySnapshot = query.get();
         try {
-            List<Post> posts = querySnapshot.get().toObjects(Post.class);
-            posts = posts.stream().filter(post -> post.getPostType() == postType).collect(Collectors.toList());
-            if (page * pageSize + pageSize <= posts.size()) {
-                return posts.subList(page * pageSize, page * pageSize + pageSize);
-            } else if (page * pageSize <= posts.size()) {
-                return posts.subList(page * pageSize, posts.size());
+            if (postType != null) {
+                List<Post> posts = querySnapshot.get().toObjects(Post.class);
+                return posts.stream().filter(post -> post.getPostType() == postType).collect(Collectors.toList());
             } else {
-                return new ArrayList<>();
+                return querySnapshot.get().toObjects(Post.class);
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public List<Post> getPostsOrderedByDate(String postType, Integer page, Integer pageSize, String filter) {
+        if (page == null) {
+            return this.getPostsOrderedByDate(PostType.valueOf(postType), filter);
+        }
+
+        CollectionReference postsCollection = firestore.collection(POSTS_COLLECTION);
+
+        Query query;
+
+        if (filter != null) {
+            query = postsCollection.orderBy("title").startAt(filter).endAt(filter + "\uf8ff");
+        } else {
+            query = postsCollection.orderBy("postDate", Query.Direction.DESCENDING);
+        }
+
+        if (postType == null) {
+            query = query.limit(pageSize).offset(page * pageSize);
+            ApiFuture<QuerySnapshot> querySnapshot = query.get();
+            try {
+                return querySnapshot.get().toObjects(Post.class);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            ApiFuture<QuerySnapshot> querySnapshot = query.get();
+            try {
+                List<Post> posts = querySnapshot.get().toObjects(Post.class);
+                posts = posts.stream().filter(post -> post.getPostType() == PostType.valueOf(postType)).collect(Collectors.toList());
+                if (page * pageSize + pageSize <= posts.size()) {
+                    return posts.subList(page * pageSize, page * pageSize + pageSize);
+                } else if (page * pageSize <= posts.size()) {
+                    return posts.subList(page * pageSize, posts.size());
+                } else {
+                    return new ArrayList<>();
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 
@@ -118,9 +132,18 @@ public class PostService {
         firestore.collection(POSTS_COLLECTION).document(id).delete();
     }
 
-    public int getPostCount() {
+    public int getPostCount(String filter) {
         CollectionReference posts = firestore.collection(POSTS_COLLECTION);
-        ApiFuture<QuerySnapshot> querySnapshot = posts.get();
+
+        ApiFuture<QuerySnapshot> querySnapshot;
+
+        if (filter != null) {
+            Query query = posts.orderBy("title").startAt(filter).endAt(filter + "\uf8ff");
+            querySnapshot = query.get();
+        } else {
+            querySnapshot = posts.get();
+        }
+
         try {
             return querySnapshot.get().size();
         } catch (InterruptedException | ExecutionException e) {
@@ -129,9 +152,17 @@ public class PostService {
         }
     }
 
-    public int getPostCount(PostType postType) {
+    public int getPostCount(PostType postType, String filter) {
         CollectionReference posts = firestore.collection(POSTS_COLLECTION);
-        ApiFuture<QuerySnapshot> querySnapshot = posts.whereEqualTo("postType", postType.toString()).get();
+        ApiFuture<QuerySnapshot> querySnapshot;
+
+        if (filter != null) {
+            Query query = posts.whereEqualTo("postType", postType.toString()).orderBy("title").startAt(filter).endAt(filter + "\uf8ff");
+            querySnapshot = query.get();
+        } else {
+            querySnapshot = posts.whereEqualTo("postType", postType.toString()).get();
+        }
+
         try {
             return querySnapshot.get().size();
         } catch (InterruptedException | ExecutionException e) {

@@ -98,7 +98,7 @@ p, span {
 
 .title {
     text-align: left;
-    margin-top: 0.7rem;
+    margin: 0.7rem 0;
 }
 
 .subtitle {
@@ -184,10 +184,31 @@ p, span {
     color: $primary-color;
     margin-bottom: 0.7rem;
 }
+
+.postsListHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 0.7rem 0;
+}
+
+.filterBarContainer {
+    margin: 0.7rem 0;
+    width: 30%;
+}
+
+.filterBar {
+
+}
+
+.filterBar__font-awesome {
+    font-family: FontAwesome;
+}
+
 .postsListItem {
     border: 2px solid $secondary-color;
     border-radius: 10px;
-    margin: 0.7rem;
+    margin: 0.7rem 0;
     color: white;
 }
 

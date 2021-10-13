@@ -34,36 +34,31 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public ResponseEntity<Integer> getPostCount(@RequestParam(required = false) String postType) {
+    public ResponseEntity<Integer> getPostCount(@RequestParam(required = false) String postType,
+                                                @RequestParam(required = false) String filter) {
         if (postType != null) {
             if (!PostType.contains(postType)) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             } else {
-                return new ResponseEntity<>(postService.getPostCount(PostType.valueOf(postType)), HttpStatus.OK);
+                return new ResponseEntity<>(postService.getPostCount(PostType.valueOf(postType), filter), HttpStatus.OK);
             }
         }
-        return new ResponseEntity<>(postService.getPostCount(), HttpStatus.OK);
+        return new ResponseEntity<>(postService.getPostCount(filter), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<List<Post>> getPosts(@RequestParam(required = false) String postType,
                                @RequestParam(required = false) Integer page,
-                               @RequestParam(required = false) Integer count) {
-        if (postType != null) {
-            if (!PostType.contains(postType)) {
+                               @RequestParam(required = false) Integer count,
+                               @RequestParam(required = false) String filter) {
+        if (postType != null && !PostType.contains(postType)) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            } else {
-                if (page == null || count == null) {
-                    return new ResponseEntity<>(postService.getPostsOrderedByDate(PostType.valueOf(postType)), HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>(postService.getPostsOrderedByDate(PostType.valueOf(postType), page, count), HttpStatus.OK);
-                }
-            }
-        } else if (page == null || count == null) {
-            return new ResponseEntity<>(postService.getPostsOrderedByDate(), HttpStatus.OK);
+        }
+        if (page != null && count == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(postService.getPostsOrderedByDate(page, count), HttpStatus.OK);
+        return new ResponseEntity<>(postService.getPostsOrderedByDate(postType, page, count, filter), HttpStatus.OK);
     }
 
     @Override

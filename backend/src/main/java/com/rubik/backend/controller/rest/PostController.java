@@ -16,12 +16,14 @@ import java.util.List;
 public interface PostController {
 
     @GetMapping("/count")
-    ResponseEntity<Integer> getPostCount(@RequestParam(required = false) String postType);
+    ResponseEntity<Integer> getPostCount(@RequestParam(required = false) String postType,
+                                         @RequestParam(required = false) String filter);
 
     @GetMapping("")
     ResponseEntity<List<Post>> getPosts(@RequestParam(required = false) String postType,
                                                @RequestParam(required = false) Integer page,
-                                               @RequestParam(required = false) Integer count);
+                                               @RequestParam(required = false) Integer count,
+                                        @RequestParam(required = false) String filter);
 
     @GetMapping("/{id}")
     Post getPost(@PathVariable("id") String postId, HttpServletRequest request);
