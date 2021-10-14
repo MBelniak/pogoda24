@@ -42,7 +42,7 @@ export const FilterBar = (props: FilterBarProps) => {
     }, []);
 
     return <div className={"filterBarContainer"}>
-        <input className="input filterBar search filterBar__font-awesome" type="text" maxLength={100}
+        <input className="input filterBar__font-awesome" type="text" maxLength={100}
                placeholder='&#xf002;'
                onFocus={handleFocus}
                onBlur={handleBlur}

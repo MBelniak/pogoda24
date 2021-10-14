@@ -7,6 +7,7 @@ const webpack = require('webpack');
 const path = require('path');
 const dotenv = require('dotenv').config();
 
+const isProd = process.env.NODE_ENV === 'production';
 module.exports = {
     entry: {
         main: ['@babel/polyfill', './src/public/src/index.tsx'],
@@ -14,14 +15,14 @@ module.exports = {
     },
     output: {
         path: path.resolve('dist'),
-        filename: `[name].bundle${process.env.NODE_ENV === 'production' ? '.min' : ''}.js`,
+        filename: `[name].bundle${isProd ? '.[hash].min' : ''}.js`,
         publicPath: '/'
     },
     optimization: {
         splitChunks: {
             chunks: 'all'
         },
-        minimize: process.env.NODE_ENV === 'production',
+        minimize: isProd,
         minimizer: [new TerserPlugin()]
     },
     devServer: {
@@ -34,7 +35,7 @@ module.exports = {
         contentBase: path.resolve('src')
     },
     mode: process.env.NODE_ENV,
-    devtool: process.env.NODE_ENV === 'production' ? false : 'inline-module-source-map',
+    devtool: isProd ? false : 'inline-module-source-map',
     resolve: {
         modules: ['src/admin', 'src/public', 'src/shared', 'node_modules'],
         symlinks: true,
@@ -72,7 +73,7 @@ module.exports = {
                     {
                         loader: 'sass-loader',
                         options: {
-                            sourceMap: process.env.NODE_ENV !== 'production'
+                            sourceMap: !isProd
                         }
                     }
                 ]
@@ -103,7 +104,7 @@ module.exports = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new MiniCssExtractPlugin({
-            filename: 'css/[name].css'
+            filename: `css/[name]${isProd ? '.[hash]' : ''}.css`
         }),
         new webpack.DefinePlugin({
             'process.env': JSON.stringify(dotenv.parsed)
